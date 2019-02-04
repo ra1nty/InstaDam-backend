@@ -13,7 +13,7 @@ pip install -r requirements.txt
 python manage.py start
 ```
 
-start a production server (PostgreSQL) :
+~~start a production server (PostgreSQL) : ~~
 ```
 python manage.py initdb --mode=production
 python manage.py start --mode=production
