@@ -12,7 +12,7 @@ before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
 
 script:
-  - py.test --cov-report=xml --cov=tinderoot tests/
+  - py.test --cov-report=xml --cov=instadam tests/
 
 after_success:
-  - codecov
+  - codecov --token=de8254db-773b-4c7c-a847-05943628b8e0
