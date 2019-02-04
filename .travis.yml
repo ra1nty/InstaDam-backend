@@ -15,4 +15,4 @@ script:
   - py.test --cov-report=xml --cov=tinderoot tests/
 
 after_success:
-  - codecov --token=12c92463-53d5-4167-92ad-ee3651218a6a
+  - codecov
