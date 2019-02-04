@@ -29,6 +29,9 @@ def cli():
 @click.option('--mode', default='development', help='production/development')
 def start(mode):
     app = create_app(mode)
+    if mode == 'development':
+        with app.app_context():
+            db.create_all() # init in-memory Sqlite
     app.run(host='0.0.0.0', port=8080)
 
 @cli.command()
