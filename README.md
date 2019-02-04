@@ -7,9 +7,14 @@ Backend API server for InstaDam, an application to create ground truth pixel-wis
 
 ## Quickstart
 
-Start a development server:
+Start a development server (Use In-memory Sqlite) :
 ```
 pip install -r requirements.txt 
-python manage.py initdb
 python manage.py start
+```
+
+start a production server (PostgreSQL) :
+```
+python manage.py initdb --mode=production
+python manage.py start --mode=production
 ```
