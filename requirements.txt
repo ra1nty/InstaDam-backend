@@ -1,0 +1,6 @@
+pytest
+pytest-cov
+flask
+flask-sqlalchemy
+psycopg2
+codecov

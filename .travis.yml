@@ -1,0 +1,18 @@
+dist: xenial
+language: python
+python: 3.7
+
+services:
+  - postgresql
+
+install:
+  - pip install -r requirements.txt
+
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
+
+script:
+  - py.test --cov-report=xml --cov=tinderoot tests/
+
+after_success:
+  - codecov --token=12c92463-53d5-4167-92ad-ee3651218a6a
