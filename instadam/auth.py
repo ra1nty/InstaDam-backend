@@ -64,7 +64,11 @@ def register():
     username = req['username']
     password = req['password']
     email = req['email']
-    credential_checking(password, email)
+
+    try:
+        credential_checking(password, email)
+    except IntegrityError:
+        abort(401)
 
     user = User(username=username, email=email)
     user.set_password(password)
