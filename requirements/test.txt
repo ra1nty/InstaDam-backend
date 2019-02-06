@@ -1,3 +1,6 @@
+flask
+flask-sqlalchemy
+psycopg2
 pytest
 pytest-cov
 codecov
