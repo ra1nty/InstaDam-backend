@@ -1,12 +1,17 @@
 class Config(object):
     # Some default config
+    DEVELOPMENT = False
+    TESTING = False
+
     MAIL_SERVER = 'smtp.localhost.test'
     MAIL_DEFAULT_SENDER = 'admin@demo.test'
 
 class Development(Config):
     """
-    Testing config
+    Development config
     """
+    DEVELOPMENT = True
+
     SECRET_KEY = "Some really random string"
     SQLALCHEMY_DATABASE_URI = 'sqlite://' # In-memory sqlite db
     SQLALCHEMY_ECHO = True
@@ -32,6 +37,8 @@ class Testing(Config):
     """
     Testing config
     """
+    TESTING = True
+
     SECRET_KEY = ""
     _SQLALCHEMY_DATABASE_DATABASE = 'travis_ci_test'
     _SQLALCHEMY_DATABASE_HOSTNAME = 'localhost'

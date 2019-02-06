@@ -1,6 +1,6 @@
 pytest
 pytest-cov
+codecov
 flask
 flask-sqlalchemy
 psycopg2
-codecov
