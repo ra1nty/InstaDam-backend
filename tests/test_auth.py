@@ -1,6 +1,3 @@
-from instadam.utils.auth import verify_token
-
-
 def register(client, email, username, password):
     return client.post(
         '/register',
