@@ -11,10 +11,15 @@ setup(
    author='',
    author_email='',
    url="",
-   packages=[''], # instadam-backend
+   packages=[''], # instadam-backend 
+   tests_require = [
+      'pytest',
+      'pytest-cov',
+      'codecov',
+   ],
    install_requires = [
       'flask>=1.0.2', 
       'flask-sqlalchemy', 
       'psycopg2', 
-      ], 
+   ],
 )
