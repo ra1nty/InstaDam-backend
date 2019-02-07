@@ -53,7 +53,7 @@ def test_auth(client):
 
 
 def test_register(client):
-    rv = register(client, 'someone@illinois.edu', 'test0', 'password')
+    rv = register(client, 'someone1@illinois.edu', 'test1', 'password')
     code = rv.status
     json_data = rv.get_json()
     assert code == '201 CREATED'
@@ -69,6 +69,6 @@ def test_register(client):
     code = rv.status
     assert code == '400 BAD REQUEST'
 
-    rv = register(client, 'someone@illinois.edu', 'test0', 'password')
+    rv = register(client, 'someone1@illinois.edu', 'test1', 'password')
     code = rv.status
     assert code == '401 UNAUTHORIZED'
