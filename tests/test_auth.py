@@ -13,7 +13,7 @@ def login(client, username, password):
 
 def test_auth(client):
     """Make sure login works."""
-    rv = register(client, 'someone@illinois.edu', 'test0', 'password')
+    rv = register(client, 'someone@illinois.edu', 'test0', 'Password0')
     code = rv.status
     json_data = rv.get_json()
     assert code == '201 CREATED'
