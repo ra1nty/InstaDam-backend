@@ -69,3 +69,36 @@ def test_register(client):
     rv = register(client, 'someone1@illinois.edu', 'test1', 'password')
     code = rv.status
     assert code == '401 UNAUTHORIZED'
+
+
+def test_logout(client):
+    rv = register(client, 'someone2@illinois.edu', 'test2', 'password')
+    code = rv.status
+    json_data = rv.get_json()
+    assert code == '201 CREATED'
+    assert 'access_token' in json_data
+    access_token = json_data['access_token']
+
+    rv = login(client, 'test2', 'password')
+    code = rv.status
+    assert code == '201 CREATED'
+    assert 'access_token' in json_data
+
+    rv = client.delete(
+        '/logout',
+        follow_redirects=True,
+        headers={'Authorization': 'Bearer %s' % access_token})
+    json_data = rv.get_json()
+    code = rv.status
+    assert code == '200 OK'
+    assert 'msg' in json_data
+    assert 'Logged out' == json_data['msg']
+
+    # Try logout again  should fail
+    rv = client.delete(
+        '/logout',
+        follow_redirects=True,
+        headers={'Authorization': 'Bearer %s' % access_token})
+    json_data = rv.get_json()
+    code = rv.status
+    assert code == '401 UNAUTHORIZED'

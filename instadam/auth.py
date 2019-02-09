@@ -1,12 +1,15 @@
-from .app import db
+from .app import db, jwt
 from .models.user import User
-from flask import (
-    Blueprint, request, abort, jsonify, g
-)
+from .models.invoked_token import InvokedToken
+from flask import (Blueprint, request, abort, jsonify, g)
 from .utils.auth import generate_token, requires_auth
 from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import (JWTManager, jwt_required, get_jwt_identity,
+                                create_access_token, create_refresh_token,
+                                jwt_refresh_token_required, get_raw_jwt)
 
 bp = Blueprint('auth', __name__, url_prefix='')
+
 
 @bp.route('/login', methods=['POST'])
 def login():
@@ -25,8 +28,12 @@ def login():
     user = User.query.filter_by(username=req['username']).first()
     if user is not None:
         if user.verify_password(req['password']):
-            return jsonify({'access_token' : generate_token(user)}), 201
+            return jsonify({
+                'access_token':
+                create_access_token(identity=user.username)
+            }), 201
     abort(401)
+
 
 @bp.route('/register', methods=['POST'])
 def register():
@@ -52,4 +59,24 @@ def register():
         abort(401)
     else:
         db.session.commit()
-    return jsonify({'access_token' : generate_token(user)}), 201
+    return jsonify({
+        'access_token': create_access_token(identity=user.username)
+    }), 201
+
+
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    jti = decrypted_token['jti']
+    token = InvokedToken.query.filter_by(jti=jti).first()
+    return not token is None
+
+
+@bp.route('/logout', methods=['DELETE'])
+@jwt_required
+def logout():
+    jti = get_raw_jwt()['jti']
+    token = InvokedToken(jti=jti)
+    db.session.add(token)
+    db.session.flush()
+    db.session.commit()
+    return jsonify({'msg': 'Logged out'}), 200

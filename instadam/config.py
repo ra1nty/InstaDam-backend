@@ -2,6 +2,8 @@ class Config(object):
     # Some default config
     MAIL_SERVER = 'smtp.localhost.test'
     MAIL_DEFAULT_SENDER = 'admin@demo.test'
+    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_TOKEN_CHECKS = ['access']
 
 class Development(Config):
     """
