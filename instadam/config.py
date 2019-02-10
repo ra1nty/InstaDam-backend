@@ -34,7 +34,7 @@ class Testing(Config):
     """
     Testing config
     """
-    SECRET_KEY = ""
+    SECRET_KEY = "Some really random string"
     _SQLALCHEMY_DATABASE_DATABASE = 'travis_ci_test'
     _SQLALCHEMY_DATABASE_HOSTNAME = 'localhost'
     _SQLALCHEMY_DATABASE_PASSWORD = ''
