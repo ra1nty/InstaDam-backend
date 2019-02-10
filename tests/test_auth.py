@@ -94,7 +94,7 @@ def test_logout(client):
     assert 'msg' in json_data
     assert 'Logged out' == json_data['msg']
 
-    # Try logout again  should fail
+    # Try logout again should fail
     rv = client.delete(
         '/logout',
         follow_redirects=True,
