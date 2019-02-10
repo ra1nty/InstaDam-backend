@@ -2,6 +2,8 @@ class Config(object):
     # Some default config
     MAIL_SERVER = 'smtp.localhost.test'
     MAIL_DEFAULT_SENDER = 'admin@demo.test'
+    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_TOKEN_CHECKS = ['access']
 
 class Development(Config):
     """
@@ -32,7 +34,7 @@ class Testing(Config):
     """
     Testing config
     """
-    SECRET_KEY = ""
+    SECRET_KEY = "Some really random string"
     _SQLALCHEMY_DATABASE_DATABASE = 'travis_ci_test'
     _SQLALCHEMY_DATABASE_HOSTNAME = 'localhost'
     _SQLALCHEMY_DATABASE_PASSWORD = ''
