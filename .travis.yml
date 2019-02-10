@@ -15,4 +15,4 @@ script:
   - py.test --cov-report=xml --cov=instadam tests/
 
 after_success:
-  - codecov --token=de8254db-773b-4c7c-a847-05943628b8e0
+  - codecov
