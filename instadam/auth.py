@@ -1,12 +1,11 @@
-from .app import db, jwt
-from .models.user import User
-from .models.revoked_token import RevokedToken
-from flask import (Blueprint, request, abort, jsonify, g)
-from .utils.auth import generate_token, requires_auth
+from flask import Blueprint, abort, jsonify, request
+from flask_jwt_extended import (create_access_token, create_refresh_token,
+                                get_raw_jwt, jwt_required)
 from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import (JWTManager, jwt_required, get_jwt_identity,
-                                create_access_token, create_refresh_token,
-                                jwt_refresh_token_required, get_raw_jwt)
+
+from .app import db, jwt
+from .models.revoked_token import RevokedToken
+from .models.user import User
 
 bp = Blueprint('auth', __name__, url_prefix='')
 
