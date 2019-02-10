@@ -1,5 +1,7 @@
 flask
 flask-sqlalchemy
 psycopg2
-codecov
 flask-jwt-extended
+pytest
+pytest-cov
+codecov
