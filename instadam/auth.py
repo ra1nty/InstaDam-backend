@@ -1,6 +1,6 @@
 from .app import db, jwt
 from .models.user import User
-from .models.invoked_token import InvokedToken
+from .models.revoked_token import RevokedToken
 from flask import (Blueprint, request, abort, jsonify, g)
 from .utils.auth import generate_token, requires_auth
 from sqlalchemy.exc import IntegrityError
@@ -67,7 +67,7 @@ def register():
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
-    token = InvokedToken.query.filter_by(jti=jti).first()
+    token = RevokedToken.query.filter_by(jti=jti).first()
     return not token is None
 
 
@@ -75,7 +75,7 @@ def check_if_token_in_blacklist(decrypted_token):
 @jwt_required
 def logout():
     jti = get_raw_jwt()['jti']
-    token = InvokedToken(jti=jti)
+    token = RevokedToken(jti=jti)
     db.session.add(token)
     db.session.flush()
     db.session.commit()
