@@ -10,21 +10,25 @@ from .models.user import User
 
 bp = Blueprint('auth', __name__, url_prefix='')
 
+
 # Raises IntegrityError exception if values for request fields do not follow certain constraints
 def credential_checking(password, email):
     # Check password
     if len(password) < 8:
-        raise IntegrityError("Password should be longer than 8 characters.", password, "")
+        raise IntegrityError('Password should be longer than 8 characters.',
+                             password, '')
     has_digit = any([c.isdigit() for c in password])
     if not has_digit:
-        raise IntegrityError("Password must have at least one digit.", password, "")
+        raise IntegrityError('Password must have at least one digit.', password,
+                             '')
     has_upper = any([c.isupper() for c in password])
     if not has_upper:
-        raise IntegrityError("Password must have at least one uppercase letter.", password, "")
-    
+        raise IntegrityError(
+            'Password must have at least one uppercase letter.', password, '')
+
     # Check email
     if parseaddr(email) == ('', '') or '@' not in email:
-        raise IntegrityError("Please enter a valid email addresss.", email, "")
+        raise IntegrityError('Please enter a valid email addresss.', email, '')
 
 
 @bp.route('/login', methods=['POST'])
@@ -44,10 +48,9 @@ def login():
     user = User.query.filter_by(username=req['username']).first()
     if user is not None:
         if user.verify_password(req['password']):
-            return jsonify({
-                'access_token':
-                create_access_token(identity=user.username)
-            }), 201
+            return jsonify(
+                {'access_token':
+                 create_access_token(identity=user.username)}), 201
     abort(401)
 
 
@@ -65,15 +68,15 @@ def register():
     req = request.get_json()
     if 'username' not in req or 'password' not in req or 'email' not in req:
         abort(400)
-    
+
     username = req['username']
     password = req['password']
     email = req['email']
 
     try:
         credential_checking(password, email)
-    except IntegrityError:
-        abort(401)
+    except IntegrityError as e:
+        return jsonify({'msg': str(e.statement)}), 400
 
     user = User(username=username, email=email)
     user.set_password(password)
@@ -85,9 +88,8 @@ def register():
         abort(401)
     else:
         db.session.commit()
-    return jsonify({
-        'access_token': create_access_token(identity=user.username)
-    }), 201
+    return jsonify(
+        {'access_token': create_access_token(identity=user.username)}), 201
 
 
 @jwt.token_in_blacklist_loader

@@ -27,12 +27,12 @@ def test_auth(client):
     assert code == '201 CREATED'
     assert 'access_token' in json_data
 
-    rv = login(client, 'test0', 'password')
+    rv = login(client, 'test0', 'Password0')
     code = rv.status
     assert code == '201 CREATED'
     assert 'access_token' in json_data
 
-    rv = login(client, 'test0', 'password ')
+    rv = login(client, 'test0', 'Password0 ')
     code = rv.status
     assert code == '401 UNAUTHORIZED'
     json_data = rv.get_json()
@@ -50,7 +50,7 @@ def test_auth(client):
 
 
 def test_register(client):
-    rv = register(client, 'someone1@illinois.edu', 'test1', 'password')
+    rv = register(client, 'someone1@illinois.edu', 'test1', 'Password0')
     code = rv.status
     json_data = rv.get_json()
     assert code == '201 CREATED'
@@ -66,20 +66,20 @@ def test_register(client):
     code = rv.status
     assert code == '400 BAD REQUEST'
 
-    rv = register(client, 'someone1@illinois.edu', 'test1', 'password')
+    rv = register(client, 'someone1@illinois.edu', 'test1', 'Password0')
     code = rv.status
     assert code == '401 UNAUTHORIZED'
 
 
 def test_logout(client):
-    rv = register(client, 'someone2@illinois.edu', 'test2', 'password')
+    rv = register(client, 'someone2@illinois.edu', 'test2', 'Password0')
     code = rv.status
     json_data = rv.get_json()
     assert code == '201 CREATED'
     assert 'access_token' in json_data
     access_token = json_data['access_token']
 
-    rv = login(client, 'test2', 'password')
+    rv = login(client, 'test2', 'Password0')
     code = rv.status
     assert code == '201 CREATED'
     assert 'access_token' in json_data
@@ -102,3 +102,35 @@ def test_logout(client):
     json_data = rv.get_json()
     code = rv.status
     assert code == '401 UNAUTHORIZED'
+
+
+def test_credential_validation(client):
+    rv = register(client, 'someone3@illinois.edu', 'test3', 'Password0')
+    code = rv.status
+    json_data = rv.get_json()
+    assert code == '201 CREATED'
+    assert 'access_token' in json_data
+
+    rv = register(client, 'someone4@illinois.edu', 'test4', 'password')
+    code = rv.status
+    json_data = rv.get_json()
+    assert code == '400 BAD REQUEST'
+    assert 'msg' in json_data
+
+    rv = register(client, 'someone4@illinois.edu', 'test4', 'pass')
+    code = rv.status
+    json_data = rv.get_json()
+    assert code == '400 BAD REQUEST'
+    assert 'msg' in json_data
+
+    rv = register(client, 'someone4@illinois.edu', 'test4', 'password0')
+    code = rv.status
+    json_data = rv.get_json()
+    assert code == '400 BAD REQUEST'
+    assert 'msg' in json_data
+
+    rv = register(client, 'someone4#illinois.edu', 'test4', 'Password0')
+    code = rv.status
+    json_data = rv.get_json()
+    assert code == '400 BAD REQUEST'
+    assert 'msg' in json_data
