@@ -9,7 +9,7 @@ Backend API server for InstaDam, an application to create ground truth pixel-wis
 
 Start a development server (Use In-memory Sqlite) :
 ```
-pip install -r requirements.txt 
+pip install -r requirements.txt
 python manage.py start
 ```
 
