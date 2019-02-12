@@ -35,14 +35,10 @@ def test_auth(client):
     rv = login(client, 'test0', 'Password0 ')
     code = rv.status
     assert code == '401 UNAUTHORIZED'
-    json_data = rv.get_json()
-    assert json_data is None
 
     rv = login(client, 'test1', 'password ')
     code = rv.status
     assert code == '401 UNAUTHORIZED'
-    json_data = rv.get_json()
-    assert json_data is None
 
     rv = client.post('/login', json={'password': '1235'}, follow_redirects=True)
     code = rv.status

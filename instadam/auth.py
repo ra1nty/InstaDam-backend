@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import (create_access_token, create_refresh_token,
                                 get_raw_jwt, jwt_required)
 from sqlalchemy.exc import IntegrityError
@@ -44,14 +44,15 @@ def login():
     """
     req = request.get_json()
     if 'username' not in req or 'password' not in req:
-        abort(400)
+        return jsonify({'msg': 'Missing credentials'}), 400
+    username = req['username']
     user = User.query.filter_by(username=req['username']).first()
     if user is not None:
         if user.verify_password(req['password']):
             return jsonify(
                 {'access_token':
                  create_access_token(identity=user.username)}), 201
-    abort(401)
+    return jsonify({'msg': 'User %s not found' % username}), 401
 
 
 @bp.route('/register', methods=['POST'])
@@ -67,7 +68,7 @@ def register():
     """
     req = request.get_json()
     if 'username' not in req or 'password' not in req or 'email' not in req:
-        abort(400)
+        return jsonify({'msg': 'Missing credentials'}), 400
 
     username = req['username']
     password = req['password']
@@ -85,7 +86,7 @@ def register():
         db.session.flush()
     except IntegrityError:
         db.session.rollback()
-        abort(401)
+        return jsonify({'msg': 'User %s already exist' % username}), 401
     else:
         db.session.commit()
     return jsonify(
