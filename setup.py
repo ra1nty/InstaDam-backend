@@ -18,8 +18,9 @@ setup(
       'codecov',
    ],
    install_requires = [
-      'flask>=1.0.2', 
-      'flask-sqlalchemy', 
-      'psycopg2', 
+      'flask>=1.0.2',
+      'flask-sqlalchemy',
+      'psycopg2',
+      'flask-jwt-extended',
    ],
 )

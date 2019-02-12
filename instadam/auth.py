@@ -10,10 +10,14 @@ from .models.user import User
 
 bp = Blueprint('auth', __name__, url_prefix='')
 
-
-# Raises IntegrityError exception if values for request fields do not follow certain constraints
 def credential_checking(password, email):
-    # Check password
+    """Check the validity of the given user credential.
+
+    * Needs a refactoring
+
+    Raises:
+        IntegrityError: An error occurred when invalidate user credential is given
+    """
     if len(password) < 8:
         raise IntegrityError('Password should be longer than 8 characters.',
                              password, '')
@@ -33,13 +37,12 @@ def credential_checking(password, email):
 
 @bp.route('/login', methods=['POST'])
 def login():
-    """
-    User login endpoint for application
+    """User login endpoint for application
 
     Take POST data as json with userame and password.
     Return a json web token as access token.
 
-    Example:
+    Usage:
         POST /login
     """
     req = request.get_json()
@@ -57,13 +60,12 @@ def login():
 
 @bp.route('/register', methods=['POST'])
 def register():
-    """
-    User register endpoint for application
+    """User register endpoint for application
 
     Take POST data as json with userame and password.
     Return a json web token as access token.
 
-    Example:
+    Usage:
         POST /register
     """
     req = request.get_json()
@@ -103,6 +105,13 @@ def check_if_token_in_blacklist(decrypted_token):
 @bp.route('/logout', methods=['DELETE'])
 @jwt_required
 def logout():
+    """User logout endpoint for application
+
+    Invalidate the token in the request header
+
+    Usage:
+        DELETE /logout
+    """
     jti = get_raw_jwt()['jti']
     token = RevokedToken(jti=jti)
     db.session.add(token)
