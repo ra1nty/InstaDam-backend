@@ -13,6 +13,8 @@ bp = Blueprint('auth', __name__, url_prefix='')
 def credential_checking(password, email):
     """Check the validity of the given user credential.
 
+    * Needs a refactoring
+
     Raises:
         IntegrityError: An error occurred when invalidate user credential is given
     """
