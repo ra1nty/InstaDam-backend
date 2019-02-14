@@ -1,6 +1,11 @@
+import enum
 import datetime as dt
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..app import db
+
+class PrivelegesEnum(enum.Enum):
+    ADMIN = 'admin'
+    ANNOTATOR = 'annotator'
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -10,6 +15,7 @@ class User(db.Model):
     password = db.Column(db.String(128))
     created_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
+    priveleges = db.Column(db.Enum(PrivelegesEnum), nullable=False)
 
     def set_password(self, password):
         """
