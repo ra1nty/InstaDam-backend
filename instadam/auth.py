@@ -1,14 +1,18 @@
+from email.utils import parseaddr
+
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import (create_access_token, create_refresh_token,
                                 get_raw_jwt, jwt_required)
 from sqlalchemy.exc import IntegrityError
-from email.utils import parseaddr
 
 from .app import db, jwt
 from .models.revoked_token import RevokedToken
 from .models.user import User
+from .utils import construct_msg
+from .utils.exception import MsgException
 
 bp = Blueprint('auth', __name__, url_prefix='')
+
 
 def credential_checking(password, email):
     """Check the validity of the given user credential.
@@ -19,20 +23,17 @@ def credential_checking(password, email):
         IntegrityError: An error occurred when invalidate user credential is given
     """
     if len(password) < 8:
-        raise IntegrityError('Password should be longer than 8 characters.',
-                             password, '')
+        raise MsgException('Password should be longer than 8 characters.')
     has_digit = any([c.isdigit() for c in password])
     if not has_digit:
-        raise IntegrityError('Password must have at least one digit.', password,
-                             '')
+        raise MsgException('Password must have at least one digit.')
     has_upper = any([c.isupper() for c in password])
     if not has_upper:
-        raise IntegrityError(
-            'Password must have at least one uppercase letter.', password, '')
+        raise MsgException('Password must have at least one uppercase letter.')
 
     # Check email
     if parseaddr(email) == ('', '') or '@' not in email:
-        raise IntegrityError('Please enter a valid email addresss.', email, '')
+        raise MsgException('Please enter a valid email addresss.')
 
 
 @bp.route('/login', methods=['POST'])
@@ -55,7 +56,7 @@ def login():
             return jsonify(
                 {'access_token':
                  create_access_token(identity=user.username)}), 201
-    return jsonify({'msg': 'User %s not found' % username}), 401
+    return construct_msg('User %s not found' % username), 401
 
 
 @bp.route('/register', methods=['POST'])
@@ -78,8 +79,8 @@ def register():
 
     try:
         credential_checking(password, email)
-    except IntegrityError as e:
-        return jsonify({'msg': str(e.statement)}), 400
+    except MsgException as exception:
+        return construct_msg(exception), 400
 
     user = User(username=username, email=email)
     user.set_password(password)
@@ -88,7 +89,7 @@ def register():
         db.session.flush()
     except IntegrityError:
         db.session.rollback()
-        return jsonify({'msg': 'User %s already exist' % username}), 401
+        return construct_msg('User %s already exist' % username), 401
     else:
         db.session.commit()
     return jsonify(
@@ -117,4 +118,4 @@ def logout():
     db.session.add(token)
     db.session.flush()
     db.session.commit()
-    return jsonify({'msg': 'Logged out'}), 200
+    return construct_msg('Logged out'), 200
