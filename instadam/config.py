@@ -4,10 +4,13 @@
 import os
 DATABASE_USERNAME = 'postgres'
 DATABASE_PASSWORD = ''
+FLASK_SECRETE_KEY = ''
 if '_DB_USERNAME' in os.environ and os.environ['_DB_USERNAME'] is not None:
     DATABASE_USERNAME = os.environ['_DB_USERNAME']
 if '_DB_PASSWORD' in os.environ and os.environ['_DB_PASSWORD'] is not None:
     DATABASE_PASSWORD = os.environ['_DB_PASSWORD']
+if '_SECRETE_KEY' in os.environ and os.environ['_SECRETE_KEY'] is not None:
+    FLASK_SECRETE_KEY = os.environ['_SECRETE_KEY']
 
 
 class Config(object):
@@ -27,7 +30,7 @@ class Development(Config):
     """
     DEVELOPMENT = True
 
-    SECRET_KEY = "Some really random string"
+    SECRET_KEY = 'Some really random string'
     SQLALCHEMY_DATABASE_URI = 'sqlite://'  # In-memory sqlite db
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -36,7 +39,7 @@ class Development(Config):
 class Production(Config):
     """Production config
     """
-    SECRET_KEY = ""
+    SECRET_KEY = FLASK_SECRETE_KEY
     _SQLALCHEMY_DATABASE_DATABASE = ''
     _SQLALCHEMY_DATABASE_HOSTNAME = 'localhost'
     _SQLALCHEMY_DATABASE_PASSWORD = DATABASE_PASSWORD
@@ -53,7 +56,7 @@ class Production(Config):
 class Testing(Config):
     """Testing config
     """
-    SECRET_KEY = "Some really random string"
+    SECRET_KEY = 'Some really random string'
     _SQLALCHEMY_DATABASE_DATABASE = 'travis_ci_test'
     _SQLALCHEMY_DATABASE_HOSTNAME = 'localhost'
     _SQLALCHEMY_DATABASE_PASSWORD = DATABASE_PASSWORD
