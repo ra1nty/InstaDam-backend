@@ -7,7 +7,7 @@ DATABASE_PASSWORD = ''
 if '_DB_USERNAME' in os.environ and os.environ['_DB_USERNAME'] is not None:
     DATABASE_USERNAME = os.environ['_DB_USERNAME']
 if '_DB_PASSWORD' in os.environ and os.environ['_DB_PASSWORD'] is not None:
-    DATABASE_USERNAME = os.environ['_DB_PASSWORD']
+    DATABASE_PASSWORD = os.environ['_DB_PASSWORD']
 
 
 class Config(object):
