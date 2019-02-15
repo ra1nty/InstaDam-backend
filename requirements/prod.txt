@@ -2,3 +2,4 @@ flask
 flask-sqlalchemy
 psycopg2
 flask-jwt-extended
+uwsgi
