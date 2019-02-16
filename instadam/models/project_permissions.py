@@ -2,6 +2,7 @@ import enum
 import datetime as dt
 from ..app import db
 
+
 class AccessTypeEnum(enum.Enum):
     """Class AccessTypeEnum is an enum structure to represent the access type of a specific user for a specific project
 
@@ -11,6 +12,7 @@ class AccessTypeEnum(enum.Enum):
 
     READ_WRITE = 'rw'
     READ_ONLY = 'r'
+
 
 class ProjectPermissions(db.Model):
     """Class User is a database model to represent a project permission

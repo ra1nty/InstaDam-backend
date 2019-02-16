@@ -3,6 +3,7 @@ import datetime as dt
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..app import db
 
+
 class PrivilegesEnum(enum.Enum):
     """Class PrivilegesEnum is an enum structure to represent the permission level of a user
 
@@ -12,6 +13,7 @@ class PrivilegesEnum(enum.Enum):
 
     ADMIN = 'admin'
     ANNOTATOR = 'annotator'
+
 
 class User(db.Model):
     """Class User is a database model to represent a user
@@ -33,16 +35,21 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128))
-    created_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
-    privileges = db.Column(db.Enum(PrivilegesEnum), nullable=False, default=PrivilegesEnum.ANNOTATOR)
+    created_at = db.Column(
+        db.DateTime, nullable=False, default=dt.datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, nullable=False, default=dt.datetime.utcnow)
+    privileges = db.Column(
+        db.Enum(PrivilegesEnum),
+        nullable=False,
+        default=PrivilegesEnum.ANNOTATOR)
 
     def set_password(self, password):
         """
         Set password to a hashed password
         """
         self.password = generate_password_hash(password)
-    
+
     def verify_password(self, password):
         """
         Check if hashed password matches actual password
