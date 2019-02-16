@@ -32,3 +32,6 @@ class ProjectPermissions(db.Model):
     project_id = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, nullable=False)
     access_type = db.Column(db.Enum(AccessTypeEnum), nullable=False)
+
+    def __repr__(self):
+        return '<Access type of permission: %r>' % self.access_type
