@@ -5,7 +5,8 @@ from ..app import db
 
 
 class PrivilegesEnum(enum.Enum):
-    """Class PrivilegesEnum is an enum structure to represent the permission level of a user
+    """Class PrivilegesEnum is an enum structure to represent the 
+    permission level of a user
 
     Has two possible values: ADMIN and ANNOTATOR
     Return string values
@@ -24,7 +25,8 @@ class User(db.Model):
         id: unique integer id given to a user (primary key)
         username: unique string that user chooses
         email: unique string (email address) that user specifies
-        password: secure string that is greater than 8 chars in length, at least one uppercase char and one digit
+        password: secure string that is greater than 8 chars in length, 
+                    at least one uppercase char and one digit
         created_at: datetime that specifies when user signed up
         updated_at: datetime that specifies 
         privileges: enum type that specifies permission level of user
