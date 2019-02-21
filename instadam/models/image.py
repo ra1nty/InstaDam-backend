@@ -14,10 +14,10 @@ class Image(db.Model):
         added_at: datetime that image was added to the project
     """
 
-    __tablename__ = 'images'
+    __tablename__ = 'image'
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(
-        db.Integer, db.ForeignKey('projects.id'), nullable=False)
+        db.Integer, db.ForeignKey('project.id'), nullable=False)
     image_name = db.Column(db.String(64), nullable=False)
     added_at = db.Column(
         db.DateTime, nullable=False, default=dt.datetime.utcnow)
