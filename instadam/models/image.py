@@ -16,7 +16,8 @@ class Image(db.Model):
 
     __tablename__ = 'images'
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, nullable=False)
+    project_id = db.Column(
+        db.Integer, db.ForeignKey('projects.id'), nullable=False)
     image_name = db.Column(db.String(64), nullable=False)
     added_at = db.Column(
         db.DateTime, nullable=False, default=dt.datetime.utcnow)

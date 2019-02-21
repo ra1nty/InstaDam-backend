@@ -32,8 +32,9 @@ class ProjectPermissions(db.Model):
 
     __tablename__ = 'project_permissions'
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, nullable=False)
-    user_id = db.Column(db.Integer, nullable=False)
+    project_id = db.Column(
+        db.Integer, db.ForeignKey('project.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     access_type = db.Column(db.Enum(AccessTypeEnum), nullable=False)
 
     def __repr__(self):

@@ -14,10 +14,10 @@ class Project(db.Model):
         created_at: datetime to represent date at which project was created
     """
 
-    __tablename__ = 'projects'
+    __tablename__ = 'project'
     id = db.Column(db.Integer, primary_key=True)
     project_name = db.Column(db.String(64), unique=True, nullable=False)
-    created_by = db.Column(db.Integer, nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(
         db.DateTime, nullable=False, default=dt.datetime.utcnow)
 
