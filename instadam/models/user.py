@@ -1,6 +1,9 @@
-import enum
 import datetime as dt
+import enum
+
+from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
+
 from ..app import db
 
 
@@ -45,6 +48,9 @@ class User(db.Model):
         db.Enum(PrivilegesEnum),
         nullable=False,
         default=PrivilegesEnum.ANNOTATOR)
+
+    project_permissions = relationship('ProjectPermission',
+                                       back_populates='user')
 
     def set_password(self, password):
         """

@@ -1,4 +1,7 @@
 import datetime as dt
+
+from sqlalchemy.orm import relationship
+
 from ..app import db
 
 
@@ -20,6 +23,9 @@ class Project(db.Model):
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(
         db.DateTime, nullable=False, default=dt.datetime.utcnow)
+
+    images = relationship('Image')
+    permissions = relationship('ProjectPermission', back_populates='project')
 
     def __repr__(self):
         return '<Project: %r>' % self.project_name

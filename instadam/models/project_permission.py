@@ -1,5 +1,7 @@
 import enum
-import datetime as dt
+
+from sqlalchemy.orm import relationship
+
 from ..app import db
 
 
@@ -16,7 +18,7 @@ class AccessTypeEnum(enum.Enum):
     READ_ONLY = 'r'
 
 
-class ProjectPermissions(db.Model):
+class ProjectPermission(db.Model):
     """Class User is a database model to represent a project permission
 
     Specifies the full database schema of the table 'project_permissions'
@@ -30,12 +32,14 @@ class ProjectPermissions(db.Model):
         access_type: enum type that specifies the level of access
     """
 
-    __tablename__ = 'project_permissions'
+    __tablename__ = 'project_permission'
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(
-        db.Integer, db.ForeignKey('project.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     access_type = db.Column(db.Enum(AccessTypeEnum), nullable=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    user = relationship('User', back_populates='project_permissions')
+    project = relationship('Project', back_populates='permissions')
 
     def __repr__(self):
         return '<Access type of permission: %r>' % self.access_type
