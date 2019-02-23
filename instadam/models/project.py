@@ -24,7 +24,7 @@ class Project(db.Model):
     created_at = db.Column(
         db.DateTime, nullable=False, default=dt.datetime.utcnow)
 
-    images = relationship('Image')
+    images = relationship('Image', backref='project')
     permissions = relationship('ProjectPermission', back_populates='project')
 
     def __repr__(self):
