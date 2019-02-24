@@ -131,3 +131,17 @@ def test_upload_image_fail_3(local_client):
         assert '400 BAD REQUEST' == rv.status
         json_data = rv.get_json()
         assert 'msg' in json_data
+
+
+def test_upload_image_fail_4(local_client):
+    access_token = successful_login(local_client, 'test_upload_user1',
+                                    'TestTest1')
+
+    with open('tests/__init__.py', 'rb') as fd:
+        file = FileStorage(fd)
+        rv = local_client.post(
+            '/image/upload/1', data={'image': file},
+            headers={'Authorization': 'Bearer %s' % access_token})
+        assert '400 BAD REQUEST' == rv.status
+        json_data = rv.get_json()
+        assert 'msg' in json_data
