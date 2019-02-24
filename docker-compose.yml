@@ -1,0 +1,28 @@
+version: '2.1'
+services:
+  postgres:
+    restart: always
+    image: postgres:10
+    environment:
+      - POSTGRES_USER=${_DB_USERNAME}
+      - POSTGRES_PASSWORD=${_DB_PASSWORD}
+      - POSTGRES_DB=${_DB_NAME}
+    volumes:
+      - ./postgres-data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  app:
+    restart: always
+    build: .
+    environment:
+      - _DB_USERNAME=${_DB_USERNAME}
+      - _DB_PASSWORD=${_DB_PASSWORD}
+      - _DB_NAME=${_DB_NAME}
+    ports:
+      - 5000:5000
+    volumes: 
+      - .:/app
+    depends_on:
+      - postgres
+    command: ["python", "manage.py", "initdb", "--mode=production"]
+    entrypoint: ["python", "manage.py", "start", "--mode=production"]
