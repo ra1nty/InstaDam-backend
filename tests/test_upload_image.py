@@ -2,7 +2,6 @@ import os
 import shutil
 
 import pytest
-from sqlalchemy.exc import IntegrityError
 from werkzeug.datastructures import FileStorage
 
 from instadam.app import create_app, db
@@ -20,36 +19,29 @@ def local_client():
     app = create_app(TEST_MODE)
     with app.app_context():
         db.create_all()
-        user = User(id=0, username='user1', email='email@illinois.edu',
+
+        user = User(username='user1', email='email@illinois.edu',
                     privileges=PrivilegesEnum.ADMIN)
         user.set_password('TestTest1')
-        project = Project(id=0, project_name='test/test', created_by=user.id)
+        db.session.add(user)
+        db.session.flush()
+        db.session.commit()
+
+        project = Project(project_name='test/test', created_by=user.id)
+        db.session.add(project)
+        db.session.flush()
+        db.session.commit()
+
         permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
-        permission.user_id = user.id
-        permission.project_id = project.id
         user.project_permissions.append(permission)
-        permission.project = project
-        try:
-            db.session.add(user)
-            db.session.add(project)
-            db.session.add(permission)
-            db.session.flush()
-        except IntegrityError:
-            assert False
-        db.session.commit()
+        project.permissions.append(permission)
 
-        user = User(id=1, username='user2', email='email2@illinois.edu')
+        user = User(username='user2', email='email2@illinois.edu')
         user.set_password('TestTest1')
-        permission = ProjectPermission(access_type=AccessTypeEnum.READ_ONLY)
-        user.project_permissions.append(permission)
-        permission.project = project
-
-        try:
-            db.session.add(user)
-            db.session.add(permission)
-        except IntegrityError:
-            assert False
+        db.session.add(user)
+        db.session.flush()
         db.session.commit()
+
     client = app.test_client()
     yield client
 
@@ -69,6 +61,9 @@ def test_upload_image(local_client):
     with open('tests/cat.jpg', 'rb') as img:
         file = FileStorage(img)
         rv = local_client.post(
-            '/image/upload/0', data={'image': file},
+            '/image/upload/1', data={'image': file},
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '200 OK' == rv.status
+        json_data = rv.get_json()
+        assert 'msg' in json_data
+        assert 'Image added successfully' == json_data['msg']
