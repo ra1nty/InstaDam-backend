@@ -1,8 +1,8 @@
-import os
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from .config import app_config
 from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
+
+from .config import app_config
 
 db = SQLAlchemy()
 jwt = JWTManager()
@@ -26,5 +26,7 @@ def create_app(mode='development'):
 
     from . import auth
     app.register_blueprint(auth.bp)
+    from . import error_handlers
+    app.register_blueprint(error_handlers.bp)
 
     return app
