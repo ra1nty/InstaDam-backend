@@ -1,3 +1,4 @@
+import filecmp
 import os
 import shutil
 
@@ -67,3 +68,10 @@ def test_upload_image(local_client):
         json_data = rv.get_json()
         assert 'msg' in json_data
         assert 'Image added successfully' == json_data['msg']
+
+    storage_path = os.path.join(Config.STATIC_STORAGE_DIR, '1')
+    assert os.path.isdir(storage_path)
+    files = os.listdir(storage_path)
+    assert 1 == len(files)
+    saved_file = files[0]
+    assert filecmp.cmp('tests/cat.jpg', os.path.join(storage_path, saved_file))
