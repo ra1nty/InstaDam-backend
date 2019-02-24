@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
@@ -28,5 +30,10 @@ def create_app(mode='development'):
     app.register_blueprint(auth.bp)
     from . import error_handlers
     app.register_blueprint(error_handlers.bp)
+    from . import image
+    app.register_blueprint(image.bp)
+
+    if not os.path.isdir(app.config['STATIC_STORAGE_DIR']):
+        os.mkdir(app.config['STATIC_STORAGE_DIR'])
 
     return app
