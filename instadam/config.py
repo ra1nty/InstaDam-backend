@@ -2,6 +2,7 @@
 """
 
 import os
+
 DATABASE_USERNAME = 'postgres'
 DATABASE_PASSWORD = ''
 FLASK_SECRETE_KEY = ''
@@ -11,6 +12,11 @@ if '_DB_PASSWORD' in os.environ and os.environ['_DB_PASSWORD'] is not None:
     DATABASE_PASSWORD = os.environ['_DB_PASSWORD']
 if '_SECRETE_KEY' in os.environ and os.environ['_SECRETE_KEY'] is not None:
     FLASK_SECRETE_KEY = os.environ['_SECRETE_KEY']
+
+INSTADAM_STORAGE = 'static'
+if ('INSTADAM_STORAGE' in os.environ
+        and os.environ['INSTADAM_STORAGE'] is not None):
+    INSTADAM_STORAGE = os.environ['INSTADAM_STORAGE']
 
 
 class Config(object):
@@ -23,6 +29,8 @@ class Config(object):
     MAIL_DEFAULT_SENDER = 'admin@demo.test'
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ['access']
+
+    STATIC_STORAGE_DIR = INSTADAM_STORAGE
 
 
 class Development(Config):
