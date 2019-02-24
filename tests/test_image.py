@@ -14,6 +14,9 @@ def test_image_repr(client):
 def test_invalid_project():
     app = create_app(TEST_MODE)
     with app.app_context():
+        db.reflect()
+        db.drop_all()
+        db.create_all()
         db.create_all()
         with open('tests/cat.jpg', 'rb') as fd:
             img = FileStorage(fd)

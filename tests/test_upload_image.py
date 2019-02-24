@@ -19,6 +19,8 @@ def local_client():
         shutil.rmtree(Config.STATIC_STORAGE_DIR)
     app = create_app(TEST_MODE)
     with app.app_context():
+        db.reflect()
+        db.drop_all()
         db.create_all()
 
         user = User(username='test_upload_user1', email='email@test_upload.com',
