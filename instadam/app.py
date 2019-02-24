@@ -25,6 +25,7 @@ def create_app(mode='development'):
     jwt.init_app(app)
 
     from . import auth
+    from . import project
     app.register_blueprint(auth.bp)
 
     return app

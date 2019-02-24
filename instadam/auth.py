@@ -20,7 +20,7 @@ def credential_checking(password, email):
     * Needs a refactoring
 
     Raises:
-        MsgException: An error occurred when invalidate user credential is given
+        IntegrityError: An error occurred when invalidate user credential is given
     """
     if len(password) < 8:
         raise MsgException('Password should be longer than 8 characters.')
