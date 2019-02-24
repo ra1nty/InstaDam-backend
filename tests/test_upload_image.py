@@ -39,6 +39,9 @@ def local_client():
 
         user = User(username='user2', email='email2@illinois.edu')
         user.set_password('TestTest1')
+        permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
+        user.project_permissions.append(permission)
+        project.permissions.append(permission)
         db.session.add(user)
         db.session.flush()
         db.session.commit()
@@ -47,17 +50,21 @@ def local_client():
     yield client
 
 
-def test_upload_image(local_client):
-    rv = local_client.post(
+def successful_login(client, username, password):
+    rv = client.post(
         '/login',
-        json={'username': 'user1', 'password': 'TestTest1'},
+        json={'username': username, 'password': password},
         follow_redirects=True)
 
     assert '201 CREATED' == rv.status
     json_data = rv.get_json()
     assert 'access_token' in json_data
 
-    access_token = json_data['access_token']
+    return json_data['access_token']
+
+
+def test_upload_image(local_client):
+    access_token = successful_login(local_client, 'user1', 'TestTest1')
 
     with open('tests/cat.jpg', 'rb') as img:
         file = FileStorage(img)
@@ -75,3 +82,45 @@ def test_upload_image(local_client):
     assert 1 == len(files)
     saved_file = files[0]
     assert filecmp.cmp('tests/cat.jpg', os.path.join(storage_path, saved_file))
+
+
+def test_upload_image_fail_1(local_client):
+    access_token = successful_login(local_client, 'user1', 'TestTest1')
+
+    with open('tests/cat.jpg', 'rb') as img:
+        file = FileStorage(img)
+        rv = local_client.post(
+            '/image/upload/0', data={'image': file},
+            headers={'Authorization': 'Bearer %s' % access_token})
+        assert '401 UNAUTHORIZED' == rv.status
+        json_data = rv.get_json()
+        assert 'msg' in json_data
+
+    storage_path = os.path.join(Config.STATIC_STORAGE_DIR, '0')
+    assert not os.path.isdir(storage_path)
+
+
+def test_upload_image_fail_2(local_client):
+    access_token = successful_login(local_client, 'user2', 'TestTest1')
+
+    with open('tests/cat.jpg', 'rb') as img:
+        file = FileStorage(img)
+        rv = local_client.post(
+            '/image/upload/1', data={'image': file},
+            headers={'Authorization': 'Bearer %s' % access_token})
+        assert '401 UNAUTHORIZED' == rv.status
+        json_data = rv.get_json()
+        assert 'msg' in json_data
+
+
+def test_upload_image_fail_3(local_client):
+    access_token = successful_login(local_client, 'user1', 'TestTest1')
+
+    with open('tests/cat.jpg', 'rb') as img:
+        file = FileStorage(img)
+        rv = local_client.post(
+            '/image/upload/1', data={'file': file},
+            headers={'Authorization': 'Bearer %s' % access_token})
+        assert '400 BAD REQUEST' == rv.status
+        json_data = rv.get_json()
+        assert 'msg' in json_data
