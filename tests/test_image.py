@@ -11,7 +11,7 @@ def test_image_repr(client):
     assert str(image) == '<Image: %r>' % 'cracked_building.png'
 
 
-def test_invalid_project(client):
+def test_invalid_project():
     app = create_app(TEST_MODE)
     with app.app_context():
         db.create_all()

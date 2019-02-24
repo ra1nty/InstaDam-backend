@@ -21,7 +21,7 @@ def local_client():
     with app.app_context():
         db.create_all()
 
-        user = User(username='user1', email='email@illinois.edu',
+        user = User(username='test_upload_user1', email='email@test_upload.com',
                     privileges=PrivilegesEnum.ADMIN)
         user.set_password('TestTest1')
         db.session.add(user)
@@ -37,7 +37,8 @@ def local_client():
         user.project_permissions.append(permission)
         project.permissions.append(permission)
 
-        user = User(username='user2', email='email2@illinois.edu')
+        user = User(username='test_upload_user2',
+                    email='email2@test_upload.com')
         user.set_password('TestTest1')
         permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
         user.project_permissions.append(permission)
@@ -64,7 +65,8 @@ def successful_login(client, username, password):
 
 
 def test_upload_image(local_client):
-    access_token = successful_login(local_client, 'user1', 'TestTest1')
+    access_token = successful_login(local_client, 'test_upload_user1',
+                                    'TestTest1')
 
     with open('tests/cat.jpg', 'rb') as img:
         file = FileStorage(img)
@@ -85,7 +87,8 @@ def test_upload_image(local_client):
 
 
 def test_upload_image_fail_1(local_client):
-    access_token = successful_login(local_client, 'user1', 'TestTest1')
+    access_token = successful_login(local_client, 'test_upload_user1',
+                                    'TestTest1')
 
     with open('tests/cat.jpg', 'rb') as img:
         file = FileStorage(img)
@@ -101,7 +104,8 @@ def test_upload_image_fail_1(local_client):
 
 
 def test_upload_image_fail_2(local_client):
-    access_token = successful_login(local_client, 'user2', 'TestTest1')
+    access_token = successful_login(local_client, 'test_upload_user2',
+                                    'TestTest1')
 
     with open('tests/cat.jpg', 'rb') as img:
         file = FileStorage(img)
@@ -114,7 +118,8 @@ def test_upload_image_fail_2(local_client):
 
 
 def test_upload_image_fail_3(local_client):
-    access_token = successful_login(local_client, 'user1', 'TestTest1')
+    access_token = successful_login(local_client, 'test_upload_user1',
+                                    'TestTest1')
 
     with open('tests/cat.jpg', 'rb') as img:
         file = FileStorage(img)
