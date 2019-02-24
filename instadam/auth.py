@@ -1,15 +1,13 @@
 from email.utils import parseaddr
 
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import (create_access_token, create_refresh_token,
-                                get_raw_jwt, jwt_required)
+from flask import Blueprint, abort, jsonify, request
+from flask_jwt_extended import (create_access_token, get_raw_jwt, jwt_required)
 from sqlalchemy.exc import IntegrityError
 
 from .app import db, jwt
 from .models.revoked_token import RevokedToken
 from .models.user import User
 from .utils import construct_msg
-from .utils.exception import MsgException
 
 bp = Blueprint('auth', __name__, url_prefix='')
 
@@ -20,20 +18,21 @@ def credential_checking(password, email):
     * Needs a refactoring
 
     Raises:
-        IntegrityError: An error occurred when invalidate user credential is given
+        IntegrityError: An error occurred when invalidate user credential is
+        given
     """
     if len(password) < 8:
-        raise MsgException('Password should be longer than 8 characters.')
+        abort(400, 'Password should be longer than 8 characters.')
     has_digit = any([c.isdigit() for c in password])
     if not has_digit:
-        raise MsgException('Password must have at least one digit.')
+        abort(400, 'Password must have at least one digit.')
     has_upper = any([c.isupper() for c in password])
     if not has_upper:
-        raise MsgException('Password must have at least one uppercase letter.')
+        abort(400, 'Password must have at least one uppercase letter.')
 
     # Check email
     if parseaddr(email) == ('', '') or '@' not in email:
-        raise MsgException('Please enter a valid email addresss.')
+        abort(400, 'Please enter a valid email address.')
 
 
 @bp.route('/login', methods=['POST'])
@@ -48,15 +47,14 @@ def login():
     """
     req = request.get_json()
     if 'username' not in req or 'password' not in req:
-        return jsonify({'msg': 'Missing credentials'}), 400
+        abort(400, 'Missing credentials')
     username = req['username']
     user = User.query.filter_by(username=req['username']).first()
     if user is not None:
         if user.verify_password(req['password']):
-            return jsonify(
-                {'access_token':
-                 create_access_token(identity=user.username)}), 201
-    return construct_msg('User %s not found' % username), 401
+            return jsonify({'access_token': create_access_token(
+                identity=user.username)}), 201
+    abort(401, 'User %s not found' % username)
 
 
 @bp.route('/register', methods=['POST'])
@@ -71,16 +69,13 @@ def register():
     """
     req = request.get_json()
     if 'username' not in req or 'password' not in req or 'email' not in req:
-        return jsonify({'msg': 'Missing credentials'}), 400
+        abort(400, 'Missing credentials')
 
     username = req['username']
     password = req['password']
     email = req['email']
 
-    try:
-        credential_checking(password, email)
-    except MsgException as exception:
-        return construct_msg(exception), 400
+    credential_checking(password, email)
 
     user = User(username=username, email=email)
     user.set_password(password)
@@ -89,7 +84,7 @@ def register():
         db.session.flush()
     except IntegrityError:
         db.session.rollback()
-        return construct_msg('User %s already exist' % username), 401
+        abort(401, 'User %s already exist' % username)
     else:
         db.session.commit()
     return jsonify(
