@@ -15,3 +15,8 @@ def register_error_handler(status_code):
 
 register_error_handler(400)
 register_error_handler(401)
+register_error_handler(403)
+register_error_handler(404)
+register_error_handler(405)
+register_error_handler(406)
+register_error_handler(415)
