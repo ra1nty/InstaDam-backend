@@ -1,5 +1,4 @@
 import datetime as dt
-
 from sqlalchemy.orm import relationship
 
 from ..app import db
