@@ -26,6 +26,6 @@ before_deploy:
 deploy:
 - provider: script
   skip_cleanup: true
-  script: rsync -e "ssh -o StrictHostKeyChecking=no" -r --delete-after --quiet $TRAVIS_BUILD_DIR $TRAVIS_SSH_USER@$TRAVIS_SSH_HOST:/tmp/$TRAVIS_BUILD_ID;
+  script: bash scripts/deploy.sh
   on:
     branch: deploy
