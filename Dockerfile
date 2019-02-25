@@ -16,6 +16,7 @@ RUN apk --purge del .build-deps
 
 COPY instadam instadam
 COPY manage.py ./
+COPY wsgi.py ./
 
 RUN chown -R instadam:instadam ./
 USER instadam
