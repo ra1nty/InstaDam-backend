@@ -8,9 +8,6 @@ from sqlalchemy.exc import IntegrityError
 from instadam.app import db
 from instadam.models.image import Image
 from instadam.models.project import Project
-from instadam.models.project_permission import (AccessTypeEnum,
-                                                ProjectPermission)
-from instadam.models.user import PrivilegesEnum, User
 from instadam.utils import construct_msg
 
 bp = Blueprint('project', __name__, url_prefix='/project')
@@ -25,11 +22,9 @@ def get_unannotated_images():
     Get unannotated images across ALL projects so that user (annotator) can see images to annotate
     NOTE: Only returning a fixed number of images (k=5) for Iteration 3
     """
-    current_user = get_jwt_identity()
-    user = User.query.filter_by(username=current_user).first()
     unannotated_images = Image.query.filter_by(is_annotated=False).all()[0:k]
     if len(unannotated_images) == 0:
-        return jsonify({'email': user.email, 'unannotated_images': []})
+        return jsonify({'unannotated_images': []})
 
     unannotated_images_res = []
     for unannotated_image in unannotated_images:
@@ -40,10 +35,7 @@ def get_unannotated_images():
         unannotated_image_res['project_id'] = unannotated_image.project_id
         unannotated_images_res.append(unannotated_image_res)
 
-    return jsonify({
-        'email': user.email,
-        'unannotated_images': unannotated_images_res
-    })
+    return jsonify({'unannotated_images': unannotated_images_res})
 
 
 @bp.route('/<project_id>/image/<image_id>')
@@ -57,18 +49,15 @@ def get_project_image(project_id, image_id):
         project_id: The id of the project
         image_id: The id of the image to return
     """
-    current_user = get_jwt_identity()
-    user = User.query.filter_by(username=current_user).first()
     image = Image.query.filter_by(id=image_id, project_id=project_id).all()
     if len(image) == 0:
         abort(
-            400, 'No image in project of id=' + str(project_id) +
-            ' exists with id=' + str(image_id))
+            404, 'No image in project of id=' + str(project_id) +
+            ' found with id=' + str(image_id))
     else:
         image = image[0]
 
     return jsonify({
-        'email': user.email,
         'id': image.id,
         'path': image.image_path,
         'project_id': image.project_id
@@ -85,11 +74,9 @@ def get_project_images(project_id):
     Args:
         project_id: The id of the project
     """
-    current_user = get_jwt_identity()
-    user = User.query.filter_by(username=current_user).first()
     project_images = Image.query.filter_by(project_id=project_id).all()[0:k]
     if len(project_images) == 0:
-        return jsonify({'email': user.email, 'project_images': []})
+        return jsonify({'project_images': []})
 
     project_images_res = []
     for project_image in project_images:
@@ -99,4 +86,4 @@ def get_project_images(project_id):
         project_image['project_id'] = project_image.project_id
         project_images_res.append(project_image_res)
 
-    return jsonify({'email': user.email, 'project_images': project_images_res})
+    return jsonify({'project_images': project_images_res})
