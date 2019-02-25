@@ -24,4 +24,4 @@ services:
       - .:/app
     depends_on:
       - postgres
-    command: gunicorn --log-level info --log-file=/gunicorn.log -b 0.0.0.0:5000 wsgi
+    command: gunicorn --log-level info --log-file=./gunicorn.log -b 0.0.0.0:5000 wsgi:app
