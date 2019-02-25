@@ -15,6 +15,8 @@ from instadam.utils import construct_msg
 
 bp = Blueprint('project', __name__, url_prefix='/project')
 
+k = 5  # Fixed max number of images to return in response
+
 
 @bp.route('/new', methods=['GET'])
 @jwt_required
@@ -25,7 +27,22 @@ def get_unannotated_images():
     """
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
-    return jsonify({'username': current_user})
+    unannotated_images = Image.query.filter_by(is_annotated=False).all()[0:k]
+    print(unannotated_images)
+
+    unannotated_images_res = []
+    for unannotated_image in unannotated_images:
+        unannotated_image_res = {}
+        unannotated_image_res['id'] = unannotated_image.id
+        unannotated_image_res['name'] = unannotated_image.image_name
+        unannotated_image_res['path'] = unannotated_image.image_path
+        unannotated_image_res['project_id'] = unannotated_image.project_id
+        unannotated_images_res.append(unannotated_image_res)
+
+    return jsonify({
+        'email': user.email,
+        'unannotated_images': unannotated_images_res
+    })
 
 
 @bp.route('/<project_id>/image/<image_id>')
@@ -41,7 +58,15 @@ def get_project_image(project_id, image_id):
     """
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
-    return jsonify({'username': current_user})
+    image = Image.query.filter_by(id=image_id, project_id=project_id)[0]
+    print(image)
+
+    return jsonify({
+        'username': user.email,
+        'id': image.id,
+        'path': image.image_path,
+        'project_id': image.project_id
+    })
 
 
 @bp.route('/<project_id>/images')
@@ -56,4 +81,18 @@ def get_project_images(project_id):
     """
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
-    return jsonify({'username': current_user})
+    project_images = Image.query.filter_by(project_id=project_id)[0:k]
+    print(project_images)
+
+    project_images_res = []
+    for project_image in project_images:
+        project_image_res = {}
+        project_image['id'] = project_image.id
+        project_image['path'] = project_image.image_path
+        project_image['project_id'] = project_image.project_id
+        project_images_res.append(project_image_res)
+
+    return jsonify({
+        'username': user.email,
+        'project_images': project_images_res
+    })

@@ -28,9 +28,10 @@ class Image(db.Model):
     __tablename__ = 'image'
     id = db.Column(db.Integer, primary_key=True)
     image_name = db.Column(db.String(64), nullable=False)
+    image_path = db.Column(db.String(256))
     added_at = db.Column(
         db.DateTime, nullable=False, default=dt.datetime.utcnow)
-
+    is_annotated = db.Column(db.Boolean, nullable=False, default=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
     def save_image_to_project(self, img_file):
