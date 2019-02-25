@@ -97,21 +97,17 @@ def test_load_unannotated_images(local_client):
     json_res = res.get_json()
     assert len(json_res['unannotated_images']) == 2
 
-    assert json_res['unannotated_images'][0][
-        'image_name'] == 'cat.jpg' or json_res['unannotated_images'][1][
-            'image_name'] == 'cat.jpg'
-    assert json_res['unannotated_images'][0][
-        'image_name'] == 'dog.png' or json_res['unannotated_images'][1][
-            'image_name'] == 'dog.png'
+    assert json_res['unannotated_images'][0]['name'] == 'cat.jpg' or json_res[
+        'unannotated_images'][1]['name'] == 'cat.jpg'
+    assert json_res['unannotated_images'][0]['name'] == 'dog.png' or json_res[
+        'unannotated_images'][1]['name'] == 'dog.png'
 
     assert json_res['unannotated_images'][0][
-        'image_path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
-            'unannotated_images'][1][
-                'image_path'] == 'test_dir/test_dir_2/cat.jpg'
+        'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
+            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
     assert json_res['unannotated_images'][0][
-        'image_path'] == 'test_dir/test_dir_2/dog.png' or json_res[
-            'unannotated_images'][1][
-                'image_path'] == 'test_dir/test_dir_2/dog.png'
+        'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
+            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
 
 
 def test_load_project_images(local_client):
@@ -125,17 +121,17 @@ def test_load_project_images(local_client):
     json_res = res.get_json()
     assert len(json_res['project_images']) == 2
 
-    assert json_res['project_images'][0]['image_name'] == 'cat.jpg' or json_res[
-        'project_images'][1]['image_name'] == 'cat.jpg'
-    assert json_res['project_images'][0]['image_name'] == 'dog.png' or json_res[
-        'project_images'][1]['image_name'] == 'dog.png'
+    assert json_res['project_images'][0]['name'] == 'cat.jpg' or json_res[
+        'project_images'][1]['name'] == 'cat.jpg'
+    assert json_res['project_images'][0]['name'] == 'dog.png' or json_res[
+        'project_images'][1]['name'] == 'dog.png'
 
     assert json_res['project_images'][0][
-        'image_path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
-            'project_images'][1]['image_path'] == 'test_dir/test_dir_2/cat.jpg'
+        'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res['project_images'][
+            1]['path'] == 'test_dir/test_dir_2/cat.jpg'
     assert json_res['project_images'][0][
-        'image_path'] == 'test_dir/test_dir_2/dog.png' or json_res[
-            'project_images'][1]['image_path'] == 'test_dir/test_dir_2/dog.png'
+        'path'] == 'test_dir/test_dir_2/dog.png' or json_res['project_images'][
+            1]['path'] == 'test_dir/test_dir_2/dog.png'
 
 
 def test_load_image(local_client):
