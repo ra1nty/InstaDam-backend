@@ -17,4 +17,4 @@ def parse_and_validate_file_extension(file_name, valid_extensions):
     split = file_name.lower().split('.')
     if split and split[-1] in valid_extensions:
         return split[-1]
-    abort(400, 'Invalid file extension for %s' % file_name)
+    abort(415, 'Invalid file extension for %s' % file_name)
