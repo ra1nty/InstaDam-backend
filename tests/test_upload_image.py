@@ -142,6 +142,6 @@ def test_upload_image_fail_4(local_client):
         rv = local_client.post(
             '/image/upload/1', data={'image': file},
             headers={'Authorization': 'Bearer %s' % access_token})
-        assert '400 BAD REQUEST' == rv.status
+        assert '415 UNSUPPORTED MEDIA TYPE' == rv.status
         json_data = rv.get_json()
         assert 'msg' in json_data
