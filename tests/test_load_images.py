@@ -38,7 +38,6 @@ def local_client():
         annotator.set_password('TestTest2')
         permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
         annotator.project_permissions.append(permission)
-        project.permissions.append(permission)
         db.session.add(annotator)
         db.session.flush()
         db.session.commit()
