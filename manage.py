@@ -19,7 +19,9 @@ Options:
 
 """
 import click
+
 from instadam.app import create_app, db
+from instadam.models.user import PrivilegesEnum, User
 
 
 @click.group()
@@ -43,6 +45,12 @@ def initdb(mode):
     app = create_app(mode)
     with app.app_context():
         db.create_all()
+        admin = User(username='admin', email='admin@default.com',
+                     privileges=PrivilegesEnum.ADMIN)
+        admin.set_password('AdminPassword0')
+        db.session.add(admin)
+        db.session.flush()
+        db.session.commit()
 
 
 @cli.command()
