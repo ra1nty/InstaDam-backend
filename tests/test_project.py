@@ -5,6 +5,7 @@ def test_project_repr(client):
     project = Project(project_name='buildings_project')
     assert str(project) == '<Project: %r>' % 'buildings_project'
 
+
 def create_project(client, project_name, created_by):
     return client.post(
         '/project',
@@ -19,6 +20,7 @@ project1 = 'project1'
 creator1 = 'lita'
 project2 = 'project2'
 creator2 = 'susan'
+
 
 def test_create_project(client):
     rv = create_project(client, 'project1', 'lita')

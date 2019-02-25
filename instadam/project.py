@@ -8,8 +8,7 @@ from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
 from instadam.models.user import User, PrivilegesEnum
 from .app import db
 from .models.project import Project
-from os import os
-
+import os
 bp = Blueprint('project', __name__, url_prefix='')
 
 
