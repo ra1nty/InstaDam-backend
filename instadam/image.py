@@ -29,7 +29,8 @@ def upload_image(project_id):
     if user.privileges == PrivilegesEnum.ANNOTATOR:
         abort(401, 'User is not Admin')
     permission = ProjectPermission.query.filter_by(
-        project_id=project_id, user_id=user.id,
+        project_id=project_id,
+        user_id=user.id,
         access_type=AccessTypeEnum.READ_WRITE).first()
     if permission is None:
         abort(401, 'User does not have permission to add image to this project')
