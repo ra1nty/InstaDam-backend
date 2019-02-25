@@ -9,6 +9,9 @@ from instadam.models.user import User, PrivilegesEnum
 from .app import db
 from .models.project import Project
 import os
+
+
+
 bp = Blueprint('project', __name__, url_prefix='')
 
 
@@ -75,4 +78,5 @@ def create_project():
     project_dir = os.path.join(app.config['STATIC_STORAGE_DIR'], str(project.id))
     os.makedirs(project_dir)
 
-    return jsonify({'project_id': project.id}), 201
+    return jsonify({'msg': 'project added successfully',
+                    'project_id': project.id}), 201
