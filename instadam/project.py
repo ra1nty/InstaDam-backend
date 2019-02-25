@@ -28,7 +28,8 @@ def get_unannotated_images():
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
     unannotated_images = Image.query.filter_by(is_annotated=False).all()[0:k]
-    print(unannotated_images)
+    if len(unannotated_images) == 0:
+        return jsonify({'email': user.email, 'unannotated_images': []})
 
     unannotated_images_res = []
     for unannotated_image in unannotated_images:
@@ -58,11 +59,16 @@ def get_project_image(project_id, image_id):
     """
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
-    image = Image.query.filter_by(id=image_id, project_id=project_id).all()[0]
-    print(image)
+    image = Image.query.filter_by(id=image_id, project_id=project_id).all()
+    if len(image) == 0:
+        abort(
+            400, 'No image in project of id=' + str(project_id) +
+            ' exists with id=' + str(image_id))
+    else:
+        image = image[0]
 
     return jsonify({
-        'username': user.email,
+        'email': user.email,
         'id': image.id,
         'path': image.image_path,
         'project_id': image.project_id
@@ -82,7 +88,8 @@ def get_project_images(project_id):
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
     project_images = Image.query.filter_by(project_id=project_id).all()[0:k]
-    print(project_images)
+    if len(project_images) == 0:
+        return jsonify({'email': user.email, 'project_images': []})
 
     project_images_res = []
     for project_image in project_images:
@@ -92,7 +99,4 @@ def get_project_images(project_id):
         project_image['project_id'] = project_image.project_id
         project_images_res.append(project_image_res)
 
-    return jsonify({
-        'username': user.email,
-        'project_images': project_images_res
-    })
+    return jsonify({'email': user.email, 'project_images': project_images_res})
