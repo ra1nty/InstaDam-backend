@@ -3,14 +3,12 @@ from flask import Blueprint, jsonify, request, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy.exc import IntegrityError, DatabaseError
 
-from instadam import app
+from flask import current_app as app
 from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
 from instadam.models.user import User, PrivilegesEnum
 from .app import db
 from .models.project import Project
 import os
-
-
 
 bp = Blueprint('project', __name__, url_prefix='')
 
