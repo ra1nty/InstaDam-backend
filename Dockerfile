@@ -8,10 +8,12 @@ COPY requirements requirements
 RUN \
  apk add --no-cache postgresql-libs && \
  apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev
-RUN python -m venv venv
-RUN venv/bin/pip install -r requirements/prod.txt
-RUN venv/bin/pip install gunicorn
+
+RUN pip install --no-cache-dir -r requirements/prod.txt
+RUN pip install gunicorn
+
 RUN apk --purge del .build-deps
+
 COPY instadam instadam
 COPY manage.py ./
 
