@@ -81,9 +81,9 @@ def get_project_images(project_id):
     project_images_res = []
     for project_image in project_images:
         project_image_res = {}
-        project_image['id'] = project_image.id
-        project_image['path'] = project_image.image_path
-        project_image['project_id'] = project_image.project_id
+        project_image_res['id'] = project_image.id
+        project_image_res['path'] = project_image.image_path
+        project_image_res['project_id'] = project_image.project_id
         project_images_res.append(project_image_res)
 
     return jsonify({'project_images': project_images_res})

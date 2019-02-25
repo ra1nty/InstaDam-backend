@@ -151,7 +151,7 @@ def test_load_image(local_client):
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
-    assert id in json_res
+    assert 'id' in json_res
     assert json_res['path'] == 'test_dir/test_dir_2/cat.jpg'
 
 
