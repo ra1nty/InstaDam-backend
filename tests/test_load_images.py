@@ -95,7 +95,7 @@ def test_load_unannotated_images(local_client):
         '/project/new', headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
-    assert len(res['unannotated_images']) == 2
+    assert len(json_res['unannotated_images']) == 2
 
     assert json_res['unannotated_images'][0][
         'image_name'] == 'cat.jpg' or json_res['unannotated_images'][1][
@@ -125,21 +125,17 @@ def test_load_project_images(local_client):
     json_res = res.get_json()
     assert len(json_res['project_images']) == 2
 
-    assert json_res['unannotated_images'][0][
-        'image_name'] == 'cat.jpg' or json_res['unannotated_images'][1][
-            'image_name'] == 'cat.jpg'
-    assert json_res['unannotated_images'][0][
-        'image_name'] == 'dog.png' or json_res['unannotated_images'][1][
-            'image_name'] == 'dog.png'
+    assert json_res['project_images'][0]['image_name'] == 'cat.jpg' or json_res[
+        'project_images'][1]['image_name'] == 'cat.jpg'
+    assert json_res['project_images'][0]['image_name'] == 'dog.png' or json_res[
+        'project_images'][1]['image_name'] == 'dog.png'
 
-    assert json_res['unannotated_images'][0][
+    assert json_res['project_images'][0][
         'image_path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
-            'unannotated_images'][1][
-                'image_path'] == 'test_dir/test_dir_2/cat.jpg'
-    assert json_res['unannotated_images'][0][
+            'project_images'][1]['image_path'] == 'test_dir/test_dir_2/cat.jpg'
+    assert json_res['project_images'][0][
         'image_path'] == 'test_dir/test_dir_2/dog.png' or json_res[
-            'unannotated_images'][1][
-                'image_path'] == 'test_dir/test_dir_2/dog.png'
+            'project_images'][1]['image_path'] == 'test_dir/test_dir_2/dog.png'
 
 
 def test_load_image(local_client):
