@@ -30,7 +30,7 @@ def init_test(app):
 
         user = User(username=ADMIN_USERNAME,
                     email='success@test_project.com',
-                    privipedges=PrivilegesEnum.ADMIN)
+                    privileges=PrivilegesEnum.ADMIN)
         user.set_password(ADMIN_PWD)
         db.session.add(user)
 
