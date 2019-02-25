@@ -58,7 +58,7 @@ def get_project_image(project_id, image_id):
     """
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
-    image = Image.query.filter_by(id=image_id, project_id=project_id)[0]
+    image = Image.query.filter_by(id=image_id, project_id=project_id).all()[0]
     print(image)
 
     return jsonify({
@@ -81,7 +81,7 @@ def get_project_images(project_id):
     """
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
-    project_images = Image.query.filter_by(project_id=project_id)[0:k]
+    project_images = Image.query.filter_by(project_id=project_id).all()[0:k]
     print(project_images)
 
     project_images_res = []
