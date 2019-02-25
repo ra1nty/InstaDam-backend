@@ -70,7 +70,7 @@ def test_create_project_success(client):
 
 
 def test_create_project_not_logged_in(client):
-    response = client.pst(PROJECT_ENDPOINT,
+    response = client.post(PROJECT_ENDPOINT,
                           json={'project_name': FAIL_PROJECT_NAME})
     assert response.status_code == 401
     res = response.get_json()
