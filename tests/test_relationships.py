@@ -28,3 +28,4 @@ def test_image_and_project(client):
     assert len(project.images) == 1
     assert image == project.images[0]
     assert project == image.project
+

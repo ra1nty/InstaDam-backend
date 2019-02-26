@@ -27,11 +27,13 @@ def create_app(mode='development'):
     jwt.init_app(app)
 
     from . import auth
+    from . import project
     app.register_blueprint(auth.bp)
     from . import error_handlers
     app.register_blueprint(error_handlers.bp)
     from . import image
     app.register_blueprint(image.bp)
+    app.register_blueprint(project.bp)
 
     if not os.path.isdir(app.config['STATIC_STORAGE_DIR']):
         os.mkdir(app.config['STATIC_STORAGE_DIR'])
