@@ -8,6 +8,9 @@ services:
 install:
 - pip install -r requirements/test.txt
 
+before_script:
+- psql -c 'create database travis_ci_test;' -U postgres
+
 script:
 - py.test --cov-report=xml --cov=instadam tests/
 
