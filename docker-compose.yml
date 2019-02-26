@@ -22,7 +22,7 @@ services:
     ports:
       - 5000:5000
     volumes: 
-      - ../instadam-data:/instadamlog
+      - ../instadam-log:~/log
     depends_on:
       - postgres
-    command: gunicorn --log-level info --log-file=/instadamlog/gunicorn.log -b 0.0.0.0:5000 wsgi:app
+    command: gunicorn --log-level info --log-file=~/log/gunicorn.log -b 0.0.0.0:5000 wsgi:app
