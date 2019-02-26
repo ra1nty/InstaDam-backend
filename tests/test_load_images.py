@@ -1,9 +1,7 @@
-import filecmp
 import os
 import shutil
 
 import pytest
-from werkzeug.datastructures import FileStorage
 
 from instadam.app import create_app, db
 from instadam.config import Config
@@ -92,7 +90,7 @@ def test_load_unannotated_images(local_client):
                                     'TestTest2')
 
     res = local_client.get(
-        '/project/new', headers={'Authorization': 'Bearer %s' % access_token})
+        '/image/new', headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
     assert len(json_res['unannotated_images']) == 2
@@ -103,11 +101,11 @@ def test_load_unannotated_images(local_client):
         'unannotated_images'][1]['name'] == 'dog.png'
 
     assert json_res['unannotated_images'][0][
-        'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
-            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
+               'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
+               'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
     assert json_res['unannotated_images'][0][
-        'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
-            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
+               'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
+               'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
 
 
 def test_load_project_images(local_client):
@@ -115,7 +113,7 @@ def test_load_project_images(local_client):
                                     'TestTest2')
 
     res = local_client.get(
-        '/project/1/images',
+        '/image/1/images',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
@@ -127,11 +125,13 @@ def test_load_project_images(local_client):
         'project_images'][1]['name'] == 'dog.png'
 
     assert json_res['project_images'][0][
-        'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res['project_images'][
-            1]['path'] == 'test_dir/test_dir_2/cat.jpg'
+               'path'] == 'test_dir/test_dir_2/cat.jpg' or \
+           json_res['project_images'][
+               1]['path'] == 'test_dir/test_dir_2/cat.jpg'
     assert json_res['project_images'][0][
-        'path'] == 'test_dir/test_dir_2/dog.png' or json_res['project_images'][
-            1]['path'] == 'test_dir/test_dir_2/dog.png'
+               'path'] == 'test_dir/test_dir_2/dog.png' or \
+           json_res['project_images'][
+               1]['path'] == 'test_dir/test_dir_2/dog.png'
 
 
 def test_load_image(local_client):
@@ -139,7 +139,7 @@ def test_load_image(local_client):
                                     'TestTest2')
 
     res = local_client.get(
-        '/project/1/image/1',
+        '/image/1/image/1',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
@@ -152,7 +152,7 @@ def test_load_image_fail(local_client):
                                     'TestTest2')
 
     res = local_client.get(
-        '/project/1/image/5',
+        '/image/1/image/5',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     assert '404 NOT FOUND' == res.status
