@@ -25,4 +25,4 @@ services:
       - ../instadam-log:/home/instadam/log
     depends_on:
       - postgres
-    command: gunicorn --log-level info --log-file=~/log/gunicorn.log -b 0.0.0.0:5000 wsgi:app
+    command: gunicorn --log-level info --log-file=/home/instadam/log/gunicorn.log -b 0.0.0.0:5000 wsgi:app
