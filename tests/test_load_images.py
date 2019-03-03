@@ -109,18 +109,6 @@ def test_load_unannotated_images(local_client):
             'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
 
 
-def test_load_unannotated_images_fail(local_client):
-    access_token = successful_login(local_client, 'test_upload_annotator1',
-                                    'TestTest2')
-
-    res = local_client.get(
-        '/image/unannotated',
-        headers={'Authorization': 'Bearer %s' % access_token})
-
-    json_res = res.get_json()
-    assert len(json_res['unannotated_images']) == 0
-
-
 def test_load_project_images(local_client):
     access_token = successful_login(local_client, 'test_upload_annotator1',
                                     'TestTest2')
