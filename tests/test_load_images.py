@@ -90,7 +90,8 @@ def test_load_unannotated_images(local_client):
                                     'TestTest2')
 
     res = local_client.get(
-        '/image/new', headers={'Authorization': 'Bearer %s' % access_token})
+        '/image/unannotated',
+        headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
     assert len(json_res['unannotated_images']) == 2
@@ -101,11 +102,23 @@ def test_load_unannotated_images(local_client):
         'unannotated_images'][1]['name'] == 'dog.png'
 
     assert json_res['unannotated_images'][0][
-               'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
-               'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
+        'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
+            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
     assert json_res['unannotated_images'][0][
-               'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
-               'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
+        'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
+            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
+
+
+def test_load_unannotated_images_fail(local_client):
+    access_token = successful_login(local_client, 'test_upload_annotator1',
+                                    'TestTest2')
+
+    res = local_client.get(
+        '/image/unannotated',
+        headers={'Authorization': 'Bearer %s' % access_token})
+
+    json_res = res.get_json()
+    assert len(json_res['unannotated_images']) == 0
 
 
 def test_load_project_images(local_client):
@@ -113,7 +126,7 @@ def test_load_project_images(local_client):
                                     'TestTest2')
 
     res = local_client.get(
-        '/image/1/images',
+        '/image/project/1',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
@@ -134,12 +147,24 @@ def test_load_project_images(local_client):
                1]['path'] == 'test_dir/test_dir_2/dog.png'
 
 
+def test_load_project_images_fail(local_client):
+    access_token = successful_login(local_client, 'test_upload_annotator1',
+                                    'TestTest2')
+
+    res = local_client.get(
+        '/image/project/3',
+        headers={'Authorization': 'Bearer %s' % access_token})
+
+    json_res = res.get_json()
+    assert len(json_res['project_images']) == 0
+
+
 def test_load_image(local_client):
     access_token = successful_login(local_client, 'test_upload_annotator1',
                                     'TestTest2')
 
     res = local_client.get(
-        '/image/1/image/1',
+        '/image/1/project/1',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
@@ -152,7 +177,29 @@ def test_load_image_fail(local_client):
                                     'TestTest2')
 
     res = local_client.get(
-        '/image/1/image/5',
+        '/image/5/project/1',
+        headers={'Authorization': 'Bearer %s' % access_token})
+
+    assert '404 NOT FOUND' == res.status
+
+
+def test_load_image_fail_2(local_client):
+    access_token = successful_login(local_client, 'test_upload_annotator1',
+                                    'TestTest2')
+
+    res = local_client.get(
+        '/image/1/project/4',
+        headers={'Authorization': 'Bearer %s' % access_token})
+
+    assert '404 NOT FOUND' == res.status
+
+
+def test_load_image_fail_3(local_client):
+    access_token = successful_login(local_client, 'test_upload_annotator1',
+                                    'TestTest2')
+
+    res = local_client.get(
+        '/image/4/project/3',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     assert '404 NOT FOUND' == res.status

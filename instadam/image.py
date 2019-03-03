@@ -55,7 +55,7 @@ def upload_image(project_id):
         abort(400, 'Missing \'image\' in request')
 
 
-@bp.route('/new', methods=['GET'])
+@bp.route('/unannotated', methods=['GET'])
 @jwt_required
 def get_unannotated_images():
     """
@@ -79,7 +79,7 @@ def get_unannotated_images():
     return jsonify({'unannotated_images': unannotated_images_res}), 200
 
 
-@bp.route('/<project_id>/image/<image_id>')
+@bp.route('/<image_id>/project/<project_id>')
 @jwt_required
 def get_project_image(project_id, image_id):
     """
@@ -92,18 +92,20 @@ def get_project_image(project_id, image_id):
     """
     image = Image.query.filter_by(id=image_id, project_id=project_id).all()
     if len(image) == 0:
-        abort(404, 'No image in project of id=%s found with id=%s' % (
-            project_id, image_id))
+        abort(
+            404, 'No image in project of id=%s found with id=%s' % (project_id,
+                                                                    image_id))
     else:
         image = image[0]
 
     return jsonify({
         'id': image.id,
         'path': image.image_path,
-        'project_id': image.project_id}), 200
+        'project_id': image.project_id
+    }), 200
 
 
-@bp.route('/<project_id>/images')
+@bp.route('/project/<project_id>')
 @jwt_required
 def get_project_images(project_id):
     """
