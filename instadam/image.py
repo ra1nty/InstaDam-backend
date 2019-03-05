@@ -90,7 +90,7 @@ def get_project_image(project_id, image_id):
         project_id: The id of the project
         image_id: The id of the image to return
     """
-    image = Image.query.filter_by(id=image_id, project_id=project_id).all()
+    image = Image.query.filter_by(id=image_id, project_id=project_id)
     if image.first() == None:
         abort(
             404, 'No image in project of id=%s found with id=%s' % (project_id,
