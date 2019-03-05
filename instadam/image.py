@@ -64,7 +64,7 @@ def get_unannotated_images():
     NOTE: Only returning a fixed number of images (k=5) for Iteration 3
     """
     unannotated_images = Image.query.filter_by(is_annotated=False).all()[0:k]
-    if len(unannotated_images) == 0:
+    if not unannotated_images:
         return jsonify({'unannotated_images': []}), 200
 
     unannotated_images_res = []
@@ -91,7 +91,7 @@ def get_project_image(project_id, image_id):
         image_id: The id of the image to return
     """
     image = Image.query.filter_by(id=image_id, project_id=project_id).all()
-    if len(image) == 0:
+    if image.first() == None:
         abort(
             404, 'No image in project of id=%s found with id=%s' % (project_id,
                                                                     image_id))
@@ -116,7 +116,7 @@ def get_project_images(project_id):
         project_id: The id of the project
     """
     project_images = Image.query.filter_by(project_id=project_id).all()[0:k]
-    if len(project_images) == 0:
+    if not project_images:
         return jsonify({'project_images': []}), 200
 
     project_images_res = []
