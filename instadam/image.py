@@ -90,13 +90,11 @@ def get_project_image(project_id, image_id):
         project_id: The id of the project
         image_id: The id of the image to return
     """
-    image = Image.query.filter_by(id=image_id, project_id=project_id)
-    if image.first() == None:
+    image = Image.query.filter_by(id=image_id, project_id=project_id).first()
+    if image == None:
         abort(
             404, 'No image in project of id=%s found with id=%s' % (project_id,
                                                                     image_id))
-    else:
-        image = image[0]
 
     return jsonify({
         'id': image.id,
