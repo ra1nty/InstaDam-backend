@@ -97,7 +97,7 @@ def get_unannotated_images(project_id):
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
 
-    project_exists = Project.query.filter_by(project_id=project_id).first()
+    project_exists = Project.query.filter_by(id=project_id).first()
     if project_exists is None:
         abort(404, 'Project with id=%s does not exist' % (project_id))
 
@@ -140,7 +140,7 @@ def get_project_images(project_id):
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
 
-    project_exists = Project.query.filter_by(project_id=project_id).first()
+    project_exists = Project.query.filter_by(id=project_id).first()
     if project_exists is None:
         abort(404, 'Project with id=%s does not exist' % (project_id))
 
