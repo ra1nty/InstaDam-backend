@@ -22,21 +22,33 @@ def local_client():
         db.drop_all()
         db.create_all()
 
+        rw_permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
+        r_permission = ProjectPermission(access_type=AccessTypeEnum.READ_ONLY)
+
         admin = User(
             username='test_upload_admin1',
-            email='email@test_upload.com',
+            email='email@test_load.com',
             privileges=PrivilegesEnum.ADMIN)
         admin.set_password('TestTest1')
+        admin.project_permissions.append(rw_permission)
         db.session.add(admin)
         db.session.flush()
         db.session.commit()
 
         annotator = User(
-            username='test_upload_annotator1', email='email2@test_upload.com')
+            username='test_upload_annotator1',
+            email='email2@test_load.com',
+            privileges=PrivilegesEnum.ANNOTATOR)
         annotator.set_password('TestTest2')
-        permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
-        annotator.project_permissions.append(permission)
+        annotator.project_permissions.append(r_permission)
         db.session.add(annotator)
+        db.session.flush()
+        db.session.commit()
+
+        annotator_2 = User(
+            username='test_upload_annotator2', email='email3@test_load.com')
+        annotator_2.set_password('TestTest3')
+        db.session.add(annotator_2)
         db.session.flush()
         db.session.commit()
 
@@ -45,9 +57,8 @@ def local_client():
         db.session.flush()
         db.session.commit()
 
-        permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
-        annotator.project_permissions.append(permission)
-        project.permissions.append(permission)
+        project.permissions.append(rw_permission)
+        project.permissions.append(r_permission)
 
         test_image = Image(
             image_name='cat.jpg',
@@ -90,7 +101,7 @@ def test_load_unannotated_images(local_client):
                                     'TestTest2')
 
     res = local_client.get(
-        '/image/unannotated',
+        '/projects/1/unannotated',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
@@ -109,12 +120,23 @@ def test_load_unannotated_images(local_client):
             'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
 
 
+def test_load_unannotated_images_fail(local_client):
+    access_token = successful_login(local_client, 'test_upload_annotator2',
+                                    'TestTest3')
+
+    res = local_client.get(
+        '/projects/1/unannotated',
+        headers={'Authorization': 'Bearer %s' % access_token})
+
+    assert '401 UNAUTHORIZED' == res.status
+
+
 def test_load_project_images(local_client):
     access_token = successful_login(local_client, 'test_upload_annotator1',
                                     'TestTest2')
 
     res = local_client.get(
-        '/image/project/1',
+        '/projects/1/images',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
@@ -140,11 +162,22 @@ def test_load_project_images_fail(local_client):
                                     'TestTest2')
 
     res = local_client.get(
-        '/image/project/3',
+        '/projects/3/images',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
     assert len(json_res['project_images']) == 0
+
+
+def test_load_project_images_fail_2(local_client):
+    access_token = successful_login(local_client, 'test_upload_annotator2',
+                                    'TestTest3')
+
+    res = local_client.get(
+        '/projects/1/images,
+        headers={'Authorization': 'Bearer %s' % access_token})
+
+    assert '401 UNAUTHORIZED' == res.status
 
 
 def test_load_image(local_client):
@@ -152,8 +185,7 @@ def test_load_image(local_client):
                                     'TestTest2')
 
     res = local_client.get(
-        '/image/1/project/1',
-        headers={'Authorization': 'Bearer %s' % access_token})
+        '/image/1', headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
     assert 'id' in json_res
@@ -165,29 +197,6 @@ def test_load_image_fail(local_client):
                                     'TestTest2')
 
     res = local_client.get(
-        '/image/5/project/1',
-        headers={'Authorization': 'Bearer %s' % access_token})
-
-    assert '404 NOT FOUND' == res.status
-
-
-def test_load_image_fail_2(local_client):
-    access_token = successful_login(local_client, 'test_upload_annotator1',
-                                    'TestTest2')
-
-    res = local_client.get(
-        '/image/1/project/4',
-        headers={'Authorization': 'Bearer %s' % access_token})
-
-    assert '404 NOT FOUND' == res.status
-
-
-def test_load_image_fail_3(local_client):
-    access_token = successful_login(local_client, 'test_upload_annotator1',
-                                    'TestTest2')
-
-    res = local_client.get(
-        '/image/4/project/3',
-        headers={'Authorization': 'Bearer %s' % access_token})
+        '/image/5', headers={'Authorization': 'Bearer %s' % access_token})
 
     assert '404 NOT FOUND' == res.status

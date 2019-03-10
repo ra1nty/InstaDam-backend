@@ -57,7 +57,7 @@ def upload_image(project_id):
 
 @bp.route('/<image_id>')
 @jwt_required
-def get_project_image(project_id, image_id):
+def get_project_image(image_id):
     """
     Get images with image_id that exists in project with project_id
     NOTE: Only returning a fixed number of images (k=5) for Iteration 3

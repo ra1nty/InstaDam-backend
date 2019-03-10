@@ -93,7 +93,20 @@ def get_unannotated_images(project_id):
     see images to annotate
     NOTE: Only returning a fixed number of images (k=5) for Iteration 3
     """
-    unannotated_images = Image.query.filter_by(is_annotated=False).all()[0:k]
+
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
+    has_permission = ProjectPermission.query.filter_by(
+        user_id=user.id, project_id=project_id).first()
+
+    if has_permission is None:
+        abort(
+            401,
+            'User does not have the privilege to view the unannotated images of project with id=%s'
+            % (project_id))
+
+    unannotated_images = Image.query.filter_by(
+        is_annotated=False, project_id=project_id).all()
     if not unannotated_images:
         return jsonify({'unannotated_images': []}), 200
 
@@ -119,7 +132,19 @@ def get_project_images(project_id):
     Args:
         project_id: The id of the project
     """
-    project_images = Image.query.filter_by(project_id=project_id).all()[0:k]
+
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
+    has_permission = ProjectPermission.query.filter_by(
+        user_id=user.id, project_id=project_id).first()
+
+    if has_permission is None:
+        abort(
+            401,
+            'User does not have the privilege to view the images of project with id=%s'
+            % (project_id))
+
+    project_images = Image.query.filter_by(project_id=project_id).all()
     if not project_images:
         return jsonify({'project_images': []}), 200
 
