@@ -174,7 +174,7 @@ def test_load_project_images_fail_2(local_client):
                                     'TestTest3')
 
     res = local_client.get(
-        '/projects/1/images,
+        '/projects/1/images',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     assert '401 UNAUTHORIZED' == res.status
