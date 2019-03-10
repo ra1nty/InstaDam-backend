@@ -7,8 +7,6 @@ from zipfile import ZipFile
 
 from flask import Blueprint, abort, jsonify, request
 from flask_jwt_extended import (get_jwt_identity, jwt_required)
-from sqlalchemy.exc import IntegrityError
-
 from instadam.app import db
 from instadam.models.image import Image, VALID_IMG_EXTENSIONS
 from instadam.models.project_permission import (AccessTypeEnum,
@@ -17,6 +15,7 @@ from instadam.models.user import PrivilegesEnum, User
 from instadam.utils import construct_msg
 from instadam.utils.file import (get_project_dir,
                                  parse_and_validate_file_extension)
+from sqlalchemy.exc import IntegrityError
 
 bp = Blueprint('image', __name__, url_prefix='/image')
 
@@ -89,7 +88,7 @@ def upload_zip(project_id):
     project_dir = get_project_dir(project)
     if 'zip' in request.files:
         file = request.files['zip']
-        extension = parse_and_validate_file_extension(file, {'zip'})
+        extension = parse_and_validate_file_extension(file.filename, {'zip'})
         new_file_name = '%s.%s' % (str(uuid.uuid4()), extension)
         zip_path = os.path.join(project_dir, new_file_name)
         file.save(zip_path)
@@ -111,8 +110,10 @@ def upload_zip(project_id):
             else:
                 db.session.commit()
             name_map[image_name] = image.image_name
-            multiprocessing.Process(target=unzip_process,
-                                    args=(zip_path, name_map))
+
+        zip_file.close()
+        multiprocessing.Process(target=unzip_process,
+                                args=(zip_path, name_map)).start()
         return (construct_msg(
             'Zip uploaded successfully, please wait for unzip'), 200)
     else:
