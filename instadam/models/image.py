@@ -6,7 +6,7 @@ from flask import abort
 from flask import current_app as app
 
 from instadam.models.project import Project
-from instadam.utils.file import parse_and_validate_file_extension
+from instadam.utils.file import (parse_and_validate_file_extension, get_project_dir)
 from ..app import db
 
 VALID_IMG_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -46,13 +46,21 @@ class Image(db.Model):
         project = Project.query.filter_by(id=self.project_id).first()
         if project is None:
             abort(400, 'Project with id %d does not exist.' % self.project_id)
+        project_dir = get_project_dir(project)
+        new_file_name = '%s.%s' % (str(uuid.uuid4()), extension)
+        self.image_name = new_file_name
+        img_file.save(os.path.join(project_dir, new_file_name))
+
+    def save_empty_image(self, original_file_name):
+        extension = parse_and_validate_file_extension(original_file_name,
+                                                      VALID_IMG_EXTENSIONS)
+        project = Project.query.filter_by(id=self.project_id).first()
         project_dir = os.path.join(app.config['STATIC_STORAGE_DIR'],
                                    str(project.id))
         if not os.path.exists(project_dir):
             os.mkdir(project_dir)
         new_file_name = '%s.%s' % (str(uuid.uuid4()), extension)
-        self.image_name = new_file_name
-        img_file.save(os.path.join(project_dir, new_file_name))
+        self.image_name = os.path.join(project_dir, new_file_name)
 
     def __repr__(self):
         return '<Image: %r>' % self.image_name
