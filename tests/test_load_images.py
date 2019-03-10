@@ -131,6 +131,17 @@ def test_load_unannotated_images_fail(local_client):
     assert '401 UNAUTHORIZED' == res.status
 
 
+def test_load_unannotated_images_fail_2(local_client):
+    access_token = successful_login(local_client, 'test_upload_annotator1',
+                                    'TestTest2')
+
+    res = local_client.get(
+        '/projects/3/unannotated',
+        headers={'Authorization': 'Bearer %s' % access_token})
+
+    assert '404 NOT FOUND' == res.status
+
+
 def test_load_project_images(local_client):
     access_token = successful_login(local_client, 'test_upload_annotator1',
                                     'TestTest2')
@@ -165,8 +176,7 @@ def test_load_project_images_fail(local_client):
         '/projects/3/images',
         headers={'Authorization': 'Bearer %s' % access_token})
 
-    json_res = res.get_json()
-    assert len(json_res['project_images']) == 0
+    assert '404 NOT FOUND' == res.status
 
 
 def test_load_project_images_fail_2(local_client):

@@ -96,9 +96,13 @@ def get_unannotated_images(project_id):
 
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
+
+    project_exists = Project.query.filter_by(project_id=project_id).first()
+    if project_exists is None:
+        abort(404, 'Project with id=%s does not exist' % (project_id))
+
     has_permission = ProjectPermission.query.filter_by(
         user_id=user.id, project_id=project_id).first()
-
     if has_permission is None:
         abort(
             401,
@@ -135,9 +139,13 @@ def get_project_images(project_id):
 
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
+
+    project_exists = Project.query.filter_by(project_id=project_id).first()
+    if project_exists is None:
+        abort(404, 'Project with id=%s does not exist' % (project_id))
+
     has_permission = ProjectPermission.query.filter_by(
         user_id=user.id, project_id=project_id).first()
-
     if has_permission is None:
         abort(
             401,
