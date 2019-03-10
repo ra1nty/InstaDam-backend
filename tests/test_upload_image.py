@@ -1,6 +1,7 @@
 import filecmp
 import os
 import shutil
+import time
 
 import pytest
 from werkzeug.datastructures import FileStorage
@@ -145,3 +146,49 @@ def test_upload_image_fail_4(local_client):
         assert '415 UNSUPPORTED MEDIA TYPE' == rv.status
         json_data = rv.get_json()
         assert 'msg' in json_data
+
+
+def test_upload_zip(local_client):
+    access_token = successful_login(local_client, 'test_upload_user1',
+                                    'TestTest1')
+    with open('tests/test.zip', 'rb') as fd:
+        file = FileStorage(fd)
+        rv = local_client.post(
+            '/image/upload/zip/1', data={'zip': file},
+            headers={'Authorization': 'Bearer %s' % access_token})
+        assert '200 OK' == rv.status
+        json_data = rv.get_json()
+        assert 'msg' in json_data
+        assert 'Zip uploaded successfully, please wait for unzip' == json_data[
+            'msg']
+
+    time.sleep(1)
+
+    storage_path = os.path.join(Config.STATIC_STORAGE_DIR, '1')
+    assert os.path.isdir(storage_path)
+    files = os.listdir(storage_path)
+    assert 2 == len(files)
+    assert filecmp.cmp(os.path.join(storage_path, files[0]),
+                       os.path.join(storage_path, files[1]))
+    assert filecmp.cmp(os.path.join(storage_path, files[0]), 'tests/cat.jpg')
+
+
+def test_upload_zip_failed(local_client):
+    access_token = successful_login(local_client, 'test_upload_user1',
+                                    'TestTest1')
+    with open('tests/cat.jpg', 'rb') as fd:
+        file = FileStorage(fd)
+        rv = local_client.post(
+            '/image/upload/zip/1', data={'zip': file},
+            headers={'Authorization': 'Bearer %s' % access_token})
+        assert '415 UNSUPPORTED MEDIA TYPE' == rv.status
+
+def test_upload_zip_failed2(local_client):
+    access_token = successful_login(local_client, 'test_upload_user1',
+                                    'TestTest1')
+    with open('tests/cat.jpg', 'rb') as fd:
+        file = FileStorage(fd)
+        rv = local_client.post(
+            '/image/upload/zip/1', data={'image': file},
+            headers={'Authorization': 'Bearer %s' % access_token})
+        assert '400 BAD REQUEST' == rv.status
