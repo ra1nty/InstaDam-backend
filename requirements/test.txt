@@ -1,5 +1,6 @@
 flask
 Pillow
+numpy
 flask-sqlalchemy
 psycopg2
 flask-jwt-extended

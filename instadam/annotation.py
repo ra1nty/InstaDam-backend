@@ -5,9 +5,12 @@ Module for annotation end points
 import base64
 from io import BytesIO
 
-import PIL
+import PIL.Image
+import numpy as np
 from flask import Blueprint, abort, jsonify, request
 from flask_jwt_extended import (get_jwt_identity, jwt_required)
+from sqlalchemy.exc import IntegrityError
+
 from instadam.app import db
 from instadam.models.annotation import Annotation
 from instadam.models.image import Image
@@ -15,7 +18,6 @@ from instadam.models.label import Label
 from instadam.models.user import User
 from instadam.utils import construct_msg
 from instadam.utils.get_project import maybe_get_project
-from sqlalchemy.exc import IntegrityError
 
 bp = Blueprint('annotation', __name__, url_prefix='/annotation')
 
@@ -36,12 +38,12 @@ def upload_annotation():
     if not (label and image):
         abort(400, 'Invalid label or image')
 
-    # orig_image = PIL.Image.open(image.image_path)
-    # binary_annotation = base64.b85decode(req['annotation'])
-    # annotation_img = PIL.Image.open(BytesIO(binary_annotation))
-    #
-    # if not orig_image.shape[:2] == annotation_img.shape[:2]:
-    #     abort(400, 'Annotation shape does not match image')
+    orig_image = np.asarray(PIL.Image.open(image.image_path))
+    binary_annotation = base64.b64decode(req['annotation'])
+    annotation_img = np.asarray(PIL.Image.open(BytesIO(binary_annotation)))
+
+    if not orig_image.shape[:2] == annotation_img.shape[:2]:
+        abort(400, 'Annotation shape does not match image')
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
 
