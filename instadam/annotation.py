@@ -47,7 +47,13 @@ def upload_annotation():
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
 
-    byte_data = base64.b64decode(req['annotation'])
+    byte_data = b''
+
+    try:
+        byte_data = base64.b64decode(req['annotation'])
+    except Exception as e:
+        abort(400, str(e))
+
     annotation = Annotation(data=byte_data, image_id=image.id,
                             label_id=label.id)
     project.annotations.append(annotation)
