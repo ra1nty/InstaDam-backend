@@ -59,3 +59,19 @@ def test_annotation_and_project(client):
     assert len(project.annotations) == 2
     assert annotation1 == project.annotations[1]
     assert project == annotation1.project
+
+
+def test_annotation_and_user(client):
+    annotation = Annotation()
+    annotation1 = Annotation()
+    user = User()
+    user.annotations.append(annotation)
+    user.annotations.append(annotation1)
+
+    assert annotation == user.annotations[0]
+    assert user == annotation.created_by
+
+    assert len(user.annotations) == 2
+    assert annotation1 == user.annotations[1]
+    assert user == annotation1.created_by
+

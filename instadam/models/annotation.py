@@ -11,7 +11,7 @@ class Annotation(db.Model):
         id: unique integer id given to a user (primary key)
         project_id: integer to represent id of project that this annotation belongs to
         image_id: integer to represent id of image that this annotation belongs to
-        created_by: integer to represent id of user that creates this annotation
+        creator_id: integer to represent id of user that creates this annotation
         label_id: integer to represent id of label that this annotation is for
         added_at: datetime that image was added to the project
         data: largebinary to represent the mask (largebinary corresponds to BYTEA on PostgreSQL:
@@ -25,14 +25,16 @@ class Annotation(db.Model):
     # backref: original_image
     image_id = db.Column(db.Integer, db.ForeignKey('image.id'), nullable=False)
 
-    # Since in image model, project_id is nullable, it is illogical to make the annotation non-nullable here
+    # Since in image model, project_id is nullable, it is illogical to make it non-nullable here
     # backref: project
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
+    # backref: created_by
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+    # backref: label
+    label_id = db.Column(db.Integer, db.ForeignKey('label.id'), nullable=False)
 
-    # created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
-    # label_id = db.Column(db.Integer, db.ForeignKey('label.id'), nullable=False)
     added_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
     data = db.Column(db.LargeBinary, nullable=False)
 
