@@ -30,6 +30,7 @@ def test_image_and_project(client):
     assert image == project.images[0]
     assert project == image.project
 
+
 def test_annotation_and_image(client):
     annotation = Annotation()
     image = Image()
