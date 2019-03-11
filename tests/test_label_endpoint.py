@@ -74,3 +74,37 @@ def test_add_label(local_client):
     json_data = rv.get_json()
     assert 'msg' in json_data
     assert 'Label added successfully' == json_data['msg']
+
+
+def test_get_label(local_client):
+    access_token = successful_login(local_client, 'test_upload_user1',
+                                    'TestTest1')
+    rv = local_client.post(
+        '/project/1/labels', json={'label_name': 'my_label_1'},
+        headers={'Authorization': 'Bearer %s' % access_token})
+    assert '200 OK' == rv.status
+    json_data = rv.get_json()
+    assert 'msg' in json_data
+    assert 'Label added successfully' == json_data['msg']
+
+    rv = local_client.post(
+        '/project/1/labels', json={'label_name': 'my_label_2'},
+        headers={'Authorization': 'Bearer %s' % access_token})
+    assert '200 OK' == rv.status
+    json_data = rv.get_json()
+    assert 'msg' in json_data
+    assert 'Label added successfully' == json_data['msg']
+
+    rv = local_client.get(
+        '/project/1/labels',
+        headers={'Authorization': 'Bearer %s' % access_token})
+
+    assert '200 OK' == rv.status
+    json_data = rv.get_json()
+    assert 'labels' in json_data
+    labels = json_data['labels']
+    assert 2 == len(labels)
+
+    for label in labels:
+        label_id = label['id']
+        assert 'my_label_%d' % label_id == label['name']

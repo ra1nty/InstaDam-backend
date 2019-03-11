@@ -194,3 +194,12 @@ def add_label(project_id):
     else:
         db.session.commit()
     return construct_msg('Label added successfully'), 200
+
+
+@bp.route('/project/<project_id>/labels', methods=['GET'])
+@jwt_required
+def get_labels(project_id):
+    project = maybe_get_project(project_id)
+    labels = [{'name': label.label_name, 'id': label.id} for label in
+              project.labels]
+    return jsonify({'labels': labels}), 200
