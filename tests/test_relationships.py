@@ -44,3 +44,18 @@ def test_annotation_and_image(client):
     assert len(image.annotations) == 2
     assert annotation1 == image.annotations[1]
     assert image == annotation1.original_image
+
+
+def test_annotation_and_project(client):
+    annotation = Annotation()
+    annotation1 = Annotation()
+    project = Project()
+    project.annotations.append(annotation)
+    project.annotations.append(annotation1)
+
+    assert annotation == project.annotations[0]
+    assert project == annotation.project
+
+    assert len(project.annotations) == 2
+    assert annotation1 == project.annotations[1]
+    assert project == annotation1.project

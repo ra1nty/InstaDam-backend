@@ -25,6 +25,7 @@ class Project(db.Model):
 
     images = relationship('Image', backref='project')
     permissions = relationship('ProjectPermission', back_populates='project')
+    annotations = relationship('Annotation', backref='project')
 
     def __repr__(self):
         return '<Project: %r>' % self.project_name

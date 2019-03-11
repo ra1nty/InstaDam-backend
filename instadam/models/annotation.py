@@ -21,11 +21,16 @@ class Annotation(db.Model):
     __tablename__ = 'annotation'
     id = db.Column(db.Integer, primary_key=True)
 
+    # TODO: consistency problem - image's project and project_id should be the consistent
     # backref: original_image
     image_id = db.Column(db.Integer, db.ForeignKey('image.id'), nullable=False)
 
     # Since in image model, project_id is nullable, it is illogical to make the annotation non-nullable here
-    # project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    # backref: project
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+
+
+
     # created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
     # label_id = db.Column(db.Integer, db.ForeignKey('label.id'), nullable=False)
     added_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
