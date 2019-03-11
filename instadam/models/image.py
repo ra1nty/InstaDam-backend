@@ -4,6 +4,7 @@ import uuid
 
 from flask import abort
 from flask import current_app as app
+from sqlalchemy.orm import relationship
 
 from instadam.models.project import Project
 from instadam.utils.file import (parse_and_validate_file_extension, get_project_dir)
@@ -33,6 +34,9 @@ class Image(db.Model):
         db.DateTime, nullable=False, default=dt.datetime.utcnow)
     is_annotated = db.Column(db.Boolean, nullable=False, default=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+
+    annotations = relationship('Annotation', backref='original_image')
+
 
     def save_image_to_project(self, img_file):
         """Saves the image file associated to disk.
