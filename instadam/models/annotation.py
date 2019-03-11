@@ -29,9 +29,6 @@ class Annotation(db.Model):
     # backref: project
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
-    # backref: created_by
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
     # backref: label
     label_id = db.Column(db.Integer, db.ForeignKey('label.id'), nullable=False)
 
