@@ -1,4 +1,5 @@
 flask
+Pillow
 flask-sqlalchemy
 psycopg2
 flask-jwt-extended
