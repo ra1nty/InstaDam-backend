@@ -33,6 +33,7 @@ class Project(db.Model):
 
     images = relationship('Image', backref='project')
     permissions = relationship('ProjectPermission', back_populates='project')
+    annotations = relationship('Annotation', backref='project')
 
     labels = relationship("Label", secondary=label_project_association_table, backref="projects")
 
