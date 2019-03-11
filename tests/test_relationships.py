@@ -32,6 +32,34 @@ def test_image_and_project(client):
     assert project == image.project
 
 
+def test_label_and_project(client):
+    label = Label()
+    label1 = Label()
+    project = Project()
+    project1 = Project()
+
+    project.labels.append(label)
+    project.labels.append(label1)
+    assert(len(project.labels) == 2)
+    assert(label == project.labels[0])
+    assert(label1 == project.labels[1])
+
+    assert(len(label.projects) == 1)
+    assert(len(label1.projects) == 1)
+
+    # test many-to-many relationship
+    project1.labels.append(label)
+    project1.labels.append(label1)
+    assert(len(project1.labels) == 2)
+    assert (label == project1.labels[0])
+    assert (label1 == project1.labels[1])
+
+    assert (len(label.projects) == 2)
+    assert (len(label1.projects) == 2)
+
+# TODO: test label_project_association unique (cannot add the same association twice)
+
+
 def test_annotation_and_image(client):
     annotation = Annotation()
     image = Image()
