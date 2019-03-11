@@ -4,8 +4,7 @@ ssh -o StrictHostKeyChecking=no $TRAVIS_SSH_USER@$TRAVIS_SSH_HOST -t "cd ~/Insta
 docker-compose down;\
 cd /tmp/${TRAVIS_BUILD_ID};\
 sudo rm -rf ~/InstaDam-backend;\
-mkdir -p ~/InstaDam-backend;\
-sudo mv /tmp/${TRAVIS_BUILD_ID}/InstaDam-backend ~/InstaDam-backend;\
+sudo mv /tmp/${TRAVIS_BUILD_ID}/InstaDam-backend ~/;\
 cd ~/InstaDam-backend;\
 source ~/.bashrc;\
 docker-compose up --build"
