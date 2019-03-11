@@ -7,4 +7,4 @@ cd /tmp/${TRAVIS_BUILD_ID};\
 sudo rm -rf ~/InstaDam-backend;\
 sudo mv /tmp/${TRAVIS_BUILD_ID}/InstaDam-backend ~/;\
 cd ~/InstaDam-backend;\
-sudo docker-compose up --build&"
+sudo docker-compose --verbose up --build&"
