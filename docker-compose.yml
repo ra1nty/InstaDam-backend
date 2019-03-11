@@ -4,24 +4,42 @@ services:
     restart: always
     image: postgres:10
     environment:
-      - POSTGRES_USER=${_DB_USERNAME}
-      - POSTGRES_PASSWORD=${_DB_PASSWORD}
-      - POSTGRES_DB=${_DB_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
     volumes:
-      - ./postgres-data/postgres:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+      - "dbdata:/var/lib/postgresql/data"
+    networks:
+      - db_nw
   app:
     restart: always
     build: .
     environment:
-      - _DB_USERNAME=${_DB_USERNAME}
-      - _DB_PASSWORD=${_DB_PASSWORD}
-      - _DB_NAME=${_DB_NAME}
-    ports:
-      - 5000:5000
+      - _DB_USERNAME=${DB_USERNAME}
+      - _DB_PASSWORD=${DB_PASSWORD}
+      - _DB_NAME=${DB_NAME}
     volumes: 
-      - .:/app
+      - ./instadam:/home/flaskapp/src
+    networks:
+      - db_nw
+      - web_nw
     depends_on:
       - postgres
     entrypoint: ["python","manage.py","start", "--mode=production"]
+  nginx:
+    image: "nginx:1.13.5"
+    ports:
+      - "8080:80"
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d
+    networks:
+      - web_nw
+    depends_on:
+      - app
+networks:
+  db_nw:
+    driver: bridge
+  web_nw:
+    driver: bridge
+volumes:
+  dbdata:
