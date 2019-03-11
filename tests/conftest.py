@@ -2,7 +2,7 @@ import pytest
 
 from instadam.app import create_app, db
 
-TEST_MODE = 'testing'
+TEST_MODE = 'development'
 
 
 @pytest.fixture
