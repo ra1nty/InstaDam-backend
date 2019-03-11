@@ -6,34 +6,19 @@ import uuid
 from zipfile import ZipFile
 
 from flask import Blueprint, abort, jsonify, request
-from flask_jwt_extended import (get_jwt_identity, jwt_required)
+from flask_jwt_extended import (jwt_required)
 from instadam.app import db
 from instadam.models.image import Image, VALID_IMG_EXTENSIONS
-from instadam.models.project_permission import (AccessTypeEnum,
-                                                ProjectPermission)
-from instadam.models.user import PrivilegesEnum, User
 from instadam.utils import construct_msg
 from instadam.utils.file import (get_project_dir,
                                  parse_and_validate_file_extension)
 from sqlalchemy.exc import IntegrityError
 
+from instadam.utils.get_project import maybe_get_project
+
 bp = Blueprint('image', __name__, url_prefix='/image')
 
 k = 5  # Fixed max number of images to return in response
-
-
-def maybe_get_project(project_id):
-    current_user = get_jwt_identity()
-    user = User.query.filter_by(username=current_user).first()
-    if user.privileges == PrivilegesEnum.ANNOTATOR:
-        abort(401, 'User is not Admin')
-    permission = ProjectPermission.query.filter_by(
-        project_id=project_id,
-        user_id=user.id,
-        access_type=AccessTypeEnum.READ_WRITE).first()
-    if permission is None:
-        abort(401, 'User does not have permission to add image to this project')
-    return permission.project
 
 
 @bp.route('/upload/<project_id>', methods=['POST'])
