@@ -3,18 +3,19 @@ Module for annotation end points
 """
 
 import base64
+from io import BytesIO
 
-from PIL import Image
+import PIL
 from flask import Blueprint, abort, jsonify, request
-from flask_jwt_extended import (jwt_required)
-from sqlalchemy.exc import IntegrityError
-
+from flask_jwt_extended import (get_jwt_identity, jwt_required)
 from instadam.app import db
 from instadam.models.annotation import Annotation
 from instadam.models.image import Image
 from instadam.models.label import Label
+from instadam.models.user import User
 from instadam.utils import construct_msg
 from instadam.utils.get_project import maybe_get_project
+from sqlalchemy.exc import IntegrityError
 
 bp = Blueprint('annotation', __name__, url_prefix='/annotation')
 
@@ -23,31 +24,34 @@ bp = Blueprint('annotation', __name__, url_prefix='/annotation')
 @jwt_required
 def upload_annotation():
     req = request.get_json()
-    ids_to_check = ['project_id', 'label_id', 'image_id']
+    ids_to_check = ['project_id', 'label_id', 'image_id', 'annotation']
     for id_to_check in ids_to_check:
         if id_to_check not in req:
             abort(400, 'Missing %s in json' % id_to_check)
     project = maybe_get_project(req['project_id'])
     label = Label.query.filter_by(id=req['label_id'],
                                   project_id=project.id).first()
-    image = Image.query.filter_by(id=req['image'],
+    image = Image.query.filter_by(id=req['image_id'],
                                   project_id=project.id).first()
     if not (label and image):
         abort(400, 'Invalid label or image')
-    if 'annotation' not in request.files:
-        abort(400, 'Missing annotation file')
 
-    file = request.files['annotation']
-    orig_image = Image.open(image.image_path)
-    binary_annotation = file.read()
-    annotation_img = Image.open(binary_annotation)
+    # orig_image = PIL.Image.open(image.image_path)
+    # binary_annotation = base64.b85decode(req['annotation'])
+    # annotation_img = PIL.Image.open(BytesIO(binary_annotation))
+    #
+    # if not orig_image.shape[:2] == annotation_img.shape[:2]:
+    #     abort(400, 'Annotation shape does not match image')
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
 
-    if not orig_image.shape[:2] == annotation_img.shape[:2]:
-        abort(400, 'Annotation shape does not match image')
-    annotation = Annotation(data=binary_annotation)
+    byte_data = base64.b64decode(req['annotation'])
+    annotation = Annotation(data=byte_data, image_id=image.id,
+                            label_id=label.id)
     project.annotations.append(annotation)
     image.annotations.append(annotation)
     label.annotations.append(annotation)
+    user.annotations.append(annotation)
     try:
         db.session.add(label)
         db.session.flush()
@@ -61,7 +65,7 @@ def upload_annotation():
 
 @bp.route('/', methods=['GET'])
 @jwt_required
-def upload_annotation():
+def get_annotation():
     req = request.get_json()
     ids_to_check = ['label_id', 'image_id']
     for id_to_check in ids_to_check:
@@ -71,14 +75,14 @@ def upload_annotation():
     if not label:
         abort(400, 'Invalid label id')
     project = maybe_get_project(label.project_id)
-    image = Image.query.filter_by(id=req['image'],
+    image = Image.query.filter_by(id=req['image_id'],
                                   project_id=project.id).first()
     if image is None:
         abort(400, 'Invalid image id')
     annotation = Annotation.query.filter_by(project_id=project.id,
                                             image_id=image.id,
-                                            label_id=label.id)
+                                            label_id=label.id).first()
     if not annotation:
         abort(400, 'Annotation not found')
-    encoded_string = base64.encodebytes(annotation.data)
-    return jsonify({'base64': encoded_string}), 200
+    base64_str = base64.b64encode(annotation.data).decode('utf-8')
+    return jsonify({'base64': base64_str}), 200

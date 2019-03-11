@@ -34,6 +34,8 @@ def create_app(mode='development'):
     from . import image
     app.register_blueprint(image.bp)
     app.register_blueprint(project.bp)
+    from . import annotation
+    app.register_blueprint(annotation.bp)
 
     if not os.path.isdir(app.config['STATIC_STORAGE_DIR']):
         os.mkdir(app.config['STATIC_STORAGE_DIR'])

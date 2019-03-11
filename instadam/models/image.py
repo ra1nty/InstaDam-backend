@@ -53,7 +53,8 @@ class Image(db.Model):
         project_dir = get_project_dir(project)
         new_file_name = '%s.%s' % (str(uuid.uuid4()), extension)
         self.image_name = new_file_name
-        img_file.save(os.path.join(project_dir, new_file_name))
+        self.image_path = os.path.join(project_dir, new_file_name)
+        img_file.save(self.image_path)
 
     def save_empty_image(self, original_file_name):
         extension = parse_and_validate_file_extension(original_file_name,
@@ -64,7 +65,8 @@ class Image(db.Model):
         if not os.path.exists(project_dir):
             os.mkdir(project_dir)
         new_file_name = '%s.%s' % (str(uuid.uuid4()), extension)
-        self.image_name = os.path.join(project_dir, new_file_name)
+        self.image_name = new_file_name
+        self.image_path = os.path.join(project_dir, new_file_name)
 
     def __repr__(self):
         return '<Image: %r>' % self.image_name
