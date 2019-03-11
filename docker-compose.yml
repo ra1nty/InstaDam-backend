@@ -25,7 +25,7 @@ services:
       - web_nw
     depends_on:
       - postgres
-    entrypoint: ["python","manage.py","start", "--mode=production"]
+    entrypoint: ["python","manage.py","deploy"]
   nginx:
     image: "nginx:1.13.5"
     ports:

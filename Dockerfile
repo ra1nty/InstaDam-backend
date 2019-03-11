@@ -8,11 +8,11 @@ RUN \
  apk add --no-cache postgresql-libs && \
  apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev
 
-RUN pip install --no-cache-dir -r requirements/prod.txt
+RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install gunicorn
 RUN apk --purge del .build-deps
 
-COPY instadam /home/flaskapp/src
+COPY instadam /home/flaskapp/instadam
 COPY manage.py /home/flaskapp
 
 EXPOSE 5000

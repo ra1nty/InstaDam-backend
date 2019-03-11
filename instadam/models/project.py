@@ -2,7 +2,7 @@ import datetime as dt
 
 from sqlalchemy import Table, PrimaryKeyConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
-
+from instadam.models.label import Label
 from ..app import db
 
 label_project_association_table = Table('label_project_association',
