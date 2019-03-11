@@ -1,14 +1,18 @@
-from flask import Blueprint, jsonify, request, abort
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from sqlalchemy.exc import IntegrityError, DatabaseError
+import os
 
+from flask import Blueprint, abort, jsonify, request
 from flask import current_app as app
-from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
-from instadam.models.user import User, PrivilegesEnum
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from sqlalchemy.exc import DatabaseError, IntegrityError
+
 from instadam.models.image import Image
+from instadam.models.label import Label
+from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
+from instadam.models.user import PrivilegesEnum, User
+from instadam.utils import construct_msg
+from instadam.utils.get_project import maybe_get_project
 from .app import db
 from .models.project import Project
-import os
 
 bp = Blueprint('project', __name__, url_prefix='')
 
@@ -18,7 +22,8 @@ bp = Blueprint('project', __name__, url_prefix='')
 def create_project():
     """ Create a new project by the user currently signed in
 
-    Create a new project entry in the database and a new folder in the filesystem
+    Create a new project entry in the database and a new folder in the
+    filesystem
     to hold image dataset upon receiving a `POST`request to the `/project` entry
     point. User must be signed in as an ADMIN and must provide a `project name`
     to create a new project.
@@ -57,7 +62,7 @@ def create_project():
         db.session.rollback()
         abort(
             400, 'Duplicate project name. '
-            'Please provide a different project name.')
+                 'Please provide a different project name.')
     else:
         # if able to add project to db, try add project_permission
         # creator is granted with READ_WRITE privilege
@@ -106,7 +111,8 @@ def get_unannotated_images(project_id):
     if has_permission is None:
         abort(
             401,
-            'User does not have the privilege to view the unannotated images of project with id=%s'
+            'User does not have the privilege to view the unannotated images '
+            'of project with id=%s'
             % (project_id))
 
     unannotated_images = Image.query.filter_by(
@@ -149,7 +155,8 @@ def get_project_images(project_id):
     if has_permission is None:
         abort(
             401,
-            'User does not have the privilege to view the images of project with id=%s'
+            'User does not have the privilege to view the images of project '
+            'with id=%s'
             % (project_id))
 
     project_images = Image.query.filter_by(project_id=project_id).all()
@@ -166,3 +173,24 @@ def get_project_images(project_id):
         project_images_res.append(project_image_res)
 
     return jsonify({'project_images': project_images_res}), 200
+
+
+@bp.route('/project/<project_id>/labels', methods=['POST'])
+@jwt_required
+def add_label(project_id):
+    project = maybe_get_project(project_id)
+    req = request.get_json()
+    if not 'label_name' in req:
+        abort(400, 'Missing label name')
+    label_name = req['label_name']
+    label = Label(label_name=label_name)
+    project.labels.append(label)
+    try:
+        db.session.add(label)
+        db.session.flush()
+    except IntegrityError:
+        db.session.rollback()
+        abort(400, 'Failed to add image')
+    else:
+        db.session.commit()
+    return construct_msg('Label added successfully'), 200
