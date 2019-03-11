@@ -2,15 +2,15 @@ import datetime as dt
 from ..app import db
 
 
-class Annotation(db.Model):
-    """Class Annotation is a database model to represent an annotation
+class Label(db.Model):
+    """Class Annotation is a database model to represent a label
 
     Specifies the full database schema of the table 'annotation'
 
     Attributes:
         id: unique integer id given to a user (primary key)
-        project_id: integer to represent id of project that this annotation belongs to
         image_id: integer to represent id of image that this annotation belongs to
+        project_id: integer to represent id of project that this annotation belongs to
         created_by: integer to represent id of user that creates this annotation
         label_id: integer to represent id of label that this annotation is for
         added_at: datetime that image was added to the project
