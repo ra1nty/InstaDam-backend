@@ -1,3 +1,4 @@
+from instadam.models.annotation import Annotation
 from instadam.models.image import Image
 from instadam.models.project import Project
 from instadam.models.project_permission import ProjectPermission
@@ -29,3 +30,16 @@ def test_image_and_project(client):
     assert image == project.images[0]
     assert project == image.project
 
+def test_annotation_and_image(client):
+    annotation = Annotation()
+    image = Image()
+    image.annotations.append(annotation)
+    assert len(image.annotations) == 1
+    assert annotation == image.annotations[0]
+    assert image == annotation.original_image
+
+    annotation1 = Annotation()
+    image.annotations.append(annotation1)
+    assert len(image.annotations) == 2
+    assert annotation1 == image.annotations[1]
+    assert image == annotation1.original_image
