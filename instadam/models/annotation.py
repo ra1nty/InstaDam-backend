@@ -23,7 +23,7 @@ class Annotation(db.Model):
 
     # TODO: consistency problem - image's project and project_id should be the consistent
     # backref: original_image
-    image_id = db.Column(db.Integer, db.ForeignKey('image.id'), nullable=False)
+    image_id = db.Column(db.Integer, db.ForeignKey('image.id'))
 
     # Since in image model, project_id is nullable, it is illogical to make it non-nullable here
     # backref: project
@@ -33,7 +33,7 @@ class Annotation(db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     # backref: label
-    label_id = db.Column(db.Integer, db.ForeignKey('label.id'), nullable=False)
+    label_id = db.Column(db.Integer, db.ForeignKey('label.id'))
 
     added_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
     data = db.Column(db.LargeBinary, nullable=False)

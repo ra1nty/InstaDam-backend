@@ -183,6 +183,7 @@ def test_upload_zip_failed(local_client):
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '415 UNSUPPORTED MEDIA TYPE' == rv.status
 
+
 def test_upload_zip_failed2(local_client):
     access_token = successful_login(local_client, 'test_upload_user1',
                                     'TestTest1')
