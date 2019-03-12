@@ -51,7 +51,6 @@ class User(db.Model):
 
     project_permissions = relationship('ProjectPermission',
                                        back_populates='user')
-
     annotations = relationship('Annotation', backref='created_by')
 
     def set_password(self, password):
