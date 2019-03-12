@@ -6,5 +6,5 @@ mkdir -p ~/instadam;\
 sudo mv /tmp/${TRAVIS_BUILD_ID}/InstaDam-backend ~/instadam;\
 cd ~/instadam/InstaDam-backend; kill -9 `pgrep wsgi`;\
 source ~/.bashrc;\
-echo "Test" \
+echo "Test";\
 /home/zonglin/.local/bin/uwsgi --chmod-socket=666 -s /home/zonglin/instadam_backend.sock --manage-script-name --mount /='wsgi:app'"
