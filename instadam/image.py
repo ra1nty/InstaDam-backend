@@ -95,7 +95,7 @@ def upload_zip(project_id):
                 abort(400, 'Failed to add image')
             else:
                 db.session.commit()
-            name_map[image_name] = image.image_name
+            name_map[image_name] = image.image_path
 
         zip_file.close()
         multiprocessing.Process(

@@ -6,8 +6,11 @@ from flask import abort
 from flask import current_app as app
 from sqlalchemy.orm import relationship
 
+from instadam.models.annotation import Annotation
+
 from instadam.models.project import Project
-from instadam.utils.file import (parse_and_validate_file_extension, get_project_dir)
+from instadam.utils.file import (get_project_dir,
+                                 parse_and_validate_file_extension)
 from ..app import db
 
 VALID_IMG_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -33,10 +36,10 @@ class Image(db.Model):
     added_at = db.Column(
         db.DateTime, nullable=False, default=dt.datetime.utcnow)
     is_annotated = db.Column(db.Boolean, nullable=False, default=False)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'),
+                           nullable=False)
 
     annotations = relationship('Annotation', backref='original_image')
-
 
     def save_image_to_project(self, img_file):
         """Saves the image file associated to disk.
@@ -53,7 +56,8 @@ class Image(db.Model):
         project_dir = get_project_dir(project)
         new_file_name = '%s.%s' % (str(uuid.uuid4()), extension)
         self.image_name = new_file_name
-        img_file.save(os.path.join(project_dir, new_file_name))
+        self.image_path = os.path.join(project_dir, new_file_name)
+        img_file.save(self.image_path)
 
     def save_empty_image(self, original_file_name):
         extension = parse_and_validate_file_extension(original_file_name,
@@ -64,7 +68,8 @@ class Image(db.Model):
         if not os.path.exists(project_dir):
             os.mkdir(project_dir)
         new_file_name = '%s.%s' % (str(uuid.uuid4()), extension)
-        self.image_name = os.path.join(project_dir, new_file_name)
+        self.image_name = new_file_name
+        self.image_path = os.path.join(project_dir, new_file_name)
 
     def __repr__(self):
         return '<Image: %r>' % self.image_name

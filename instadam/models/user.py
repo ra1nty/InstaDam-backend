@@ -4,6 +4,8 @@ import enum
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from instadam.models.annotation import Annotation
+
 from ..app import db
 
 
@@ -51,7 +53,6 @@ class User(db.Model):
 
     project_permissions = relationship('ProjectPermission',
                                        back_populates='user')
-
     annotations = relationship('Annotation', backref='created_by')
 
     def set_password(self, password):

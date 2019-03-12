@@ -1,16 +1,13 @@
 import datetime as dt
 
-from sqlalchemy import Table, PrimaryKeyConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
+
+# @formatter:off
+from instadam.models.annotation import Annotation
+# @formatter:on
 
 from ..app import db
 
-label_project_association_table = Table('label_project_association',
-                                        db.Model.metadata,
-                                        db.Column('label_id', db.Integer, db.ForeignKey('label.id')),
-                                        db.Column('project_id', db.Integer, db.ForeignKey('project.id')),
-                                        UniqueConstraint('project_id', 'label_id'),
-                                        )
 
 class Project(db.Model):
     """Class Project is a database model to represent a project
@@ -35,7 +32,7 @@ class Project(db.Model):
     permissions = relationship('ProjectPermission', back_populates='project')
     annotations = relationship('Annotation', backref='project')
 
-    labels = relationship("Label", secondary=label_project_association_table, backref="projects")
+    labels = relationship("Label", backref="project")
 
     def __repr__(self):
         return '<Project: %r>' % self.project_name
