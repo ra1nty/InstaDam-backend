@@ -6,6 +6,8 @@ from flask import abort
 from flask import current_app as app
 from sqlalchemy.orm import relationship
 
+from instadam.models.annotation import Annotation
+
 from instadam.models.project import Project
 from instadam.utils.file import (get_project_dir,
                                  parse_and_validate_file_extension)
