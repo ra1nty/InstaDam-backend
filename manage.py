@@ -28,6 +28,13 @@ from instadam.models.user import PrivilegesEnum, User
 def cli():
     pass
 
+@cli.command()
+def deploy():
+    app = create_app('production')
+    with app.app_context():
+         db.create_all()
+    app.run(host='0.0.0.0', port=8080)
+
 
 @cli.command()
 @click.option('--mode', default='development', help='production/development')

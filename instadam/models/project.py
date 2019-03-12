@@ -1,11 +1,8 @@
 import datetime as dt
 
 from sqlalchemy.orm import relationship
-
-# @formatter:off
 from instadam.models.annotation import Annotation
-# @formatter:on
-
+from instadam.models.label import Label
 from ..app import db
 
 
