@@ -3,6 +3,8 @@ from sqlalchemy.orm import relationship
 # from instadam.models.project import label_project_association_table
 from ..app import db
 
+from instadam.models.annotation import Annotation
+
 
 class Label(db.Model):
     """Class label is a database model to represent an label
