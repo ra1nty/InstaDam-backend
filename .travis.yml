@@ -3,16 +3,29 @@ language: python
 python: 3.7
 
 services:
-  - postgresql
+- postgresql
 
 install:
-  - pip install -r requirements/test.txt
+- pip install -r requirements/test.txt
 
 before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
+- psql -c 'create database travis_ci_test;' -U postgres
 
 script:
-  - py.test --cov-report=xml --cov=instadam tests/
+- py.test --cov-report=xml --cov=instadam tests/
 
 after_success:
-  - codecov
+- codecov
+
+before_deploy:
+- openssl aes-256-cbc -K $encrypted_7fdaadf61be2_key -iv $encrypted_7fdaadf61be2_iv -in deploy_rsa.enc -out /tmp/deploy_rsa -d
+- eval "$(ssh-agent -s)"
+- chmod 600 /tmp/deploy_rsa
+- ssh-add /tmp/deploy_rsa
+
+deploy:
+- provider: script
+  skip_cleanup: true
+  script: bash scripts/deploy.sh
+  on:
+    branch: dockerize

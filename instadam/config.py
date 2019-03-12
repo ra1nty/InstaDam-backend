@@ -5,13 +5,17 @@ import os
 
 DATABASE_USERNAME = 'postgres'
 DATABASE_PASSWORD = ''
+DB_NAME = ''
 FLASK_SECRETE_KEY = ''
 if '_DB_USERNAME' in os.environ and os.environ['_DB_USERNAME'] is not None:
     DATABASE_USERNAME = os.environ['_DB_USERNAME']
 if '_DB_PASSWORD' in os.environ and os.environ['_DB_PASSWORD'] is not None:
     DATABASE_PASSWORD = os.environ['_DB_PASSWORD']
+if '_DB_NAME' in os.environ and os.environ['_DB_NAME'] is not None:
+    DB_NAME = os.environ['_DB_NAME']
 if '_SECRETE_KEY' in os.environ and os.environ['_SECRETE_KEY'] is not None:
     FLASK_SECRETE_KEY = os.environ['_SECRETE_KEY']
+
 
 INSTADAM_STORAGE = 'static'
 if ('INSTADAM_STORAGE' in os.environ
@@ -48,7 +52,7 @@ class Production(Config):
     """Production config
     """
     SECRET_KEY = FLASK_SECRETE_KEY
-    _SQLALCHEMY_DATABASE_DATABASE = ''
+    _SQLALCHEMY_DATABASE_DATABASE = DB_NAME
     _SQLALCHEMY_DATABASE_HOSTNAME = 'localhost'
     _SQLALCHEMY_DATABASE_PASSWORD = DATABASE_PASSWORD
     _SQLALCHEMY_DATABASE_USERNAME = DATABASE_USERNAME
