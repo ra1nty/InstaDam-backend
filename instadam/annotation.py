@@ -5,6 +5,7 @@ Module for annotation end points
 import base64
 from io import BytesIO
 
+import PIL.Image
 import numpy as np
 from flask import Blueprint, abort, jsonify, request
 from flask_jwt_extended import (get_jwt_identity, jwt_required)
