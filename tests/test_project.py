@@ -118,6 +118,8 @@ def test_create_project_illegal_project_name(client):
 def get_project_fixture():
     app = create_app(TEST_MODE)
     with app.app_context():
+        db.reflect()
+        db.drop_all()
         db.create_all()
 
         user = User(username=ADMIN_USERNAME,
