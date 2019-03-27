@@ -18,6 +18,7 @@ services:
       - _DB_USERNAME=${DB_USERNAME}
       - _DB_PASSWORD=${DB_PASSWORD}
       - _DB_NAME=${DB_NAME}
+      - _SECRETE_KEY=${SECRETE_KEY}
     volumes: 
       - ./instadam:/home/flaskapp/src
     networks:

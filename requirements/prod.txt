@@ -1,5 +1,4 @@
 flask
-Pillow
 numpy
 flask-sqlalchemy
 psycopg2

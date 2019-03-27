@@ -6,7 +6,7 @@ WORKDIR /home/flaskapp
 COPY requirements/prod.txt requirements.txt
 RUN \
  apk add --no-cache postgresql-libs && \
- apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev
+ apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev zlib
 
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install gunicorn
