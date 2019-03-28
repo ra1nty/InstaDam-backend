@@ -90,6 +90,27 @@ def create_project():
     }), 201
 
 
+@bp.route('/projects', methods=['GET'])
+@jwt_required
+def get_projects():
+    """
+    List all the project this user has access to.
+    Returns:
+
+    """
+
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
+    projects = []
+    for project_permission in user.project_permissions:
+        project_dict = {'name': project_permission.project.project_name,
+                        'is_admin': (user.privileges == PrivilegesEnum.ADMIN
+                                     and project_permission.access_type ==
+                                     AccessTypeEnum.READ_WRITE)}
+        projects.append(project_dict)
+    return jsonify(projects), 200
+
+
 @bp.route('/projects/<project_id>/unannotated', methods=['GET'])
 @jwt_required
 def get_unannotated_images(project_id):
