@@ -96,21 +96,57 @@ def test_add_and_get_annotation(image_label_uploaded):
 
     with open('tests/cat.jpg', 'rb') as img:
         base64_str = base64.b64encode(img.read()).decode('utf-8')
+        labels = [{'label_id': 1, 'bitmap': base64_str,
+                   'vector': {'name': 'test', 'user': 'admin'}}]
         rv = image_label_uploaded.post(
             '/annotation/', json={'project_id': 1, 'label_id': 1, 'image_id': 1,
-                                 'annotation': base64_str},
+                                  'labels': labels},
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '200 OK' == rv.status
         json_data = rv.get_json()
         assert 'msg' in json_data
         print(json_data['msg'])
-        assert 'Annotation added successfully' == json_data['msg']
+        assert 'Annotation saved successfully' == json_data['msg']
 
         rv = image_label_uploaded.get(
-            '/annotation/', json={'project_id': 1, 'label_id': 1, 'image_id': 1},
+            '/annotation/',
+            json={'project_id': 1, 'label_id': 1, 'image_id': 1},
             headers={'Authorization': 'Bearer %s' % access_token})
 
         assert '200 OK' == rv.status
         json_data = rv.get_json()
-        assert 'base64' in json_data
-        assert base64_str == json_data['base64']
+        assert 'bitmap' in json_data
+        assert base64_str == json_data['bitmap']
+        vector = json_data['vector']
+        assert 'name' in vector
+        assert 'test' == vector['name']
+        assert 'user' in vector
+        assert 'admin' == vector['user']
+
+        labels[0]['vector']['test-test'] = 100
+        rv = image_label_uploaded.post(
+            '/annotation/', json={'project_id': 1, 'label_id': 1, 'image_id': 1,
+                                  'labels': labels},
+            headers={'Authorization': 'Bearer %s' % access_token})
+        assert '200 OK' == rv.status
+        json_data = rv.get_json()
+        assert 'msg' in json_data
+        print(json_data['msg'])
+        assert 'Annotation saved successfully' == json_data['msg']
+
+        rv = image_label_uploaded.get(
+            '/annotation/',
+            json={'project_id': 1, 'label_id': 1, 'image_id': 1},
+            headers={'Authorization': 'Bearer %s' % access_token})
+
+        assert '200 OK' == rv.status
+        json_data = rv.get_json()
+        assert 'bitmap' in json_data
+        assert base64_str == json_data['bitmap']
+        vector = json_data['vector']
+        assert 'name' in vector
+        assert 'test' == vector['name']
+        assert 'user' in vector
+        assert 'admin' == vector['user']
+        assert 'test-test' in vector
+        assert 100 == vector['test-test']
