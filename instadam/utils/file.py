@@ -37,3 +37,17 @@ def get_project_dir(project):
     if not os.path.exists(project_dir):
         os.mkdir(project_dir)
     return project_dir
+
+
+def get_project_static_url(project):
+    """
+    Return the url path to the static file directory
+    Args:
+        project: The project
+
+    Returns:
+        Path
+
+    """
+    return os.path.join(app.config['STATIC_STORAGE_URL'],
+                        str(project.id))

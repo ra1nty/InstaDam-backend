@@ -82,7 +82,8 @@ def create_project():
     # create project directory
     project_dir = os.path.join(app.config['STATIC_STORAGE_DIR'],
                                str(project.id))
-    os.makedirs(project_dir)
+    if not os.path.exists(project_dir):
+        os.makedirs(project_dir)
 
     return jsonify({
         'msg': 'project added successfully',
@@ -146,7 +147,7 @@ def get_unannotated_images(project_id):
         unannotated_image_res = {}
         unannotated_image_res['id'] = unannotated_image.id
         unannotated_image_res['name'] = unannotated_image.image_name
-        unannotated_image_res['path'] = unannotated_image.image_path
+        unannotated_image_res['path'] = unannotated_image.image_url
         unannotated_image_res['project_id'] = unannotated_image.project_id
         unannotated_images_res.append(unannotated_image_res)
 
@@ -189,7 +190,7 @@ def get_project_images(project_id):
         project_image_res = {}
         project_image_res['id'] = project_image.id
         project_image_res['name'] = project_image.image_name
-        project_image_res['path'] = project_image.image_path
+        project_image_res['path'] = project_image.image_url
         project_image_res['project_id'] = project_image.project_id
         project_images_res.append(project_image_res)
 

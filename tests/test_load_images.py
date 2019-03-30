@@ -62,7 +62,7 @@ def local_client():
 
         test_image = Image(
             image_name='cat.jpg',
-            image_path='test_dir/test_dir_2/cat.jpg',
+            image_url='test_dir/test_dir_2/cat.jpg',
             project_id=project.id)
         db.session.add(test_image)
         db.session.flush()
@@ -70,7 +70,7 @@ def local_client():
 
         test_image_2 = Image(
             image_name='dog.png',
-            image_path='test_dir/test_dir_2/dog.png',
+            image_url='test_dir/test_dir_2/dog.png',
             project_id=project.id)
         db.session.add(test_image_2)
         db.session.flush()
