@@ -6,10 +6,8 @@ from flask import abort
 from flask import current_app as app
 from sqlalchemy.orm import relationship
 
-from instadam.models.annotation import Annotation
-
 from instadam.models.project import Project
-from instadam.utils.file import (get_project_dir,
+from instadam.utils.file import (get_project_dir, get_project_static_url,
                                  parse_and_validate_file_extension)
 from ..app import db
 
@@ -32,7 +30,8 @@ class Image(db.Model):
     __tablename__ = 'image'
     id = db.Column(db.Integer, primary_key=True)
     image_name = db.Column(db.String(64), nullable=False)
-    image_path = db.Column(db.String(256))
+    image_url = db.Column(db.String(256))
+    image_storage_path = db.Column(db.String(256))
     added_at = db.Column(
         db.DateTime, nullable=False, default=dt.datetime.utcnow)
     is_annotated = db.Column(db.Boolean, nullable=False, default=False)
@@ -56,8 +55,10 @@ class Image(db.Model):
         project_dir = get_project_dir(project)
         new_file_name = '%s.%s' % (str(uuid.uuid4()), extension)
         self.image_name = new_file_name
-        self.image_path = os.path.join(project_dir, new_file_name)
-        img_file.save(self.image_path)
+        self.image_storage_path = os.path.join(project_dir, new_file_name)
+        self.image_url = os.path.join(get_project_static_url(project),
+                                      new_file_name)
+        img_file.save(self.image_storage_path)
 
     def save_empty_image(self, original_file_name):
         extension = parse_and_validate_file_extension(original_file_name,
@@ -67,9 +68,11 @@ class Image(db.Model):
                                    str(project.id))
         if not os.path.exists(project_dir):
             os.mkdir(project_dir)
+        project_url = get_project_static_url(project)
         new_file_name = '%s.%s' % (str(uuid.uuid4()), extension)
         self.image_name = new_file_name
-        self.image_path = os.path.join(project_dir, new_file_name)
+        self.image_url = os.path.join(project_url, new_file_name)
+        self.image_storage_path = os.path.join(project_dir, new_file_name)
 
     def __repr__(self):
         return '<Image: %r>' % self.image_name

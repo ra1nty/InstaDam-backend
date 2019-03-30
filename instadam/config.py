@@ -16,10 +16,14 @@ if '_SECRETE_KEY' in os.environ and os.environ['_SECRETE_KEY'] is not None:
 if '_DB_HOSTNAME' in os.environ and os.environ['_DB_HOSTNAME'] is not None:
     DATABASE_HOSTNAME = os.environ['_DB_HOSTNAME']
 
-INSTADAM_STORAGE = 'static'
+INSTADAM_STORAGE = 'static-dir'
 if ('INSTADAM_STORAGE' in os.environ
         and os.environ['INSTADAM_STORAGE'] is not None):
     INSTADAM_STORAGE = os.environ['INSTADAM_STORAGE']
+INSTADAM_STORAGE_ROOT_URL = 'static'
+if ('INSTADAM_STORAGE_ROOT_URL' in os.environ
+        and os.environ['INSTADAM_STORAGE_ROOT_URL'] is not None):
+    INSTADAM_STORAGE_ROOT_URL = os.environ['INSTADAM_STORAGE_ROOT_URL']
 
 
 class Config(object):
@@ -34,6 +38,7 @@ class Config(object):
     JWT_BLACKLIST_TOKEN_CHECKS = ['access']
 
     STATIC_STORAGE_DIR = INSTADAM_STORAGE
+    STATIC_STORAGE_URL = INSTADAM_STORAGE_ROOT_URL
 
 
 class Development(Config):
