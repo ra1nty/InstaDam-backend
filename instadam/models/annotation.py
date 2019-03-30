@@ -37,6 +37,7 @@ class Annotation(db.Model):
 
     added_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
     data = db.Column(db.LargeBinary, nullable=False)
+    vector = db.Column(db.LargeBinary, nullable=False)
 
     def __repr__(self):
         return '<Annotation: for %r>' % self.image_id
