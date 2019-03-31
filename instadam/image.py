@@ -18,8 +18,6 @@ from instadam.utils.get_project import maybe_get_project
 
 bp = Blueprint('image', __name__, url_prefix='/image')
 
-k = 5  # Fixed max number of images to return in response
-
 
 @bp.route('/upload/<project_id>', methods=['POST'])
 @jwt_required
@@ -112,7 +110,6 @@ def upload_zip(project_id):
 def get_project_image(image_id):
     """
     Get images with image_id that exists in project with project_id
-    NOTE: Only returning a fixed number of images (k=5) for Iteration 3
 
     Args:
         project_id: The id of the project
