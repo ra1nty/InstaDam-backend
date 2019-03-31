@@ -117,7 +117,7 @@ def test_load_unannotated_images(local_client):
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
-    assert len(json_res['unannotated_images']) == 2
+    assert len(json_res['unannotated_images']) == 3
 
     assert json_res['unannotated_images'][0]['name'] == 'cat.jpg' or json_res[
         'unannotated_images'][1]['name'] == 'cat.jpg'
@@ -163,7 +163,7 @@ def test_load_project_images(local_client):
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
-    assert len(json_res['project_images']) == 2
+    assert len(json_res['project_images']) == 3
 
     assert json_res['project_images'][0]['name'] == 'cat.jpg' or json_res[
         'project_images'][1]['name'] == 'cat.jpg'
