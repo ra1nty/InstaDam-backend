@@ -10,7 +10,7 @@ from instadam.models.user import PrivilegesEnum, User
 bp = Blueprint('project', __name__, url_prefix='/users')
 
 
-@bp.route('/search/<user_query>', methods=['POST'])
+@bp.route('/search=<user_query>', methods=['GET'])
 @jwt_required
 def query_users(user_query):
     """
@@ -29,7 +29,10 @@ def query_users(user_query):
         abort(401, 'User does not have the privilege to search for users.')
 
     user_query_str = '%' + user_query + '%'
-    users = User.query.filter(User.username.like(user_query_str)).all()
+    users = User.query.filter(
+        _or(
+            User.username.ilike(user_query_str),
+            User.email.ilike(user_query_str))).all()
 
     if not users:
         return jsonify({'users': []}), 200
