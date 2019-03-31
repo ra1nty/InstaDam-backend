@@ -42,6 +42,7 @@ def query_users(user_query):
     for user in users:
         user_res = {}
         user_res['username'] = user.username
+        user_res['email'] = user.email
         user_res['created_at'] = str(user.created_at)
         user_res['privileges'] = str(user.privileges)
         users_res.append(user_res)
