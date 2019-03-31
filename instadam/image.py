@@ -7,7 +7,7 @@ import uuid
 from io import BytesIO
 from zipfile import ZipFile
 
-from PIL import Image
+from PIL import Image as PILImage
 from flask import Blueprint, abort, jsonify, request
 from flask_jwt_extended import (jwt_required)
 from sqlalchemy.exc import IntegrityError
@@ -134,7 +134,7 @@ def get_project_image(image_id):
         'project_id': image.project_id}), 200
 
 
-@bp.route('/<image_id>')
+@bp.route('/<image_id>/thumbnail')
 @jwt_required
 def get_image_thumbnail(image_id):
     """
@@ -150,13 +150,13 @@ def get_image_thumbnail(image_id):
     maybe_get_project_read_only(image.project_id)
 
     json = request.get_json()
-    if 'size' not in json or not isinstance(json['size'], (int, float)):
-        abort(400, 'No size provided or not a number')
+    if json is None:
+        for key in ['size_h', 'size_w']:
+            if key not in json or not isinstance(json[key], int):
+                abort(400, 'No %s provided or not an integer' % key)
 
-    size = json['size']
-
-    img = Image.open(image.image_storage_path)
-    img.thumbnail(size)
+    img = PILImage.open(image.image_storage_path)
+    img.thumbnail((json['size_h'], json['size_w']), PILImage.ANTIALIAS)
 
     # Save as bytes
     buffer = BytesIO()

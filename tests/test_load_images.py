@@ -1,7 +1,10 @@
+import base64
 import os
 import shutil
+from io import BytesIO
 
 import pytest
+from PIL import Image as PILImage
 
 from instadam.app import create_app, db
 from instadam.config import Config
@@ -76,6 +79,15 @@ def local_client():
         db.session.flush()
         db.session.commit()
 
+        test_image_3 = Image(
+            image_name='cat.jpg',
+            image_url='tests/cat.jpg',
+            image_storage_path='tests/cat.jpg',
+            project_id=project.id)
+        db.session.add(test_image_3)
+        db.session.flush()
+        db.session.commit()
+
     client = app.test_client()
     yield client
 
@@ -113,11 +125,11 @@ def test_load_unannotated_images(local_client):
         'unannotated_images'][1]['name'] == 'dog.png'
 
     assert json_res['unannotated_images'][0][
-        'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
-            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
+               'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
+               'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
     assert json_res['unannotated_images'][0][
-        'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
-            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
+               'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
+               'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
 
 
 def test_load_unannotated_images_fail(local_client):
@@ -210,3 +222,23 @@ def test_load_image_fail(local_client):
         '/image/5', headers={'Authorization': 'Bearer %s' % access_token})
 
     assert '404 NOT FOUND' == res.status
+
+
+def test_get_thumbnail(local_client):
+    access_token = successful_login(local_client, 'test_upload_annotator1',
+                                    'TestTest2')
+    res = local_client.get(
+        '/image/3/thumbnail',
+        json={'size_h': 16, 'size_w': 15},
+        headers={'Authorization': 'Bearer %s' % access_token})
+    json = res.get_json()
+    assert '200 OK' == res.status
+    assert 'image_id' in json
+    assert 3 == json['image_id']
+    assert 'png' == json['format']
+    base64_str = json['base64_image']
+    rep_img = PILImage.open(BytesIO(base64.b64decode(base64_str)))
+    img = PILImage.open('tests/cat.jpg')
+    img.thumbnail((16, 15), PILImage.ANTIALIAS)
+    assert img.size == rep_img.size
+    assert img == rep_img
