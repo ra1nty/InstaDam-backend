@@ -3,6 +3,7 @@
 from flask import Blueprint, abort, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from instadam.app import db
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 
 from instadam.models.user import PrivilegesEnum, User
@@ -30,7 +31,7 @@ def query_users(user_query):
 
     user_query_str = '%' + user_query + '%'
     users = User.query.filter(
-        _or(
+        or_(
             User.username.ilike(user_query_str),
             User.email.ilike(user_query_str))).all()
 

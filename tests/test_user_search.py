@@ -101,7 +101,7 @@ def test_search_users_permission_fail(local_client):
 
 
 def test_search_users_no_users(local_client):
-    access_token = successful_login(local_client, 'user_2', 'TestTest2')
+    access_token = successful_login(local_client, 'user_1', 'TestTest1')
 
     res = local_client.get(
         '/users/search=jordan',
