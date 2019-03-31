@@ -241,4 +241,3 @@ def test_get_thumbnail(local_client):
     img = PILImage.open('tests/cat.jpg')
     img.thumbnail((16, 15), PILImage.ANTIALIAS)
     assert img.size == rep_img.size
-    assert img == rep_img
