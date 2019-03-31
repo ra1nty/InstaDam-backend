@@ -73,7 +73,7 @@ def test_search_users_by_username(local_client):
     assert len(json_res['users']) == 1
 
     assert json_res['users'][0]['username'] == 'drifter'
-    assert json_res['users'][0]['email'] == 'drifter@gmail.com'
+    assert json_res['users'][0]['email'] == 'drifting@gmail.com'
 
 
 def test_search_users_by_email(local_client):
@@ -87,7 +87,7 @@ def test_search_users_by_email(local_client):
     assert len(json_res['users']) == 1
 
     assert json_res['users'][0]['username'] == 'jordanne'
-    assert json_res['users'][0]['username'] == 'jordanne@caterpillar.com'
+    assert json_res['users'][0]['email'] == 'jordanne@caterpillar.com'
 
 
 def test_search_users_permission_fail(local_client):
@@ -104,7 +104,7 @@ def test_search_users_no_users(local_client):
     access_token = successful_login(local_client, 'user_1', 'TestTest1')
 
     res = local_client.get(
-        '/users/search=jordan',
+        '/users/search=jordank',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
