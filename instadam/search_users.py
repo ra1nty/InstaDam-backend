@@ -43,7 +43,7 @@ def query_users(user_query):
         user_res = {}
         user_res['username'] = user.username
         user_res['created_at'] = user.created_at
-        user_res['priveleges'] = user.priveleges
+        user_res['privileges'] = user.privileges
         users_res.append(user_res)
 
     return jsonify({'users': users_res}), 200
