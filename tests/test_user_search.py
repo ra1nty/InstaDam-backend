@@ -49,7 +49,7 @@ def local_client():
     yield client
 
 
-def login(client, username, password):
+def successful_login(client, username, password):
     response = client.post(
         '/login',
         json={
@@ -68,6 +68,25 @@ def test_search_users_1(local_client):
     res = local_client.get('/users/search=drifter', headers={'Authorization': 'Bearer %s' % access_token}))
 
     json_res = res.get_json()
-    assert len(json_res['project_images']) == 1
+    assert len(json_res['users']) == 1
 
+    assert json_res['users'][0]['username'] == 'drifter'
+    assert json_res['users'][0]['email'] == 'drifter@gmail.com'
+
+def test_search_users_2(local_client):
+    access_token = successful_login(local_client, 'user_1', 'TestTest1')
+
+    res = local_client.get('/users/search=jordanne@caterpillar', headers={'Authorization': 'Bearer %s' % access_token}))
+
+    json_res = res.get_json()
+    assert(len(json_res['users'][0]['username']) == 1)
+
+    assert json_res['users'][0]['username'] == 'jordanne'
+    assert json_res['users'][0]['username'] == 'jordanne@caterpillar.com'
+
+def test_search_users_fail(local_client):
+    access_token = successful_login(local_client, 'user_2', 'TestTest2')
+
+    res = local_client.get('/users/search=jordanne@caterpillar', headers={'Authorization': 'Bearer %s' % access_token}))
     
+    assert '401 UNAUTHORIZED' == res.status
