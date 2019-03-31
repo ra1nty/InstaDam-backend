@@ -1,20 +1,24 @@
 """Module related to uploading image
 """
+import base64
 import multiprocessing
 import os
 import uuid
+from io import BytesIO
 from zipfile import ZipFile
 
+from PIL import Image as PILImage
 from flask import Blueprint, abort, jsonify, request
 from flask_jwt_extended import (jwt_required)
+from sqlalchemy.exc import IntegrityError
+
 from instadam.app import db
 from instadam.models.image import Image, VALID_IMG_EXTENSIONS
 from instadam.utils import construct_msg
 from instadam.utils.file import (get_project_dir,
                                  parse_and_validate_file_extension)
-from sqlalchemy.exc import IntegrityError
-
-from instadam.utils.get_project import maybe_get_project
+from instadam.utils.get_project import (maybe_get_project,
+                                        maybe_get_project_read_only)
 
 bp = Blueprint('image', __name__, url_prefix='/image')
 
@@ -65,7 +69,6 @@ def unzip_process(zip_path, name_map):
 @bp.route('/upload/zip/<project_id>', methods=['POST'])
 @jwt_required
 def upload_zip(project_id):
-
     def filter_condition(name):
         split = name.lower().split('.')
         return split and split[-1] in VALID_IMG_EXTENSIONS
@@ -119,11 +122,47 @@ def get_project_image(image_id):
         image_id: The id of the image to return
     """
     image = Image.query.filter_by(id=image_id).first()
-    if image == None:
-        abort(404, 'No image found with id=%s' % (image_id))
+    if image is None:
+        abort(404, 'No image found with id=%s' % image_id)
+
+    # We don't actually need the project. Just to check permission
+    maybe_get_project_read_only(image.project_id)
 
     return jsonify({
         'id': image.id,
         'path': image.image_url,
-        'project_id': image.project_id
-    }), 200
+        'project_id': image.project_id}), 200
+
+
+@bp.route('/<image_id>/thumbnail')
+@jwt_required
+def get_image_thumbnail(image_id):
+    """
+    Get the thumbnail of the image
+    Args:
+        image_id: The id of the image
+    """
+    image = Image.query.filter_by(id=image_id).first()
+    if image is None:
+        abort(404, 'No image found with id=%s' % image_id)
+
+    # We don't actually need the project. Just to check permission
+    maybe_get_project_read_only(image.project_id)
+
+    json = request.get_json()
+    if json is None:
+        for key in ['size_h', 'size_w']:
+            if key not in json or not isinstance(json[key], int):
+                abort(400, 'No %s provided or not an integer' % key)
+
+    img = PILImage.open(image.image_storage_path)
+    img.thumbnail((json['size_h'], json['size_w']), PILImage.ANTIALIAS)
+
+    # Save as bytes
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    base64_str = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    return jsonify({
+        'image_id': image.id,
+        'format': 'png',
+        'base64_image': base64_str}), 200
