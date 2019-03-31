@@ -32,7 +32,20 @@ def cli():
 def deploy():
     app = create_app('production')
     with app.app_context():
-         db.create_all()
+
+        meta = db.metadata                                                                                                                   
+        for table in reversed(meta.sorted_tables):                                                                                           
+            print('Clear table %s' % table)
+            db.session.execute(table.delete())
+            db.session.commit()
+
+        db.create_all()
+        admin = User(username='admin', email='admin@default.com',
+                     privileges=PrivilegesEnum.ADMIN)
+        admin.set_password('AdminPassword0')
+        db.session.add(admin)
+        db.session.flush()
+        db.session.commit()
     app.run(host='0.0.0.0', port=8080)
 
 
