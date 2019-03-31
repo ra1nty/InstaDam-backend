@@ -65,7 +65,9 @@ def successful_login(client, username, password):
 def test_search_users_by_username(local_client):
     access_token = successful_login(local_client, 'user_1', 'TestTest1')
 
-    res = local_client.get('/users/search=drifter', headers={'Authorization': 'Bearer %s' % access_token}))
+    res = local_client.get(
+        '/users/search=drifter',
+        headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
     assert len(json_res['users']) == 1
@@ -73,10 +75,13 @@ def test_search_users_by_username(local_client):
     assert json_res['users'][0]['username'] == 'drifter'
     assert json_res['users'][0]['email'] == 'drifter@gmail.com'
 
+
 def test_search_users_by_email(local_client):
     access_token = successful_login(local_client, 'user_1', 'TestTest1')
 
-    res = local_client.get('/users/search=jordanne@caterpillar', headers={'Authorization': 'Bearer %s' % access_token}))
+    res = local_client.get(
+        '/users/search=jordanne@caterpillar',
+        headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
     assert len(json_res['users']) == 1
@@ -84,17 +89,23 @@ def test_search_users_by_email(local_client):
     assert json_res['users'][0]['username'] == 'jordanne'
     assert json_res['users'][0]['username'] == 'jordanne@caterpillar.com'
 
+
 def test_search_users_permission_fail(local_client):
     access_token = successful_login(local_client, 'user_2', 'TestTest2')
 
-    res = local_client.get('/users/search=jordanne', headers={'Authorization': 'Bearer %s' % access_token}))
-    
+    res = local_client.get(
+        '/users/search=jordanne',
+        headers={'Authorization': 'Bearer %s' % access_token})
+
     assert '401 UNAUTHORIZED' == res.status
+
 
 def test_search_users_no_users(local_client):
     access_token = successful_login(local_client, 'user_2', 'TestTest2')
 
-    res = local_client.get('/users/search=jordan', headers={'Authorization': 'Bearer %s' % access_token}))
-    
+    res = local_client.get(
+        '/users/search=jordan',
+        headers={'Authorization': 'Bearer %s' % access_token})
+
     json_res = res.get_json()
     assert len(json_res['users']) == 0
