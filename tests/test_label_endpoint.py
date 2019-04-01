@@ -80,7 +80,7 @@ def test_get_label(local_client):
     access_token = successful_login(local_client, 'test_upload_user1',
                                     'TestTest1')
     rv = local_client.post(
-        '/project/1/labels', json={'label_name': 'my_label_1', 'label_color': '#000000'},
+        '/project/1/labels', json={'label_name': 'my_label_1', 'label_color': '#001000'},
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()

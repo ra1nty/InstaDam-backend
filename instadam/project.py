@@ -210,7 +210,7 @@ def add_label(project_id):
     import string
     if label_color[0] != '#' or not all(c in string.hexdigits for c in label_color[1:]):
         abort(400, 'Failed to add image, need color')
-    label = Label(label_name=label_name, label_color=label_name)
+    label = Label(label_name=label_name, label_color=label_color)
     project.labels.append(label)
     try:
         db.session.add(label)

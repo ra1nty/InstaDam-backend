@@ -19,7 +19,7 @@ class Label(db.Model):
     __tablename__ = 'label'
     id = db.Column(db.Integer, primary_key=True)
     label_name = db.Column(db.String(64), nullable=False)
-    label_color = db.Column(db.String(8), default="#E84A27")
+    label_color = db.Column(db.String(7), default="#E84A27")
     # backref: project
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
