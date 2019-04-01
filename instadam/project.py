@@ -275,15 +275,14 @@ def grant_user_privilege(project_id):
     else:
         abort(400, 'Cannot interpret access_type. This is likely due to a typo.')
 
-    # Check if user already have some kind of access permission to the project
-    permission_exist = False
-    grantee_permission = ProjectPermission.query.filter_by(
-        user_id=user.id, project_id=project_id).first()
-    if grantee_permission is not None:
-        permission_exist = True
-    grantee_permission.delete()
+    # Check if user already have this permission of `access_type` to the project
+    permission = ProjectPermission.query.filter(
+        (ProjectPermission.user_id == user.id)
+        & (ProjectPermission.project_id == project_id)).filter(
+        (ProjectPermission.access_type == access_type)).first()
+    if permission is not None:
+        return construct_msg('Permission already existed'), 200
 
-    # Create new permission
     new_permission = ProjectPermission(access_type=access_type)
     project.permissions.append(new_permission)
     user.permissions.append(new_permission)
@@ -297,5 +296,4 @@ def grant_user_privilege(project_id):
     else:
         db.session.commit()
 
-    return construct_msg('Permission %s successfully' %
-                         'updated' if permission_exist else 'added'), 200
+    return construct_msg('Permission added successfully'), 200
