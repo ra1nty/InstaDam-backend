@@ -93,10 +93,11 @@ def test_update_user_permission_readwrite(local_client):
         },
         headers={'Authorization': 'Bearer %s' % access_token}
     )
-    assert 200 == rv.status_code
+    assert 403 == rv.status_code
     json_data = rv.get_json()
     assert 'msg' in json_data
-    assert 'Permission added successfully' == json_data['msg']
+    assert 'User with ANNOTATOR privilege cannot obtain READ_WRITE access' \
+        'to projects' == json_data['msg']
 
 
 def test_update_user_permission_duplicate_permission(local_client):
@@ -105,7 +106,7 @@ def test_update_user_permission_duplicate_permission(local_client):
     # Add READ_WRITE for the first time
     body = {
         'username': ANNOTATOR_USERNAME,
-        'access_type': 'rw',
+        'access_type': 'r',
     }
     rv = local_client.put(
         '/project/1/permissions', json=body,
@@ -119,7 +120,7 @@ def test_update_user_permission_duplicate_permission(local_client):
     # Add READ_WRITE for the second time
     body = {
         'username': ANNOTATOR_USERNAME,
-        'access_type': 'rw',
+        'access_type': 'r',
     }
     rv = local_client.put(
         '/project/1/permissions', json=body,
