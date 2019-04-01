@@ -58,35 +58,23 @@ def successful_login(client, username, password):
     return json_data['access_token']
 
 
-def test_change_user_privilege_success(local_client):
-    token = successful_login(local_client, 'test_upload_admin1', 'TestTest1')
+test_data = [
+    ('test_upload_admin1', 'TestTest1', {'username': 'test_upload_annotator1',
+                                         'privilege': 'admin'}, '200 OK'),
+    ('test_upload_annotator1', 'TestTest2',
+     {'username': 'test_upload_annotator2',
+      'privilege': 'admin'}, '403 FORBIDDEN'),
+    ('test_upload_admin1', 'TestTest1', {'username': 'test_upload_annotator1'},
+     '400 BAD REQUEST'),
+    ('test_upload_admin1', 'TestTest1', None, '400 BAD REQUEST'),
+]
+
+
+@pytest.mark.parametrize("requester, requester_pass, json, expected", test_data)
+def test_change_privilege(requester, requester_pass, json, expected,
+                          local_client):
+    token = successful_login(local_client, requester, requester_pass)
     response = local_client.put('/user/privilege/',
-                                json={'username': 'test_upload_annotator1',
-                                      'privilege': 'admin'},
+                                json=json,
                                 headers={'Authorization': 'Bearer %s' % token})
-    assert '200 OK' == response.status
-
-
-def test_change_user_privilege_fail1(local_client):
-    token = successful_login(local_client, 'test_upload_annotator1',
-                             'TestTest2')
-    response = local_client.put('/user/privilege/',
-                                json={'username': 'test_upload_annotator2',
-                                      'privilege': 'admin'},
-                                headers={'Authorization': 'Bearer %s' % token})
-    assert '403 FORBIDDEN' == response.status
-
-
-def test_change_user_privilege_fail2(local_client):
-    token = successful_login(local_client, 'test_upload_admin1', 'TestTest1')
-    response = local_client.put('/user/privilege/',
-                                json={'privilege': 'admin'},
-                                headers={'Authorization': 'Bearer %s' % token})
-    assert '400 BAD REQUEST' == response.status
-
-
-def test_change_user_privilege_fail3(local_client):
-    token = successful_login(local_client, 'test_upload_admin1', 'TestTest1')
-    response = local_client.put('/user/privilege/',
-                                headers={'Authorization': 'Bearer %s' % token})
-    assert '400 BAD REQUEST' == response.status
+    assert expected == response.status
