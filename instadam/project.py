@@ -242,24 +242,25 @@ def update_user_permission(project_id):
         `access_type` takes a string of two values: `r` or `rw`, where `r` is
         `READ_ONLY` and `rw` is `READ_WRITE`
 
+        Only user with `ADMIN` privilege can have `READ_WRITE` access to projects.
+        That is, the user indicated by `username` should have an `ADMIN` privilege
+        (as opposed to `ANNOTATOR` privilege)
+
         Must supply a jwt-token to verify user status and extract `user_id`.
 
         Raises:
-            400 Error if user_name or access_type is not specified
+            400 Error if username or access_type is not specified
             400 Error if access_type is not 'r' or 'rw'
             401 Error if not logged in
             401 Error if user is not an ADMIN
             401 Error if user does not have privilege to update permission
+            403 Error if user indicated by `username` has only ANNOTATOR privilege
+                but `access_type` is 'rw'
             404 Error if user with user_name does not exist
 
         Returns:
             201 if success. Will also return `project_id`.
         """
-
-    map_code_to_access_type = {
-        'r': AccessTypeEnum.READ_ONLY,
-        'rw': AccessTypeEnum.READ_WRITE,
-    }
 
     project = maybe_get_project(project_id)  # check privilege and get project
 
@@ -272,8 +273,12 @@ def update_user_permission(project_id):
     username = req['username']
     user = User.query.filter_by(username=username).first()
     if user is None:
-        abort(404, 'User with username=%s does not exist' % username)
+        abort(404, 'User with username=%s not found' % username)
 
+    map_code_to_access_type = {
+        'r': AccessTypeEnum.READ_ONLY,
+        'rw': AccessTypeEnum.READ_WRITE,
+    }
     if req['access_type'] not in map_code_to_access_type:
         abort(400, 'Not able to interpret access_type.')
 
@@ -286,6 +291,12 @@ def update_user_permission(project_id):
             (ProjectPermission.access_type == access_type)).first()
     if permission is not None:
         return construct_msg('Permission already existed'), 200
+
+    # Check if user is allowed to have the permission of `access_type`
+    if user.privileges == PrivilegesEnum.ANNOTATOR and \
+            access_type == AccessTypeEnum.READ_WRITE:
+        abort(403, 'User with ANNOTATOR privilege cannot have READ_WRITE access'
+                   'to project')
 
     new_permission = ProjectPermission(access_type=access_type)
     project.permissions.append(new_permission)
