@@ -18,6 +18,8 @@ def construct_msg(body):
 
 
 def check_json(json, keys):
+    if json is None:
+        abort(400, 'No Json object provided')
     for key in keys:
         if key not in json:
-            abort(401, 'Missing key %s in json' % key)
+            abort(400, 'Missing key %s in json' % key)

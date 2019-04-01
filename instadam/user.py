@@ -8,7 +8,7 @@ from instadam.utils import check_json, construct_msg
 bp = Blueprint('user', __name__, url_prefix='/user')
 
 
-@bp.route('/privilege', method=['PUT'])
+@bp.route('/privilege/', methods=['PUT'])
 @jwt_required
 def change_privilege():
     """
