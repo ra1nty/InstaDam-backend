@@ -229,7 +229,7 @@ def get_labels(project_id):
 
 @bp.route('/project/<project_id>/permissions', methods=['PUT'])
 @jwt_required
-def grant_user_privilege(project_id):
+def update_user_permission(project_id):
     """ Grant a user with specified privilege to project
 
         Grant a user with specified privilege (READ_WRITE or READ_ONLY) to project
@@ -285,9 +285,8 @@ def grant_user_privilege(project_id):
 
     new_permission = ProjectPermission(access_type=access_type)
     project.permissions.append(new_permission)
-    user.permissions.append(new_permission)
+    user.project_permissions.append(new_permission)
     try:
-        db.session.add(new_permission)
         db.session.flush()
     except IntegrityError:
         db.session.rollback()
