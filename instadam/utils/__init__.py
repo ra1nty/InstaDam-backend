@@ -1,7 +1,7 @@
 """Helper function and modules
 """
 
-from flask import jsonify
+from flask import abort, jsonify
 
 
 def construct_msg(body):
@@ -15,3 +15,9 @@ def construct_msg(body):
     """
 
     return jsonify({'msg': str(body)})
+
+
+def check_json(json, keys):
+    for key in keys:
+        if key not in json:
+            abort(401, 'Missing key %s in json' % key)
