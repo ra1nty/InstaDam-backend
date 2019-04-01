@@ -180,7 +180,3 @@ def test_list_projects(get_project_fixture):
     assert 1 == len(json)
     assert 'test1' == json[0]['name']
     assert json[0]['is_admin']
-
-
-def test_update_user_permission(get_project_fixture):
-    token = login(client, ADMIN_USERNAME, ADMIN_PWD)

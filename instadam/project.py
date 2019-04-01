@@ -227,6 +227,7 @@ def get_labels(project_id):
     return jsonify({'labels': labels}), 200
 
 
+
 @bp.route('/project/<project_id>/permissions', methods=['PUT'])
 @jwt_required
 def update_user_permission(project_id):
@@ -234,9 +235,10 @@ def update_user_permission(project_id):
 
         Grant a user with specified privilege (READ_WRITE or READ_ONLY) to project
         upon receiving a `PUT`request to the `/project/<project_id>/permissions`
-        entry point. User must be signed in as an ADMIN and must provide a
-        `user_name` to specify the user that will be granted permissions, and
-        `access_type` to specify the type of privilege to grant.
+        entry point. User must be signed in as an ADMIN have READ_WRITE permission
+        to the project. User must provide a `username` to specify the user that
+        will be granted permissions, and `access_type` to specify the type of
+        privilege to grant.
 
         `access_type` takes a string of two values: `r` or `rw`, where `r` is
         `READ_ONLY` and `rw` is `READ_WRITE`
@@ -254,28 +256,31 @@ def update_user_permission(project_id):
         Returns:
             201 if success. Will also return `project_id`.
         """
+
+    map_code_to_access_type = {
+        'r': AccessTypeEnum.READ_ONLY,
+        'rw': AccessTypeEnum.READ_WRITE,
+    }
+
     project = maybe_get_project(project_id)  # check privilege and get project
 
     req = request.get_json()
-    if 'user_name' not in req:
+    if 'username' not in req:
         abort(400, 'user_name must be included.')
     if 'access_type' not in req:
         abort(400, 'access_type must be included.')
 
-    user_name = req['user_name']
-    user = User.query.filter_by(username=user_name).first()
+    username = req['username']
+    user = User.query.filter_by(username=username).first()
     if user is None:
-        abort(404, 'User with username=%s does not exist' % user_name)
+        abort(404, 'User with username=%s does not exist' % username)
 
-    access_type = None
-    if req['access_type'] == 'r':
-        access_type = AccessTypeEnum.READ_ONLY
-    elif req['access_type'] == 'rw':
-        access_type = AccessTypeEnum.READ_WRITE
-    else:
-        abort(400, 'Cannot interpret access_type. This is likely due to a typo.')
+    if req['access_type'] not in map_code_to_access_type:
+        abort(400, 'Not able to interpret access_type.')
 
-    # Check if user already have this permission of `access_type` to the project
+    access_type = map_code_to_access_type[req['access_type']]
+
+    # Check if user already have the permission of `access_type` to the project
     permission = ProjectPermission.query.filter(
         (ProjectPermission.user_id == user.id)
         & (ProjectPermission.project_id == project_id)).filter(
@@ -287,6 +292,7 @@ def update_user_permission(project_id):
     project.permissions.append(new_permission)
     user.project_permissions.append(new_permission)
     try:
+        db.session.add(new_permission)
         db.session.flush()
     except IntegrityError:
         db.session.rollback()
