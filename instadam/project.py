@@ -206,7 +206,11 @@ def add_label(project_id):
     if not 'label_name' in req:
         abort(400, 'Missing label name')
     label_name = req['label_name']
-    label = Label(label_name=label_name)
+    label_color = req['label_color']
+    import string
+    if label_color[0] != '#' or not all(c in string.hexdigits for c in label_color[1:]):
+        abort(400, 'Failed to add image, need color')
+    label = Label(label_name=label_name, label_color=label_name)
     project.labels.append(label)
     try:
         db.session.add(label)
@@ -223,6 +227,6 @@ def add_label(project_id):
 @jwt_required
 def get_labels(project_id):
     project = maybe_get_project(project_id)
-    labels = [{'name': label.label_name, 'id': label.id} for label in
+    labels = [{'color': label.label_color, 'name': label.label_name, 'id': label.id} for label in
               project.labels]
     return jsonify({'labels': labels}), 200
