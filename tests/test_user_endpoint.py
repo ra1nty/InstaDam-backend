@@ -77,10 +77,16 @@ def test_change_user_privilege_fail1(local_client):
     assert '403 FORBIDDEN' == response.status
 
 
-def test_change_user_privilege_fai2(local_client):
-    token = successful_login(local_client, 'test_upload_annotator1',
-                             'TestTest2')
+def test_change_user_privilege_fail2(local_client):
+    token = successful_login(local_client, 'test_upload_admin1', 'TestTest1')
     response = local_client.put('/user/privilege/',
                                 json={'privilege': 'admin'},
                                 headers={'Authorization': 'Bearer %s' % token})
-    assert '403 FORBIDDEN' == response.status
+    assert '400 BAD REQUEST' == response.status
+
+
+def test_change_user_privilege_fail3(local_client):
+    token = successful_login(local_client, 'test_upload_admin1', 'TestTest1')
+    response = local_client.put('/user/privilege/',
+                                headers={'Authorization': 'Bearer %s' % token})
+    assert '400 BAD REQUEST' == response.status
