@@ -66,7 +66,7 @@ def test_search_users_by_username(local_client):
     access_token = successful_login(local_client, 'user_1', 'TestTest1')
 
     res = local_client.get(
-        '/users/search=drifter',
+        '/users/search?q=drifter',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
@@ -80,7 +80,7 @@ def test_search_users_by_email(local_client):
     access_token = successful_login(local_client, 'user_1', 'TestTest1')
 
     res = local_client.get(
-        '/users/search=jordanne@caterpillar',
+        '/users/search?q=jordanne@caterpillar',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
@@ -94,7 +94,7 @@ def test_search_users_permission_fail(local_client):
     access_token = successful_login(local_client, 'user_2', 'TestTest2')
 
     res = local_client.get(
-        '/users/search=jordanne',
+        '/users/search?q=jordanne',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     assert '401 UNAUTHORIZED' == res.status
@@ -104,8 +104,22 @@ def test_search_users_no_users(local_client):
     access_token = successful_login(local_client, 'user_1', 'TestTest1')
 
     res = local_client.get(
-        '/users/search=jordank',
+        '/users/search?q=jordank',
         headers={'Authorization': 'Bearer %s' % access_token})
 
     json_res = res.get_json()
     assert len(json_res['users']) == 0
+
+
+def test_search_user_partial_match(local_client):
+    access_token = successful_login(local_client, 'user_1', 'TestTest1')
+
+    res = local_client.get(
+        '/users/search?q=jordan',
+        headers={'Authorization': 'Bearer %s' % access_token})
+
+    json_res = res.get_json()
+    assert len(json_res['users']) == 1
+
+    assert json_res['users'][0]['username'] == 'jordanne'
+    assert json_res['users'][0]['email'] == 'jordanne@caterpillar.com'

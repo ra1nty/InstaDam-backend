@@ -180,3 +180,4 @@ def test_list_projects(get_project_fixture):
     assert 1 == len(json)
     assert 'test1' == json[0]['name']
     assert json[0]['is_admin']
+    assert 1 == json[0]['id']

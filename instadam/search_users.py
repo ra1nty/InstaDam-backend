@@ -11,7 +11,7 @@ from instadam.models.user import PrivilegesEnum, User
 bp = Blueprint('search_users', __name__, url_prefix='/users')
 
 
-@bp.route('/search=<user_query>', methods=['GET'])
+@bp.route('/search?q=<user_query>', methods=['GET'])
 @jwt_required
 def query_users(user_query):
     """

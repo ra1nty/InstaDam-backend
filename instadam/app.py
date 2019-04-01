@@ -38,6 +38,8 @@ def create_app(mode='development'):
     app.register_blueprint(annotation.bp)
     from . import search_users
     app.register_blueprint(search_users.bp)
+    from . import user
+    app.register_blueprint(user.bp)
 
     if not os.path.isdir(app.config['STATIC_STORAGE_DIR']):
         os.mkdir(app.config['STATIC_STORAGE_DIR'])

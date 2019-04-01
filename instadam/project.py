@@ -104,7 +104,8 @@ def get_projects():
     user = User.query.filter_by(username=current_user).first()
     projects = []
     for project_permission in user.project_permissions:
-        project_dict = {'name': project_permission.project.project_name,
+        project_dict = {'id': project_permission.project.id,
+                        'name': project_permission.project.project_name,
                         'is_admin': (user.privileges == PrivilegesEnum.ADMIN
                                      and project_permission.access_type ==
                                      AccessTypeEnum.READ_WRITE)}
