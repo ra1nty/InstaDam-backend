@@ -9,7 +9,7 @@ from instadam.models.image import Image
 from instadam.models.label import Label
 from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
 from instadam.models.user import PrivilegesEnum, User
-from instadam.utils import construct_msg
+from instadam.utils import construct_msg, check_json
 from instadam.utils.get_project import maybe_get_project
 from .app import db
 from .models.project import Project
@@ -266,10 +266,7 @@ def update_user_permission(project_id):
     project = maybe_get_project(project_id)  # check privilege and get project
 
     req = request.get_json()
-    if 'username' not in req:
-        abort(400, 'user_name must be included.')
-    if 'access_type' not in req:
-        abort(400, 'access_type must be included.')
+    check_json(req, ('username', 'access_type'))  # check missing keys
 
     username = req['username']
     user = User.query.filter_by(username=username).first()
@@ -282,7 +279,6 @@ def update_user_permission(project_id):
     }
     if req['access_type'] not in map_code_to_access_type:
         abort(400, 'Not able to interpret access_type.')
-
     access_type = map_code_to_access_type[req['access_type']]
 
     # Check if user already have the permission of `access_type` to the project
@@ -296,8 +292,8 @@ def update_user_permission(project_id):
     # Check if user is allowed to have the permission of `access_type`
     if user.privileges == PrivilegesEnum.ANNOTATOR and \
             access_type == AccessTypeEnum.READ_WRITE:
-        abort(403, 'User with ANNOTATOR privilege cannot have READ_WRITE access'
-                   'to project')
+        abort(403, 'User with ANNOTATOR privilege cannot obtain READ_WRITE access'
+                   'to projects')
 
     new_permission = ProjectPermission(access_type=access_type)
     project.permissions.append(new_permission)
@@ -307,8 +303,7 @@ def update_user_permission(project_id):
         db.session.flush()
     except IntegrityError:
         db.session.rollback()
-        abort(
-            400, 'Update permission failed.')
+        abort(400, 'Update permission failed.')
     else:
         db.session.commit()
 
