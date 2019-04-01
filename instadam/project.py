@@ -13,6 +13,7 @@ from instadam.utils import construct_msg
 from instadam.utils.get_project import maybe_get_project
 from .app import db
 from .models.project import Project
+from string import hexdigits
 
 bp = Blueprint('project', __name__, url_prefix='')
 
@@ -206,14 +207,17 @@ def add_label(project_id):
     if not 'label_name' in req:
         abort(400, 'Missing label name')
     label_name = req['label_name']
-    label = Label(label_name=label_name)
+    label_color = req['label_color']
+    if label_color[0] != '#' or not all(c in hexdigits for c in label_color[1:]):
+        abort(400, 'Failed to add label, need color')
+    label = Label(label_name=label_name, label_color=label_color)
     project.labels.append(label)
     try:
         db.session.add(label)
         db.session.flush()
     except IntegrityError:
         db.session.rollback()
-        abort(400, 'Failed to add image')
+        abort(400, 'Failed to add label, label name should be unique')
     else:
         db.session.commit()
     return construct_msg('Label added successfully'), 200
@@ -223,6 +227,6 @@ def add_label(project_id):
 @jwt_required
 def get_labels(project_id):
     project = maybe_get_project(project_id)
-    labels = [{'name': label.label_name, 'id': label.id} for label in
+    labels = [{'color': label.label_color, 'name': label.label_name, 'id': label.id} for label in
               project.labels]
     return jsonify({'labels': labels}), 200
