@@ -103,7 +103,7 @@ def test_get_label(local_client):
     json_data = rv.get_json()
     assert 'labels' in json_data
     labels = json_data['labels']
-    assert 3 == len(labels)
+    assert 2 == len(labels)
 
     for label in labels:
         label_id = label['id']
