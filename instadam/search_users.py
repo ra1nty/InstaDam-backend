@@ -11,9 +11,9 @@ from instadam.models.user import PrivilegesEnum, User
 bp = Blueprint('search_users', __name__, url_prefix='/users')
 
 
-@bp.route('/search?q=<user_query>', methods=['GET'])
+@bp.route('/search', methods=['GET'])
 @jwt_required
-def query_users(user_query):
+def query_users():
     """
     Upload image to a project
 
@@ -23,6 +23,8 @@ def query_users(user_query):
     Returns:
         list of users that satisfy the query
     """
+
+    user_query = request.args.get('q')
 
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
