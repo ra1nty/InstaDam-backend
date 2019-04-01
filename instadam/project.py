@@ -225,3 +225,77 @@ def get_labels(project_id):
     labels = [{'name': label.label_name, 'id': label.id} for label in
               project.labels]
     return jsonify({'labels': labels}), 200
+
+
+@bp.route('/project/<project_id>/permissions', methods=['PUT'])
+@jwt_required
+def grant_user_privilege(project_id):
+    """ Grant a user with specified privilege to project
+
+        Grant a user with specified privilege (READ_WRITE or READ_ONLY) to project
+        upon receiving a `PUT`request to the `/project/<project_id>/permissions`
+        entry point. User must be signed in as an ADMIN and must provide a
+        `user_name` to specify the user that will be granted permissions, and
+        `access_type` to specify the type of privilege to grant.
+
+        `access_type` takes a string of two values: `r` or `rw`, where `r` is
+        `READ_ONLY` and `rw` is `READ_WRITE`
+
+        Must supply a jwt-token to verify user status and extract `user_id`.
+
+        Raises:
+            400 Error if user_name or access_type is not specified
+            400 Error if access_type is not 'r' or 'rw'
+            401 Error if not logged in
+            401 Error if user is not an ADMIN
+            401 Error if user does not have privilege to update permission
+            404 Error if user with user_name does not exist
+
+        Returns:
+            201 if success. Will also return `project_id`.
+        """
+    project = maybe_get_project(project_id)  # check privilege and get project
+
+    req = request.get_json()
+    if 'user_name' not in req:
+        abort(400, 'user_name must be included.')
+    if 'access_type' not in req:
+        abort(400, 'access_type must be included.')
+
+    user_name = req['user_name']
+    user = User.query.filter_by(username=user_name).first()
+    if user is None:
+        abort(404, 'User with username=%s does not exist' % user_name)
+
+    access_type = None
+    if req['access_type'] == 'r':
+        access_type = AccessTypeEnum.READ_ONLY
+    elif req['access_type'] == 'rw':
+        access_type = AccessTypeEnum.READ_WRITE
+    else:
+        abort(400, 'Cannot interpret access_type. This is likely due to a typo.')
+
+    # Check if user already have some kind of access permission to the project
+    permission_exist = False
+    grantee_permission = ProjectPermission.query.filter_by(
+        user_id=user.id, project_id=project_id).first()
+    if grantee_permission is not None:
+        permission_exist = True
+    grantee_permission.delete()
+
+    # Create new permission
+    new_permission = ProjectPermission(access_type=access_type)
+    project.permissions.append(new_permission)
+    user.permissions.append(new_permission)
+    try:
+        db.session.add(new_permission)
+        db.session.flush()
+    except IntegrityError:
+        db.session.rollback()
+        abort(
+            400, 'Update permission failed.')
+    else:
+        db.session.commit()
+
+    return construct_msg('Permission %s successfully' %
+                         'updated' if permission_exist else 'added'), 200
