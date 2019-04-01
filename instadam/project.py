@@ -227,7 +227,6 @@ def get_labels(project_id):
     return jsonify({'labels': labels}), 200
 
 
-
 @bp.route('/project/<project_id>/permissions', methods=['PUT'])
 @jwt_required
 def update_user_permission(project_id):
@@ -235,10 +234,10 @@ def update_user_permission(project_id):
 
         Grant a user with specified privilege (READ_WRITE or READ_ONLY) to project
         upon receiving a `PUT`request to the `/project/<project_id>/permissions`
-        entry point. User must be signed in as an ADMIN have READ_WRITE permission
-        to the project. User must provide a `username` to specify the user that
-        will be granted permissions, and `access_type` to specify the type of
-        privilege to grant.
+        entry point. User must be signed in as an ADMIN and have READ_WRITE
+        permission to the project. User must provide a `username` to specify the
+        user that will be granted permissions, and `access_type` to specify the
+        type of privilege to grant.
 
         `access_type` takes a string of two values: `r` or `rw`, where `r` is
         `READ_ONLY` and `rw` is `READ_WRITE`
@@ -284,7 +283,7 @@ def update_user_permission(project_id):
     permission = ProjectPermission.query.filter(
         (ProjectPermission.user_id == user.id)
         & (ProjectPermission.project_id == project_id)).filter(
-        (ProjectPermission.access_type == access_type)).first()
+            (ProjectPermission.access_type == access_type)).first()
     if permission is not None:
         return construct_msg('Permission already existed'), 200
 
