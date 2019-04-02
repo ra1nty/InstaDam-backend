@@ -56,6 +56,7 @@ def create_project():
     project_name = req['project_name']
     user_id = user.id
     project = Project(project_name=project_name, created_by=user_id)
+
     try:
         db.session.add(project)
         db.session.flush()
@@ -71,6 +72,8 @@ def create_project():
             access_type=AccessTypeEnum.READ_WRITE,
             user_id=user_id,
             project_id=project.id)
+        user.project_permissions.append(project_permission)
+        project.permissions.append(project_permission)
         try:
             db.session.add(project_permission)
             db.session.flush()
