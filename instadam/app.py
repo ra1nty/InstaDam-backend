@@ -41,6 +41,9 @@ def create_app(mode='development'):
     from . import annotation
     app.register_blueprint(annotation.bp)
 
+    from . import search_users
+    app.register_blueprint(search_users.bp)
+
     from . import user
     app.register_blueprint(user.bp)
 
