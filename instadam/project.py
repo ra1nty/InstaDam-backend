@@ -12,6 +12,7 @@ from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
 from instadam.models.user import PrivilegesEnum, User
 from instadam.utils import construct_msg, check_json
 from instadam.utils.get_project import maybe_get_project
+from instadam.utils.user_identification import check_user_admin_privilege
 from .app import db
 from .models.project import Project
 from string import hexdigits
@@ -45,14 +46,11 @@ def create_project():
     """
 
     req = request.get_json()
-    if 'project_name' not in req:
-        abort(400, 'Project name must be included.')
+    check_json(req, ['project_name'])
 
     # check user identity and privilege
     identity = get_jwt_identity()
-    user = User.query.filter_by(username=identity).first()
-    if user.privileges != PrivilegesEnum.ADMIN:
-        abort(401, 'User does not have the privilege to create a project.')
+    user = check_user_admin_privilege(identity)
 
     project_name = req['project_name']
     user_id = user.id
