@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module instadam.project</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="instadam.html"><font color="#ffffff">instadam</font></a>.project</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/nishanth/Documents/CS_COURSEWORK_JOB/CS428_Software_Engineering_II/InstaDam-backend/instadam/project.py">/Users/nishanth/Documents/CS_COURSEWORK_JOB/CS428_Software_Engineering_II/InstaDam-backend/instadam/project.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-add_label"><strong>add_label</strong></a>(project_id)</dt></dl>
+ <dl><dt><a name="-create_project"><strong>create_project</strong></a>()</dt><dd><tt>Create&nbsp;a&nbsp;new&nbsp;project&nbsp;by&nbsp;the&nbsp;user&nbsp;currently&nbsp;signed&nbsp;in<br>
+&nbsp;<br>
+Create&nbsp;a&nbsp;new&nbsp;project&nbsp;entry&nbsp;in&nbsp;the&nbsp;database&nbsp;and&nbsp;a&nbsp;new&nbsp;folder&nbsp;in&nbsp;the<br>
+filesystem<br>
+to&nbsp;hold&nbsp;image&nbsp;dataset&nbsp;upon&nbsp;receiving&nbsp;a&nbsp;`POST`request&nbsp;to&nbsp;the&nbsp;`/project`&nbsp;entry<br>
+point.&nbsp;User&nbsp;must&nbsp;be&nbsp;signed&nbsp;in&nbsp;as&nbsp;an&nbsp;ADMIN&nbsp;and&nbsp;must&nbsp;provide&nbsp;a&nbsp;`project&nbsp;name`<br>
+to&nbsp;create&nbsp;a&nbsp;new&nbsp;project.<br>
+&nbsp;<br>
+Must&nbsp;supply&nbsp;a&nbsp;jwt-token&nbsp;to&nbsp;verify&nbsp;user&nbsp;status&nbsp;and&nbsp;extract&nbsp;`user_id`.<br>
+`project&nbsp;name`&nbsp;must&nbsp;be&nbsp;unique.<br>
+&nbsp;<br>
+Raises:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;400&nbsp;Error&nbsp;if&nbsp;project&nbsp;name&nbsp;is&nbsp;not&nbsp;specified<br>
+&nbsp;&nbsp;&nbsp;&nbsp;401&nbsp;Error&nbsp;if&nbsp;not&nbsp;logged&nbsp;in<br>
+&nbsp;&nbsp;&nbsp;&nbsp;401&nbsp;Error&nbsp;if&nbsp;user&nbsp;is&nbsp;not&nbsp;an&nbsp;ADMIN<br>
+&nbsp;&nbsp;&nbsp;&nbsp;400&nbsp;Error&nbsp;if&nbsp;project&nbsp;name&nbsp;already&nbsp;exists&nbsp;in&nbsp;the&nbsp;database<br>
+&nbsp;<br>
+&nbsp;<br>
+Returns:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;201&nbsp;if&nbsp;success.&nbsp;Will&nbsp;also&nbsp;return&nbsp;`project_id`.</tt></dd></dl>
+ <dl><dt><a name="-get_labels"><strong>get_labels</strong></a>(project_id)</dt></dl>
+ <dl><dt><a name="-get_project_images"><strong>get_project_images</strong></a>(project_id)</dt><dd><tt>Get&nbsp;all&nbsp;images&nbsp;(annotated&nbsp;and&nbsp;unannotated)&nbsp;of&nbsp;project&nbsp;with&nbsp;project_id<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;project_id:&nbsp;The&nbsp;id&nbsp;of&nbsp;the&nbsp;project</tt></dd></dl>
+ <dl><dt><a name="-get_projects"><strong>get_projects</strong></a>()</dt><dd><tt>List&nbsp;all&nbsp;the&nbsp;project&nbsp;this&nbsp;user&nbsp;has&nbsp;access&nbsp;to.<br>
+Returns:</tt></dd></dl>
+ <dl><dt><a name="-get_unannotated_images"><strong>get_unannotated_images</strong></a>(project_id)</dt><dd><tt>Get&nbsp;unannotated&nbsp;images&nbsp;across&nbsp;ALL&nbsp;projects&nbsp;so&nbsp;that&nbsp;user&nbsp;(annotator)&nbsp;can<br>
+see&nbsp;images&nbsp;to&nbsp;annotate</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>app</strong> = &lt;LocalProxy unbound&gt;<br>
+<strong>bp</strong> = &lt;flask.blueprints.Blueprint object&gt;<br>
+<strong>db</strong> = &lt;SQLAlchemy engine=None&gt;<br>
+<strong>hexdigits</strong> = '0123456789abcdefABCDEF'<br>
+<strong>request</strong> = &lt;LocalProxy unbound&gt;</td></tr></table>
+</body></html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module instadam.auth</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="instadam.html"><font color="#ffffff">instadam</font></a>.auth</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/nishanth/Documents/CS_COURSEWORK_JOB/CS428_Software_Engineering_II/InstaDam-backend/instadam/auth.py">/Users/nishanth/Documents/CS_COURSEWORK_JOB/CS428_Software_Engineering_II/InstaDam-backend/instadam/auth.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-check_if_token_in_blacklist"><strong>check_if_token_in_blacklist</strong></a>(decrypted_token)</dt></dl>
+ <dl><dt><a name="-credential_checking"><strong>credential_checking</strong></a>(password, email)</dt><dd><tt>Check&nbsp;the&nbsp;validity&nbsp;of&nbsp;the&nbsp;given&nbsp;user&nbsp;credential.<br>
+&nbsp;<br>
+*&nbsp;Needs&nbsp;a&nbsp;refactoring<br>
+&nbsp;<br>
+Raises:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;IntegrityError:&nbsp;An&nbsp;error&nbsp;occurred&nbsp;when&nbsp;invalidate&nbsp;user&nbsp;credential&nbsp;is<br>
+&nbsp;&nbsp;&nbsp;&nbsp;given</tt></dd></dl>
+ <dl><dt><a name="-login"><strong>login</strong></a>()</dt><dd><tt>User&nbsp;login&nbsp;endpoint&nbsp;for&nbsp;application<br>
+&nbsp;<br>
+Take&nbsp;POST&nbsp;data&nbsp;as&nbsp;json&nbsp;with&nbsp;userame&nbsp;and&nbsp;password.<br>
+Return&nbsp;a&nbsp;json&nbsp;web&nbsp;token&nbsp;as&nbsp;access&nbsp;token.<br>
+&nbsp;<br>
+Usage:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;POST&nbsp;/login</tt></dd></dl>
+ <dl><dt><a name="-logout"><strong>logout</strong></a>()</dt><dd><tt>User&nbsp;logout&nbsp;endpoint&nbsp;for&nbsp;application<br>
+&nbsp;<br>
+Invalidate&nbsp;the&nbsp;token&nbsp;in&nbsp;the&nbsp;request&nbsp;header<br>
+&nbsp;<br>
+Usage:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;/logout</tt></dd></dl>
+ <dl><dt><a name="-register"><strong>register</strong></a>()</dt><dd><tt>User&nbsp;register&nbsp;endpoint&nbsp;for&nbsp;application<br>
+&nbsp;<br>
+Take&nbsp;POST&nbsp;data&nbsp;as&nbsp;json&nbsp;with&nbsp;userame&nbsp;and&nbsp;password.<br>
+Return&nbsp;a&nbsp;json&nbsp;web&nbsp;token&nbsp;as&nbsp;access&nbsp;token.<br>
+&nbsp;<br>
+Usage:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;POST&nbsp;/register</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>bp</strong> = &lt;flask.blueprints.Blueprint object&gt;<br>
+<strong>db</strong> = &lt;SQLAlchemy engine=None&gt;<br>
+<strong>jwt</strong> = &lt;flask_jwt_extended.jwt_manager.JWTManager object&gt;<br>
+<strong>request</strong> = &lt;LocalProxy unbound&gt;</td></tr></table>
+</body></html>
