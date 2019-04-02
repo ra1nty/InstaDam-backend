@@ -3,13 +3,12 @@ from flask import abort
 
 from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
 from instadam.models.user import PrivilegesEnum, User
+from instadam.utils.user_identification import check_user_admin_privilege
 
 
 def maybe_get_project(project_id):
     current_user = get_jwt_identity()
-    user = User.query.filter_by(username=current_user).first()
-    if user.privileges == PrivilegesEnum.ANNOTATOR:
-        abort(401, 'User is not Admin')
+    user = check_user_admin_privilege(current_user)
     permission = ProjectPermission.query.filter_by(
         project_id=project_id,
         user_id=user.id,

@@ -54,7 +54,7 @@ class Image(db.Model):
             abort(400, 'Project with id %d does not exist.' % self.project_id)
         project_dir = get_project_dir(project)
         new_file_name = '%s.%s' % (str(uuid.uuid4()), extension)
-        self.image_name = new_file_name
+        self.image_name = img_file.filename
         self.image_storage_path = os.path.join(project_dir, new_file_name)
         self.image_url = os.path.join(get_project_static_url(project),
                                       new_file_name)
@@ -70,7 +70,7 @@ class Image(db.Model):
             os.mkdir(project_dir)
         project_url = get_project_static_url(project)
         new_file_name = '%s.%s' % (str(uuid.uuid4()), extension)
-        self.image_name = new_file_name
+        self.image_name = original_file_name
         self.image_url = os.path.join(project_url, new_file_name)
         self.image_storage_path = os.path.join(project_dir, new_file_name)
 

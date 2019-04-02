@@ -6,11 +6,13 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from sqlalchemy.exc import DatabaseError, IntegrityError
 
 from instadam.models.image import Image
+from instadam.utils import check_json
 from instadam.models.label import Label
 from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
 from instadam.models.user import PrivilegesEnum, User
-from instadam.utils import construct_msg
+from instadam.utils import construct_msg, check_json
 from instadam.utils.get_project import maybe_get_project
+from instadam.utils.user_identification import check_user_admin_privilege
 from .app import db
 from .models.project import Project
 from string import hexdigits
@@ -44,18 +46,16 @@ def create_project():
     """
 
     req = request.get_json()
-    if 'project_name' not in req:
-        abort(400, 'Project name must be included.')
+    check_json(req, ['project_name'])
 
     # check user identity and privilege
     identity = get_jwt_identity()
-    user = User.query.filter_by(username=identity).first()
-    if user.privileges != PrivilegesEnum.ADMIN:
-        abort(401, 'User does not have the privilege to create a project.')
+    user = check_user_admin_privilege(identity)
 
     project_name = req['project_name']
     user_id = user.id
     project = Project(project_name=project_name, created_by=user_id)
+
     try:
         db.session.add(project)
         db.session.flush()
@@ -71,6 +71,8 @@ def create_project():
             access_type=AccessTypeEnum.READ_WRITE,
             user_id=user_id,
             project_id=project.id)
+        user.project_permissions.append(project_permission)
+        project.permissions.append(project_permission)
         try:
             db.session.add(project_permission)
             db.session.flush()
@@ -204,8 +206,9 @@ def get_project_images(project_id):
 def add_label(project_id):
     project = maybe_get_project(project_id)
     req = request.get_json()
-    if 'label_name' not in req:
-        abort(400, 'Missing label name')
+    
+    check_json(req, ['label_name', 'label_color'])
+
     label_name = req['label_name']
     label_color = req['label_color']
     if label_color[0] != '#' or not all(c in hexdigits
@@ -234,3 +237,85 @@ def get_labels(project_id):
         'id': label.id
     } for label in project.labels]
     return jsonify({'labels': labels}), 200
+
+
+@bp.route('/project/<project_id>/permissions', methods=['PUT'])
+@jwt_required
+def update_user_permission(project_id):
+    """ Grant a user with specified privilege to project
+
+        Grant a user with specified privilege (READ_WRITE or READ_ONLY) to project
+        upon receiving a `PUT`request to the `/project/<project_id>/permissions`
+        entry point. User must be signed in as an ADMIN and have READ_WRITE
+        permission to the project. User must provide a `username` to specify the
+        user that will be granted permissions, and `access_type` to specify the
+        type of privilege to grant.
+
+        `access_type` takes a string of two values: `r` or `rw`, where `r` is
+        `READ_ONLY` and `rw` is `READ_WRITE`
+
+        Only user with `ADMIN` privilege can have `READ_WRITE` access to projects.
+        That is, the user indicated by `username` should have an `ADMIN` privilege
+        (as opposed to `ANNOTATOR` privilege)
+
+        Must supply a jwt-token to verify user status and extract `user_id`.
+
+        Raises:
+            400 Error if username or access_type is not specified
+            400 Error if access_type is not 'r' or 'rw'
+            401 Error if not logged in
+            401 Error if user is not an ADMIN
+            401 Error if user does not have privilege to update permission
+            403 Error if user indicated by `username` has only ANNOTATOR privilege
+                but `access_type` is 'rw'
+            404 Error if user with user_name does not exist
+
+        Returns:
+            201 if success. Will also return `project_id`.
+        """
+
+    project = maybe_get_project(project_id)  # check privilege and get project
+
+    req = request.get_json()
+    check_json(req, ('username', 'access_type'))  # check missing keys
+
+    username = req['username']
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        abort(404, 'User with username=%s not found' % username)
+
+    map_code_to_access_type = {
+        'r': AccessTypeEnum.READ_ONLY,
+        'rw': AccessTypeEnum.READ_WRITE,
+    }
+    if req['access_type'] not in map_code_to_access_type:
+        abort(400, 'Not able to interpret access_type.')
+    access_type = map_code_to_access_type[req['access_type']]
+
+    # Check if user already have the permission of `access_type` to the project
+    permission = ProjectPermission.query.filter(
+        (ProjectPermission.user_id == user.id)
+        & (ProjectPermission.project_id == project_id)).filter(
+            (ProjectPermission.access_type == access_type)).first()
+    if permission is not None:
+        return construct_msg('Permission already existed'), 200
+
+    # Check if user is allowed to have the permission of `access_type`
+    if user.privileges == PrivilegesEnum.ANNOTATOR and \
+            access_type == AccessTypeEnum.READ_WRITE:
+        abort(403, 'User with ANNOTATOR privilege cannot obtain READ_WRITE access'
+                   'to projects')
+
+    new_permission = ProjectPermission(access_type=access_type)
+    project.permissions.append(new_permission)
+    user.project_permissions.append(new_permission)
+    try:
+        db.session.add(new_permission)
+        db.session.flush()
+    except IntegrityError:
+        db.session.rollback()
+        abort(400, 'Update permission failed.')
+    else:
+        db.session.commit()
+
+    return construct_msg('Permission added successfully'), 200
