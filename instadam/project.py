@@ -13,6 +13,7 @@ from instadam.utils import construct_msg, check_json
 from instadam.utils.get_project import maybe_get_project
 from .app import db
 from .models.project import Project
+from string import hexdigits
 
 bp = Blueprint('project', __name__, url_prefix='')
 
@@ -62,7 +63,7 @@ def create_project():
         db.session.rollback()
         abort(
             400, 'Duplicate project name. '
-                 'Please provide a different project name.')
+            'Please provide a different project name.')
     else:
         # if able to add project to db, try add project_permission
         # creator is granted with READ_WRITE privilege
@@ -104,11 +105,15 @@ def get_projects():
     user = User.query.filter_by(username=current_user).first()
     projects = []
     for project_permission in user.project_permissions:
-        project_dict = {'id': project_permission.project.id,
-                        'name': project_permission.project.project_name,
-                        'is_admin': (user.privileges == PrivilegesEnum.ADMIN
-                                     and project_permission.access_type ==
-                                     AccessTypeEnum.READ_WRITE)}
+        project_dict = {
+            'id':
+            project_permission.project.id,
+            'name':
+            project_permission.project.project_name,
+            'is_admin':
+            (user.privileges == PrivilegesEnum.ADMIN and
+             project_permission.access_type == AccessTypeEnum.READ_WRITE)
+        }
         projects.append(project_dict)
     return jsonify(projects), 200
 
@@ -119,7 +124,6 @@ def get_unannotated_images(project_id):
     """
     Get unannotated images across ALL projects so that user (annotator) can
     see images to annotate
-    NOTE: Only returning a fixed number of images (k=5) for Iteration 3
     """
 
     current_user = get_jwt_identity()
@@ -135,8 +139,7 @@ def get_unannotated_images(project_id):
         abort(
             401,
             'User does not have the privilege to view the unannotated images '
-            'of project with id=%s'
-            % (project_id))
+            'of project with id=%s' % (project_id))
 
     unannotated_images = Image.query.filter_by(
         is_annotated=False, project_id=project_id).all()
@@ -160,7 +163,6 @@ def get_unannotated_images(project_id):
 def get_project_images(project_id):
     """
     Get all images (annotated and unannotated) of project with project_id
-    NOTE: Only returning a fixed number of images (k=5) for Iteration 3
 
     Args:
         project_id: The id of the project
@@ -179,8 +181,7 @@ def get_project_images(project_id):
         abort(
             401,
             'User does not have the privilege to view the images of project '
-            'with id=%s'
-            % (project_id))
+            'with id=%s' % (project_id))
 
     project_images = Image.query.filter_by(project_id=project_id).all()
     if not project_images:
@@ -206,14 +207,18 @@ def add_label(project_id):
     if not 'label_name' in req:
         abort(400, 'Missing label name')
     label_name = req['label_name']
-    label = Label(label_name=label_name)
+    label_color = req['label_color']
+    if label_color[0] != '#' or not all(c in hexdigits
+                                        for c in label_color[1:]):
+        abort(400, 'Failed to add label, need color')
+    label = Label(label_name=label_name, label_color=label_color)
     project.labels.append(label)
     try:
         db.session.add(label)
         db.session.flush()
     except IntegrityError:
         db.session.rollback()
-        abort(400, 'Failed to add image')
+        abort(400, 'Failed to add label, label name should be unique')
     else:
         db.session.commit()
     return construct_msg('Label added successfully'), 200
@@ -223,8 +228,11 @@ def add_label(project_id):
 @jwt_required
 def get_labels(project_id):
     project = maybe_get_project(project_id)
-    labels = [{'name': label.label_name, 'id': label.id} for label in
-              project.labels]
+    labels = [{
+        'color': label.label_color,
+        'name': label.label_name,
+        'id': label.id
+    } for label in project.labels]
     return jsonify({'labels': labels}), 200
 
 

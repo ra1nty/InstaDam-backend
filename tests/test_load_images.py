@@ -125,11 +125,11 @@ def test_load_unannotated_images(local_client):
         'unannotated_images'][1]['name'] == 'dog.png'
 
     assert json_res['unannotated_images'][0][
-               'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
-               'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
+        'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
+            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
     assert json_res['unannotated_images'][0][
-               'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
-               'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
+        'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
+            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
 
 
 def test_load_unannotated_images_fail(local_client):
@@ -229,7 +229,10 @@ def test_get_thumbnail(local_client):
                                     'TestTest2')
     res = local_client.get(
         '/image/3/thumbnail',
-        json={'size_h': 16, 'size_w': 15},
+        json={
+            'size_h': 16,
+            'size_w': 15
+        },
         headers={'Authorization': 'Bearer %s' % access_token})
     json = res.get_json()
     assert '200 OK' == res.status
