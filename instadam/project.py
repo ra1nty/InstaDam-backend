@@ -6,6 +6,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from sqlalchemy.exc import DatabaseError, IntegrityError
 
 from instadam.models.image import Image
+from instadam.utils import check_json
 from instadam.models.label import Label
 from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
 from instadam.models.user import PrivilegesEnum, User
@@ -204,8 +205,9 @@ def get_project_images(project_id):
 def add_label(project_id):
     project = maybe_get_project(project_id)
     req = request.get_json()
-    if not 'label_name' in req:
-        abort(400, 'Missing label name')
+
+    check_json(req, ['label_name', 'label_color'])
+
     label_name = req['label_name']
     label_color = req['label_color']
     if label_color[0] != '#' or not all(c in hexdigits
