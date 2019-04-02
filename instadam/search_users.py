@@ -7,6 +7,7 @@ from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 
 from instadam.models.user import PrivilegesEnum, User
+from instadam.utils.user_identification import check_user_admin_privilege
 
 bp = Blueprint('search_users', __name__, url_prefix='/users')
 
@@ -27,9 +28,7 @@ def query_users():
     user_query = request.args.get('q')
 
     current_user = get_jwt_identity()
-    user = User.query.filter_by(username=current_user).first()
-    if user.privileges != PrivilegesEnum.ADMIN:
-        abort(401, 'User does not have the privilege to search for users.')
+    check_user_admin_privilege(current_user)
 
     user_query_str = '%' + user_query + '%'
     users = User.query.filter(
