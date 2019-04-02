@@ -81,7 +81,7 @@ def image_label_uploaded(local_client):
         assert 'Image added successfully' == json_data['msg']
 
     rv = local_client.post(
-        '/project/1/labels', json={'label_name': 'my_label'},
+        '/project/1/labels', json={'label_name': 'my_label', 'label_color': '#000000'},
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()
