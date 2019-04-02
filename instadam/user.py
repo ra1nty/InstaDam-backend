@@ -4,6 +4,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from instadam.app import db
 from instadam.models.user import PrivilegesEnum, User
 from instadam.utils import check_json, construct_msg
+from instadam.utils.user_identification import check_user_admin_privilege
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -33,9 +34,7 @@ def change_privilege():
 
     """
     current_user = get_jwt_identity()
-    user = User.query.filter_by(username=current_user).first()
-    if user.privileges != PrivilegesEnum.ADMIN:
-        abort(403, 'Logged in user is not admin')
+    check_user_admin_privilege(current_user)
 
     json = request.get_json()
     check_json(json, ('username', 'privilege'))
