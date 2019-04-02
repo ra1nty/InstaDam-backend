@@ -2,9 +2,7 @@
 """
 from flask import Blueprint, abort, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from instadam.app import db
 from sqlalchemy import or_
-from sqlalchemy.exc import IntegrityError
 
 from instadam.models.user import PrivilegesEnum, User
 from instadam.utils.user_identification import check_user_admin_privilege
