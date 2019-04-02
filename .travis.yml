@@ -12,8 +12,7 @@ before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
 
 script:
-#  - py.test --cov-report=xml --cov=instadam tests/
-  - echo "No Test"
+  - py.test --cov-report=xml --cov=instadam tests/
 
 after_success:
   - codecov
