@@ -1,5 +1,5 @@
 from flask_jwt_extended import get_jwt_identity
-from werkzeug.exceptions import abort
+from flask import abort
 
 from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
 from instadam.models.user import PrivilegesEnum, User

@@ -27,15 +27,20 @@ def create_app(mode='development'):
     jwt.init_app(app)
 
     from . import auth
-    from . import project
     app.register_blueprint(auth.bp)
+
     from . import error_handlers
     app.register_blueprint(error_handlers.bp)
+
     from . import image
     app.register_blueprint(image.bp)
+
+    from . import project
     app.register_blueprint(project.bp)
+
     from . import annotation
     app.register_blueprint(annotation.bp)
+
     from . import user
     app.register_blueprint(user.bp)
 

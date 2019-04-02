@@ -1,6 +1,5 @@
 from sqlalchemy.orm import relationship
 
-# from instadam.models.project import label_project_association_table
 from ..app import db
 
 from instadam.models.annotation import Annotation

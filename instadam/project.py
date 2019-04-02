@@ -181,7 +181,7 @@ def get_project_images(project_id):
             401,
             'User does not have the privilege to view the images of project '
             'with id=%s'
-            % (project_id))
+            % project_id)
 
     project_images = Image.query.filter_by(project_id=project_id).all()
     if not project_images:
@@ -189,7 +189,7 @@ def get_project_images(project_id):
 
     project_images_res = []
     for project_image in project_images:
-        project_image_res = {}
+        project_image_res = dict()
         project_image_res['id'] = project_image.id
         project_image_res['name'] = project_image.image_name
         project_image_res['path'] = project_image.image_url
@@ -204,7 +204,7 @@ def get_project_images(project_id):
 def add_label(project_id):
     project = maybe_get_project(project_id)
     req = request.get_json()
-    if not 'label_name' in req:
+    if 'label_name' not in req:
         abort(400, 'Missing label name')
     label_name = req['label_name']
     label_color = req['label_color']
