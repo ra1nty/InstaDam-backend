@@ -23,9 +23,11 @@ def credential_checking(password, email):
     """
     if len(password) < 8:
         abort(400, 'Password should be longer than 8 characters.')
+
     has_digit = any([c.isdigit() for c in password])
     if not has_digit:
         abort(400, 'Password must have at least one digit.')
+
     has_upper = any([c.isupper() for c in password])
     if not has_upper:
         abort(400, 'Password must have at least one uppercase letter.')
@@ -95,7 +97,7 @@ def register():
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     token = RevokedToken.query.filter_by(jti=jti).first()
-    return not token is None
+    return token is not None
 
 
 @bp.route('/logout', methods=['DELETE'])
