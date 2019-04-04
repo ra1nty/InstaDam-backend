@@ -73,19 +73,14 @@ def upload_annotation():
     return construct_msg('Annotation saved successfully'), 200
 
 
-@bp.route('/', methods=['GET'])
+@bp.route('/<int:label_id>/<int:image_id>/', methods=['GET'])
 @jwt_required
-def get_annotation():
-    req = request.get_json()
-    ids_to_check = ['label_id', 'image_id']
-    for id_to_check in ids_to_check:
-        if id_to_check not in req:
-            abort(400, 'Missing %s in json' % id_to_check)
-    label = Label.query.filter_by(id=req['label_id'], ).first()
+def get_annotation(label_id, image_id):
+    label = Label.query.filter_by(id=label_id).first()
     if not label:
         abort(400, 'Invalid label id')
     project = maybe_get_project(label.project_id)
-    image = Image.query.filter_by(id=req['image_id'],
+    image = Image.query.filter_by(id=image_id,
                                   project_id=project.id).first()
     if image is None:
         abort(400, 'Invalid image id')

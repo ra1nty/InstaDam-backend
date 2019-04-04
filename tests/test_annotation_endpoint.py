@@ -109,7 +109,7 @@ def test_add_and_get_annotation(image_label_uploaded):
         assert 'Annotation saved successfully' == json_data['msg']
 
         rv = image_label_uploaded.get(
-            '/annotation/',
+            '/annotation/1/1/',
             json={'project_id': 1, 'label_id': 1, 'image_id': 1},
             headers={'Authorization': 'Bearer %s' % access_token})
 
@@ -135,7 +135,7 @@ def test_add_and_get_annotation(image_label_uploaded):
         assert 'Annotation saved successfully' == json_data['msg']
 
         rv = image_label_uploaded.get(
-            '/annotation/',
+            '/annotation/1/1/',
             json={'project_id': 1, 'label_id': 1, 'image_id': 1},
             headers={'Authorization': 'Bearer %s' % access_token})
 
