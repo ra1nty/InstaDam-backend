@@ -146,16 +146,11 @@ def get_image_thumbnail(image_id):
     # We don't actually need the project. Just to check permission
     maybe_get_project_read_only(image.project_id)
 
-    json = request.get_json()
-    if json is None:
-        abort(400, 'Need a json object of size_h and size_w')
-
-    for key in ['size_h', 'size_w']:
-        if key not in json or not isinstance(json[key], int):
-            abort(400, 'No %s provided or not an integer' % key)
+    size_h = int(request.args.get('size_h', 100))
+    size_w = int(request.args.get('size_w', 100))
 
     img = PILImage.open(image.image_storage_path)
-    img.thumbnail((json['size_h'], json['size_w']), PILImage.ANTIALIAS)
+    img.thumbnail((size_h, size_w), PILImage.ANTIALIAS)
 
     # Save as bytes
     buffer = BytesIO()
