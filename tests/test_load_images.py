@@ -228,11 +228,7 @@ def test_get_thumbnail(local_client):
     access_token = successful_login(local_client, 'test_upload_annotator1',
                                     'TestTest2')
     res = local_client.get(
-        '/image/3/thumbnail',
-        json={
-            'size_h': 16,
-            'size_w': 15
-        },
+        '/image/3/thumbnail?size_h=16&size_w=15',
         headers={'Authorization': 'Bearer %s' % access_token})
     json = res.get_json()
     assert '200 OK' == res.status

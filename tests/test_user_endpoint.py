@@ -63,7 +63,7 @@ test_data = [
                                          'privilege': 'admin'}, '200 OK'),
     ('test_upload_annotator1', 'TestTest2',
      {'username': 'test_upload_annotator2',
-      'privilege': 'admin'}, '403 FORBIDDEN'),
+      'privilege': 'admin'}, '401 UNAUTHORIZED'),
     ('test_upload_admin1', 'TestTest1', {'username': 'test_upload_annotator1'},
      '400 BAD REQUEST'),
     ('test_upload_admin1', 'TestTest1', None, '400 BAD REQUEST'),
