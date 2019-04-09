@@ -6,8 +6,8 @@ from ..app import db
 
 
 class MessageTypeEnum(enum.Enum):
-    READ_WRITE_PERMISSION_REQUEST = 'rw'
-    READ_ONLY_PERMISSION_REQUEST = 'r'
+    READ_WRITE_PERMISSION_REQUEST = 'rw_request'
+    READ_ONLY_PERMISSION_REQUEST = 'r_request'
 
 
 class Message(db.Model):
@@ -25,7 +25,7 @@ class Message(db.Model):
     __tablename__ = 'message'
     id = db.Column(db.Integer, primary_key=True)
 
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     sender = relationship("User", back_populates="sent_messages")
     receivers = relationship(
         "User",
