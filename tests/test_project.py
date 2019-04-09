@@ -34,15 +34,17 @@ def init_test(app):
     with app.app_context():
         db.create_all()
 
-        user = User(username=ADMIN_USERNAME,
-                    email='success@test_project.com',
-                    privileges=PrivilegesEnum.ADMIN)
+        user = User(
+            username=ADMIN_USERNAME,
+            email='success@test_project.com',
+            privileges=PrivilegesEnum.ADMIN)
         user.set_password(ADMIN_PWD)
         db.session.add(user)
 
-        user = User(username=ANNOTATOR_USERNAME,
-                    email='no_privilege@test_project.com',
-                    privileges=PrivilegesEnum.ANNOTATOR)
+        user = User(
+            username=ANNOTATOR_USERNAME,
+            email='no_privilege@test_project.com',
+            privileges=PrivilegesEnum.ANNOTATOR)
         user.set_password(ANNOTATOR_PWD)
         db.session.add(user)
 
@@ -51,10 +53,13 @@ def init_test(app):
 
 
 def login(client, username, password):
-    response = client.post('/login',
-                           json={'username': username,
-                                 'password': password},
-                           follow_redirects=True)
+    response = client.post(
+        '/login',
+        json={
+            'username': username,
+            'password': password
+        },
+        follow_redirects=True)
     assert response.status_code == 201
     res = response.get_json()
     return res['access_token']
@@ -67,17 +72,18 @@ def test_project_repr(client):
 
 def test_create_project_success(client):
     token = login(client, ADMIN_USERNAME, ADMIN_PWD)
-    response = client.post(PROJECT_ENDPOINT,
-                           json={'project_name': SUCCESS_PROJECT_NAME},
-                           headers={'Authorization': 'Bearer %s' % token})
+    response = client.post(
+        PROJECT_ENDPOINT,
+        json={'project_name': SUCCESS_PROJECT_NAME},
+        headers={'Authorization': 'Bearer %s' % token})
     assert response.status_code == 201
     res = response.get_json()
     assert 'project_id' in res
 
 
 def test_create_project_not_logged_in(client):
-    response = client.post(PROJECT_ENDPOINT,
-                           json={'project_name': FAIL_PROJECT_NAME})
+    response = client.post(
+        PROJECT_ENDPOINT, json={'project_name': FAIL_PROJECT_NAME})
     assert response.status_code == 401
     res = response.get_json()
     assert 'msg' in res
@@ -86,30 +92,34 @@ def test_create_project_not_logged_in(client):
 
 def test_create_project_no_privilege(client):
     token = login(client, ANNOTATOR_USERNAME, ANNOTATOR_PWD)
-    response = client.post(PROJECT_ENDPOINT,
-                           json={'project_name': FAIL_PROJECT_NAME},
-                           headers={'Authorization': 'Bearer %s' % token})
+    response = client.post(
+        PROJECT_ENDPOINT,
+        json={'project_name': FAIL_PROJECT_NAME},
+        headers={'Authorization': 'Bearer %s' % token})
     assert response.status_code == 401
 
 
 def test_create_project_no_project_name(client):
     token = login(client, ADMIN_USERNAME, ADMIN_PWD)
-    response = client.post(PROJECT_ENDPOINT,
-                           json={'key': 'value'},
-                           headers={'Authorization': 'Bearer %s' % token})
+    response = client.post(
+        PROJECT_ENDPOINT,
+        json={'key': 'value'},
+        headers={'Authorization': 'Bearer %s' % token})
     assert response.status_code == 400
 
 
 def test_create_project_duplicate_project_name(client):
     token = login(client, ADMIN_USERNAME, ADMIN_PWD)
-    response = client.post(PROJECT_ENDPOINT,
-                           json={'project_name': DUPLICATE_PROJECT_NAME},
-                           headers={'Authorization': 'Bearer %s' % token})
+    response = client.post(
+        PROJECT_ENDPOINT,
+        json={'project_name': DUPLICATE_PROJECT_NAME},
+        headers={'Authorization': 'Bearer %s' % token})
     assert response.status_code == 201
 
-    response = client.post(PROJECT_ENDPOINT,
-                           json={'project_name': DUPLICATE_PROJECT_NAME},
-                           headers={'Authorization': 'Bearer %s' % token})
+    response = client.post(
+        PROJECT_ENDPOINT,
+        json={'project_name': DUPLICATE_PROJECT_NAME},
+        headers={'Authorization': 'Bearer %s' % token})
     assert response.status_code == 400
 
 
@@ -125,9 +135,10 @@ def get_project_fixture():
         db.drop_all()
         db.create_all()
 
-        user = User(username=ADMIN_USERNAME,
-                    email='success@test_project.com',
-                    privileges=PrivilegesEnum.ADMIN)
+        user = User(
+            username=ADMIN_USERNAME,
+            email='success@test_project.com',
+            privileges=PrivilegesEnum.ADMIN)
         user.set_password(ADMIN_PWD)
         db.session.add(user)
 
@@ -156,9 +167,10 @@ def get_project_fixture():
         user.project_permissions.append(permission)
         project.permissions.append(permission)
 
-        user = User(username=ANNOTATOR_USERNAME,
-                    email='no_privilege@test_project.com',
-                    privileges=PrivilegesEnum.ANNOTATOR)
+        user = User(
+            username=ANNOTATOR_USERNAME,
+            email='no_privilege@test_project.com',
+            privileges=PrivilegesEnum.ANNOTATOR)
         user.set_password(ANNOTATOR_PWD)
 
         db.session.add(user)
@@ -179,8 +191,7 @@ def get_project_fixture():
 def test_list_projects(get_project_fixture):
     token = login(get_project_fixture, ANNOTATOR_USERNAME, ANNOTATOR_PWD)
     response = get_project_fixture.get(
-        LIST_PROJECT_ENDPOINT,
-        headers={'Authorization': 'Bearer %s' % token})
+        LIST_PROJECT_ENDPOINT, headers={'Authorization': 'Bearer %s' % token})
     assert response.status_code == 200
     json = response.get_json()
     assert 1 == len(json)
@@ -189,8 +200,7 @@ def test_list_projects(get_project_fixture):
 
     token = login(get_project_fixture, ADMIN_USERNAME, ADMIN_PWD)
     response = get_project_fixture.get(
-        LIST_PROJECT_ENDPOINT,
-        headers={'Authorization': 'Bearer %s' % token})
+        LIST_PROJECT_ENDPOINT, headers={'Authorization': 'Bearer %s' % token})
     assert response.status_code == 200
     json = response.get_json()
     assert 1 == len(json)
@@ -200,8 +210,8 @@ def test_list_projects(get_project_fixture):
 
 
 def get_labels_helper(client, token):
-    response = client.get('/project/1/labels',
-                          headers={'Authorization': 'Bearer %s' % token})
+    response = client.get(
+        '/project/1/labels', headers={'Authorization': 'Bearer %s' % token})
     assert response.status_code == 200
     return response.get_json()['labels']
 
@@ -215,3 +225,11 @@ def test_delete_project_success(get_project_fixture):
         headers={'Authorization': 'Bearer %s' % token})
     assert response.status_code == 200
     assert not os.path.isdir('static-dir/1')
+
+
+def test_delete_project_permissions_fail(get_project_fixture):
+    token = login(get_project_fixture, ANNOTATOR_USERNAME, ANNOTATOR_PWD)
+    response = get_project_fixture.delete(
+        '%s/%d' % (PROJECT_ENDPOINT, 1),
+        headers={'Authorization': 'Bearer %s' % token})
+    assert response.status_code == 401
