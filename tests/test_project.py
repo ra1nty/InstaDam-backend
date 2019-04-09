@@ -1,6 +1,9 @@
+import os
+
 import pytest
 
 from instadam.app import create_app, db
+from instadam.models.label import Label
 from instadam.models.project import Project
 from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
 from instadam.models.user import PrivilegesEnum, User
@@ -136,6 +139,19 @@ def get_project_fixture():
         db.session.flush()
         db.session.commit()
 
+        label1 = Label(label_name='asdf1', project_id=project.id)
+        db.session.add(label1)
+        db.session.flush()
+        db.session.commit()
+        label2 = Label(label_name='asdf2', project_id=project.id)
+        db.session.add(label2)
+        db.session.flush()
+        db.session.commit()
+
+        # Create project directory
+        if not os.path.isdir('static-dir/1'):
+            os.makedirs('static-dir/1')
+
         permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
         user.project_permissions.append(permission)
         project.permissions.append(permission)
@@ -181,3 +197,21 @@ def test_list_projects(get_project_fixture):
     assert 'test1' == json[0]['name']
     assert json[0]['is_admin']
     assert 1 == json[0]['id']
+
+
+def get_labels_helper(client, token):
+    response = client.get('/project/1/labels',
+                          headers={'Authorization': 'Bearer %s' % token})
+    assert response.status_code == 200
+    return response.get_json()['labels']
+
+
+def test_delete_project_success(get_project_fixture):
+    token = login(get_project_fixture, ADMIN_USERNAME, ADMIN_PWD)
+    assert os.path.isdir('static-dir/1')
+    assert len(get_labels_helper(get_project_fixture, token)) == 2
+    response = get_project_fixture.delete(
+        '%s/%d' % (PROJECT_ENDPOINT, 1),
+        headers={'Authorization': 'Bearer %s' % token})
+    assert response.status_code == 200
+    assert not os.path.isdir('static-dir/1')
