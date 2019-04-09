@@ -226,31 +226,38 @@ def get_labels_helper(client, token):
     response = client.get(
         '/project/1/labels', headers={'Authorization': 'Bearer %s' % token})
     assert response.status_code == 200
-    return response.get_json()['labels']
 
-def get_annotations_helper(client, token):
+
+def get_annotations_helper(client, token, label_id):
     response = client.get(
-        '/annotation/1/1',
-        json={
-            'project_id': 1,
-            'label_id': 1,
-            'image_id': 1
-        },
-        headers={'Authorization': 'Bearer %s' % token}
-    )
-    assert response.status_code == 200
-    return response.get_json()
+        '/annotation/%d/1' % label_id,
+        headers={'Authorization': 'Bearer %s' % token})
+    return response.status_code
+
+
+def get_images_helper(client, token, project_id):
+    response = client.get(
+        'projects/%d/images' % project_id,
+        headers={'Authorization': 'Bearer %s' % token})
+    return response.status_code
 
 
 def test_delete_project_success(get_project_fixture):
     token = login(get_project_fixture, ADMIN_USERNAME, ADMIN_PWD)
     assert os.path.isdir('static-dir/1')
-    assert len(get_labels_helper(get_project_fixture, token)) == 2
+    assert get_labels_helper(get_project_fixture, token) == 200
+    assert get_annotations_helper(get_project_fixture, token, 1) == 200
+    assert get_annotations_helper(get_project_fixture, token, 2) == 200
+    assert get_images_helper(get_project_fixture, token, 1) == 200
 
     response = get_project_fixture.delete(
         '%s/%d' % (PROJECT_ENDPOINT, 1),
         headers={'Authorization': 'Bearer %s' % token})
     assert response.status_code == 200
+    assert get_labels_helper(get_project_fixture, token) == 401
+    assert get_annotations_helper(get_project_fixture, token, 1) == 400
+    assert get_annotations_helper(get_project_fixture, token, 1) == 400
+    assert get_images_helper(get_project_fixture, token, 1) == 404
     assert not os.path.isdir('static-dir/1')
 
 
