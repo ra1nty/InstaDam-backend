@@ -3,10 +3,10 @@ import os
 import pytest
 
 from instadam.app import create_app, db
-from instadam.models.label import Label
 from instadam.models.annotation import Annotation
-from instadam.models.project import Project
 from instadam.models.image import Image
+from instadam.models.label import Label
+from instadam.models.project import Project
 from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
 from instadam.models.user import PrivilegesEnum, User
 from tests.conftest import TEST_MODE
@@ -164,10 +164,12 @@ def get_project_fixture():
         db.session.commit()
 
         annotation1 = Annotation(
-            image_id=1, project_id=1, creator_id=1, label_id=1)
+            image_id=1, project_id=1, creator_id=1, label_id=1, data=b'1234',
+            vector=b'1234')
         db.session.add(annotation1)
         annotation2 = Annotation(
-            image_id=1, project_id=1, creator_id=1, label_id=2)
+            image_id=1, project_id=1, creator_id=1, label_id=2, data=b'1234',
+            vector=b'1234')
         db.session.add(annotation2)
         db.session.flush()
         db.session.commit()
@@ -225,12 +227,12 @@ def test_list_projects(get_project_fixture):
 def get_labels_helper(client, token):
     response = client.get(
         '/project/1/labels', headers={'Authorization': 'Bearer %s' % token})
-    assert response.status_code == 200
+    return response.status_code
 
 
 def get_annotations_helper(client, token, label_id):
     response = client.get(
-        '/annotation/%d/1' % label_id,
+        '/annotation/%d/1/' % label_id,
         headers={'Authorization': 'Bearer %s' % token})
     return response.status_code
 
@@ -261,12 +263,20 @@ def test_delete_project_success(get_project_fixture):
     assert not os.path.isdir('static-dir/1')
 
 
-def test_delete_project_permissions_fail(get_project_fixture):
+def test_delete_project_permissions_fail1(get_project_fixture):
     token = login(get_project_fixture, ANNOTATOR_USERNAME, ANNOTATOR_PWD)
     response = get_project_fixture.delete(
         '%s/%d' % (PROJECT_ENDPOINT, 1),
         headers={'Authorization': 'Bearer %s' % token})
     assert response.status_code == 401
 
+
+def test_delete_project_permissions_fail2(get_project_fixture):
+    token = login(get_project_fixture, ADMIN_USERNAME, ADMIN_PWD)
+    invalid_project_id = 100
+    response = get_project_fixture.delete(
+        '%s/%d' % (PROJECT_ENDPOINT, invalid_project_id),
+        headers={'Authorization': 'Bearer %s' % token})
+    assert response.status_code == 401
 
 # def test_delete_project_permissions_fail(get_project_fixture):
