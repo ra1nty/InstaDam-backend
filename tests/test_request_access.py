@@ -85,7 +85,7 @@ def test_request_success_r(local_client):
     )
     rv = local_client.post(
         '/project/1/request', json={
-            'message_type': 'r_request'
+            'message_type': 'r'
         },
         headers={'Authorization': 'Bearer %s' % access_token}
     )
@@ -104,7 +104,7 @@ def test_request_success_rw(local_client):
     )
     rv = local_client.post(
         '/project/1/request', json={
-            'message_type': 'rw_request'
+            'message_type': 'rw'
         },
         headers={'Authorization': 'Bearer %s' % access_token}
     )
