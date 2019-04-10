@@ -17,9 +17,12 @@ class Message(db.Model):
 
     Attributes:
         id: unique integer id given to a user (primary key)
-        project_name: unique string that represents name of the project
-        created_by: integer to represent id of user who created project
-        created_at: datetime to represent date at which project was created
+        sender_id
+        sender (back_populated): the user that send the message
+        receivers (back_populated): the user(s) that receive the message
+        type: the type of message (see MessageTypeEnum)
+        created_at: datetime that the message is created at
+        fulfilled: whether the message has been fulfilled
     """
 
     __tablename__ = 'message'
