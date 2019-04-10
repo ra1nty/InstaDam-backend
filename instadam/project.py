@@ -335,7 +335,10 @@ def request_permission(project_id):
         `message_type` takes a string of two values: `r_request` or `rw_request`,
         where `r_request` is `READ_ONLY` and `rw_request` is `READ_WRITE`
 
-        The request message will be sent to all admins of the project.
+        The request message will be sent to all admins of the project. Note that
+        an annotator can also send a request of 'rw' permission. The decision of
+        whether upgrading the ANNOTATOR to ADMIN and then granting 'rw' permission
+        is left to the ADMIN.
 
         Must supply a jwt-token to verify user status and extract `user_id`.
 
