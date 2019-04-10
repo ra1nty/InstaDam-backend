@@ -44,6 +44,7 @@ def query_users():
         user_res['email'] = user.email
         user_res['created_at'] = str(user.created_at)
         user_res['privileges'] = str(user.privileges)
+        user_res['user_id'] = str(user.id)
         users_res.append(user_res)
 
     return jsonify({'users': users_res}), 200
