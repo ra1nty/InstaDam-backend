@@ -181,3 +181,20 @@ def test_list_projects(get_project_fixture):
     assert 'test1' == json[0]['name']
     assert json[0]['is_admin']
     assert 1 == json[0]['id']
+
+
+def test_list_project_users(get_project_fixture):
+    token = login(get_project_fixture, ADMIN_USERNAME, ADMIN_PWD)
+    project_id = 1
+    response = get_project_fixture.get(
+        '/project/%d/users' % project_id,
+        headers={'Authorization': 'Bearer %s' % token})
+    assert response.status_code == 200
+    json = response.get_json()
+    assert len(json) == 2
+    assert 'access_type' in json[0]
+    assert 'user' in json[0]
+    assert 'username' in json[0]['user']
+    assert 'email' in json[0]['user']
+    assert 'created_at' in json[0]['user']
+    assert 'privileges' in json[0]['user']
