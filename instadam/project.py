@@ -332,8 +332,8 @@ def request_permission(project_id):
         entry point. User must be signed in. User must provide a `message_type`
         to specify the privilege he or she is requesting for.
 
-        `message_type` takes a string of two values: `r_request` or `rw_request`,
-        where `r_request` is `READ_ONLY` and `rw_request` is `READ_WRITE`
+        `message_type` takes a string of two values: `r` or `rw`,
+        where `r` is `READ_ONLY` and `rw` is `READ_WRITE`
 
         The request message will be sent to all admins of the project. Note that
         an annotator can also send a request of 'rw' permission. The decision of
@@ -344,7 +344,7 @@ def request_permission(project_id):
 
         Raises:
             400 Error if message_type is not specified
-            400 Error if message is not 'r_request' or 'rw_request'
+            400 Error if message is not 'r' or 'rw'
             401 Error if not logged in
             404 Error if project does not exist
 
@@ -363,8 +363,8 @@ def request_permission(project_id):
     user = User.query.filter_by(username=current_user).first()
 
     map_code_to_message_type = {
-        'r_request': MessageTypeEnum.READ_ONLY_PERMISSION_REQUEST,
-        'rw_request': MessageTypeEnum.READ_WRITE_PERMISSION_REQUEST,
+        'r': MessageTypeEnum.READ_ONLY_PERMISSION_REQUEST,
+        'rw': MessageTypeEnum.READ_WRITE_PERMISSION_REQUEST,
     }
 
     if req['message_type'] not in map_code_to_message_type:
