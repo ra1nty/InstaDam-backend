@@ -207,9 +207,9 @@ def add_label(project_id):
     project = maybe_get_project(project_id)
     req = request.get_json()
     
-    check_json(req, ['label_name', 'label_color'])
+    check_json(req, ['label_text', 'label_color'])
 
-    label_name = req['label_name']
+    label_name = req['label_text']
     label_color = req['label_color']
     if label_color[0] != '#' or not all(c in hexdigits
                                         for c in label_color[1:]):
@@ -233,8 +233,8 @@ def get_labels(project_id):
     project = maybe_get_project(project_id)
     labels = [{
         'color': label.label_color,
-        'name': label.label_name,
-        'id': label.id
+        'text': label.label_name,
+        'label_id': label.id
     } for label in project.labels]
     return jsonify({'labels': labels}), 200
 
