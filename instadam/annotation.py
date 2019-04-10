@@ -35,7 +35,7 @@ def upload_annotation():
 
     # Validate labels
     labels = req['labels']
-    fields_to_check = ['label_id', 'bitmap', 'vector']
+    fields_to_check = ['label_id']
     for label_obj in labels:
         for field_to_check in fields_to_check:
             if field_to_check not in label_obj:
@@ -51,8 +51,7 @@ def upload_annotation():
     user = User.query.filter_by(username=current_user).first()
 
     for label_obj in labels:
-        byte_data = base64.b64decode(label_obj['bitmap'])
-        vector_data = str.encode(json.dumps(label_obj['vector']))
+        data = str.encode(json.dumps(label_obj))
         label_id = label_obj['label_id']
         label = Label.query.filter_by(id=label_id,
                                       project_id=project.id).first()
@@ -60,11 +59,10 @@ def upload_annotation():
         annotation = Annotation.query.filter_by(label_id=label_id,
                                                 image_id=image.id).first()
         if annotation:
-            annotation.data = byte_data
-            annotation.vector = vector_data
+            annotation.data = data
         else:
-            annotation = Annotation(data=byte_data, image_id=image.id,
-                                    label_id=label_id, vector=vector_data)
+            annotation = Annotation(data=data, image_id=image.id,
+                                    label_id=label_id, vector=b'')
             project.annotations.append(annotation)
             image.annotations.append(annotation)
             label.annotations.append(annotation)
@@ -89,6 +87,4 @@ def get_annotation(label_id, image_id):
                                             label_id=label.id).first()
     if not annotation:
         abort(400, 'Annotation not found')
-    base64_str = base64.b64encode(annotation.data).decode('utf-8')
-    return jsonify(
-        {'bitmap': base64_str, 'vector': json.loads(annotation.vector)}), 200
+    return jsonify(json.loads(annotation.data)), 200
