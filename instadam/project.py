@@ -304,13 +304,6 @@ def update_user_permission(project_id):
     if permission is not None:
         return construct_msg('Permission already existed'), 200
 
-    # Check if user is allowed to have the permission of `access_type`
-    if user.privileges == PrivilegesEnum.ANNOTATOR and \
-            access_type == AccessTypeEnum.READ_WRITE:
-        abort(403,
-              'User with ANNOTATOR privilege cannot obtain READ_WRITE access'
-              'to projects')
-
     new_permission = ProjectPermission(access_type=access_type)
     project.permissions.append(new_permission)
     user.project_permissions.append(new_permission)
