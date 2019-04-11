@@ -195,6 +195,7 @@ def get_project_images(project_id):
         project_image_res['name'] = project_image.image_name
         project_image_res['path'] = project_image.image_url
         project_image_res['project_id'] = project_image.project_id
+        project_image_res['is_annotated'] = project_image.is_annotated
         project_images_res.append(project_image_res)
 
     return jsonify({'project_images': project_images_res}), 200
