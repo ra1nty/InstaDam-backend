@@ -128,7 +128,8 @@ def get_project_image(image_id):
     return jsonify({
         'id': image.id,
         'path': image.image_url,
-        'project_id': image.project_id}), 200
+        'project_id': image.project_id,
+        'modified_at': image.modified_at}), 200
 
 
 @bp.route('/<image_id>/thumbnail')
