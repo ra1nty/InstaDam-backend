@@ -4,6 +4,7 @@ Module for annotation end points
 
 import base64
 import json
+import datetime as dt
 
 from flask import Blueprint, abort, jsonify, request
 from flask_jwt_extended import (get_jwt_identity, jwt_required)
@@ -67,6 +68,10 @@ def upload_annotation():
             image.annotations.append(annotation)
             label.annotations.append(annotation)
             user.annotations.append(annotation)
+
+            image.modified_at = dt.datetime.utcnow
+            project.modified_at = dt.datetime.utcnow
+
     db.session.commit()
     return construct_msg('Annotation saved successfully'), 200
 

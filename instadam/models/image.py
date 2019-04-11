@@ -32,7 +32,8 @@ class Image(db.Model):
     image_name = db.Column(db.String(64), nullable=False)
     image_url = db.Column(db.String(256))
     image_storage_path = db.Column(db.String(256))
-    added_at = db.Column(
+
+    modified_at = db.Column(
         db.DateTime, nullable=False, default=dt.datetime.utcnow)
     is_annotated = db.Column(db.Boolean, nullable=False, default=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'),

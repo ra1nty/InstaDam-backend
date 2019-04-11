@@ -22,6 +22,7 @@ class Project(db.Model):
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(
         db.DateTime, nullable=False, default=dt.datetime.utcnow)
+    modified_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
 
     images = relationship('Image', backref='project')
     permissions = relationship('ProjectPermission', back_populates='project')
