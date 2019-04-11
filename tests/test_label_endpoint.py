@@ -68,7 +68,8 @@ def test_add_label(local_client):
     access_token = successful_login(local_client, 'test_upload_user1',
                                     'TestTest1')
     rv = local_client.post(
-        '/project/1/labels', json={'label_name': 'my_label', 'label_color': '#000000'},
+        '/project/1/labels',
+        json={'label_text': 'my_label', 'label_color': '#000000'},
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()
@@ -80,7 +81,8 @@ def test_get_label(local_client):
     access_token = successful_login(local_client, 'test_upload_user1',
                                     'TestTest1')
     rv = local_client.post(
-        '/project/1/labels', json={'label_name': 'my_label_1', 'label_color': '#001000'},
+        '/project/1/labels',
+        json={'label_text': 'my_label_1', 'label_color': '#001000'},
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()
@@ -88,7 +90,8 @@ def test_get_label(local_client):
     assert 'Label added successfully' == json_data['msg']
 
     rv = local_client.post(
-        '/project/1/labels', json={'label_name': 'my_label_2', 'label_color': '#000000'},
+        '/project/1/labels',
+        json={'label_text': 'my_label_2', 'label_color': '#000000'},
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()
@@ -106,5 +109,5 @@ def test_get_label(local_client):
     assert 2 == len(labels)
 
     for label in labels:
-        label_id = label['id']
-        assert 'my_label_%d' % label_id == label['name']
+        label_id = label['label_id']
+        assert 'my_label_%d' % label_id == label['text']
