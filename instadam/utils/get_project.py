@@ -1,8 +1,8 @@
-from flask_jwt_extended import get_jwt_identity
 from flask import abort
+from flask_jwt_extended import get_jwt_identity
 
 from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
-from instadam.models.user import PrivilegesEnum, User
+from instadam.models.user import User
 from instadam.utils.user_identification import check_user_admin_privilege
 
 
@@ -14,7 +14,7 @@ def maybe_get_project(project_id):
         user_id=user.id,
         access_type=AccessTypeEnum.READ_WRITE).first()
     if permission is None:
-        abort(401, 'User does not have permission to add image to this project')
+        abort(401, 'User does not have read write access to this project')
     return permission.project
 
 
@@ -27,6 +27,5 @@ def maybe_get_project_read_only(project_id):
         (ProjectPermission.access_type == AccessTypeEnum.READ_ONLY)
         | (ProjectPermission.access_type == AccessTypeEnum.READ_WRITE)).first()
     if permission is None:
-        abort(401,
-              'User does not have permission to read images of this project')
+        abort(401, 'User does not have read access of this project')
     return permission.project
