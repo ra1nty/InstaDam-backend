@@ -26,8 +26,7 @@ def local_client():
         db.drop_all()
         db.create_all()
 
-        user = User(username=ADMIN_USERNAME, email='email@test_upload.com',
-                    privileges=PrivilegesEnum.ADMIN)
+        user = User(username=ADMIN_USERNAME, email='email@test_upload.com')
         user.set_password(ADMIN_PWD)
         db.session.add(user)
         db.session.flush()
@@ -83,23 +82,6 @@ def test_update_user_permission_readonly(local_client):
     assert 'Permission added successfully' == json_data['msg']
 
 
-def test_update_user_permission_readwrite(local_client):
-    access_token = successful_login(local_client, ADMIN_USERNAME, ADMIN_PWD)
-
-    rv = local_client.put(
-        '/project/1/permissions', json={
-            'username': ANNOTATOR_USERNAME,
-            'access_type': 'rw',
-        },
-        headers={'Authorization': 'Bearer %s' % access_token}
-    )
-    assert 403 == rv.status_code
-    json_data = rv.get_json()
-    assert 'msg' in json_data
-    assert 'User with ANNOTATOR privilege cannot obtain READ_WRITE access' \
-        'to projects' == json_data['msg']
-
-
 def test_update_user_permission_duplicate_permission(local_client):
     access_token = successful_login(local_client, ADMIN_USERNAME, ADMIN_PWD)
 
@@ -146,4 +128,3 @@ def test_update_user_permission_bad_access_type(local_client):
     json_data = rv.get_json()
     assert 'msg' in json_data
     assert 'Not able to interpret access_type.' == json_data['msg']
-
