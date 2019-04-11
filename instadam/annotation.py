@@ -69,8 +69,10 @@ def upload_annotation():
             label.annotations.append(annotation)
             user.annotations.append(annotation)
 
-            image.modified_at = dt.datetime.utcnow
-            project.modified_at = dt.datetime.utcnow
+            annotation.added_at = dt.datetime.utcnow()
+            image.modified_at = dt.datetime.utcnow()
+            project.modified_at = dt.datetime.utcnow()
+
     db.session.commit()
     return construct_msg('Annotation saved successfully'), 200
 
