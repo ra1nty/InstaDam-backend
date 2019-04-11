@@ -81,7 +81,8 @@ def image_label_uploaded(local_client):
         assert 'Image added successfully' == json_data['msg']
 
     rv = local_client.post(
-        '/project/1/labels', json={'label_text': 'my_label', 'label_color': '#000000'},
+        '/project/1/labels',
+        json={'label_text': 'my_label', 'label_color': '#000000'},
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()
@@ -93,6 +94,14 @@ def image_label_uploaded(local_client):
 def test_add_and_get_annotation(image_label_uploaded):
     access_token = successful_login(image_label_uploaded, 'test_upload_user1',
                                     'TestTest1')
+
+    rv = image_label_uploaded.get(
+        '/projects/1/images',
+        headers={'Authorization': 'Bearer %s' % access_token})
+
+    json = rv.get_json()
+    assert 1 == len(json['project_images'])
+    assert not json['project_images'][0]['is_annotated']
 
     with open('tests/cat.jpg', 'rb') as img:
         base64_str = base64.b64encode(img.read()).decode('utf-8')
@@ -107,6 +116,14 @@ def test_add_and_get_annotation(image_label_uploaded):
         assert 'msg' in json_data
         print(json_data['msg'])
         assert 'Annotation saved successfully' == json_data['msg']
+
+        rv = image_label_uploaded.get(
+            '/projects/1/images',
+            headers={'Authorization': 'Bearer %s' % access_token})
+
+        json = rv.get_json()
+        assert 1 == len(json['project_images'])
+        assert json['project_images'][0]['is_annotated']
 
         rv = image_label_uploaded.get(
             '/annotation/1/1/',

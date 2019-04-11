@@ -2,7 +2,6 @@
 Module for annotation end points
 """
 
-import base64
 import json
 
 from flask import Blueprint, abort, jsonify, request
@@ -64,6 +63,7 @@ def upload_annotation():
             annotation = Annotation(data=data, image_id=image.id,
                                     label_id=label_id, vector=b'')
             project.annotations.append(annotation)
+            image.is_annotated = True
             image.annotations.append(annotation)
             label.annotations.append(annotation)
             user.annotations.append(annotation)
