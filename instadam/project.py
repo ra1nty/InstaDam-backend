@@ -380,4 +380,3 @@ def list_users_of_project(project_id):
                 'created_at': str(permission.user.created_at),
                 'privileges': str(permission.user.privileges)}})
     return jsonify(users), 200
->>>>>>> 3b926a5492d6d2ec9ddc85dace5cac337424cfe1
