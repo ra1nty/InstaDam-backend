@@ -196,6 +196,7 @@ def get_project_images(project_id):
         project_image_res['name'] = project_image.image_name
         project_image_res['path'] = project_image.image_url
         project_image_res['project_id'] = project_image.project_id
+        project_image_res['is_annotated'] = project_image.is_annotated
         project_images_res.append(project_image_res)
 
     return jsonify({'project_images': project_images_res}), 200
@@ -207,9 +208,9 @@ def add_label(project_id):
     project = maybe_get_project(project_id)
     req = request.get_json()
 
-    check_json(req, ['label_name', 'label_color'])
+    check_json(req, ['label_text', 'label_color'])
 
-    label_name = req['label_name']
+    label_name = req['label_text']
     label_color = req['label_color']
     if label_color[0] != '#' or not all(c in hexdigits
                                         for c in label_color[1:]):
@@ -233,8 +234,8 @@ def get_labels(project_id):
     project = maybe_get_project(project_id)
     labels = [{
         'color': label.label_color,
-        'name': label.label_name,
-        'id': label.id
+        'text': label.label_name,
+        'label_id': label.id
     } for label in project.labels]
     return jsonify({'labels': labels}), 200
 
@@ -360,3 +361,47 @@ def delete_user(project_id):
     db.session.commit()
 
     return construct_msg('Project deleted successfully'), 200
+
+
+@bp.route('/project/<project_id>/users', methods=['GET'])
+@jwt_required
+def list_users_of_project(project_id):
+    """
+    List all the users having access to the specified project. Doesn't require
+    a body
+    Args:
+        project_id: The id of the project
+
+    Raises:
+        401 if
+          * The project doesn't exist
+          * Currently logged in user is not admin of this project (read write
+            access)
+
+    Returns:
+        200 and a list of json objects. Example:
+        ```
+        [
+            {
+                "access_type": "AccessTypeEnum.READ_WRITE",
+                "user": {
+                    "username": "user0",
+                    "email": "test@example.com",
+                    "created_at": "2019-04-02 01:38:57.017910",
+                    "privileges": "PrivilegesEnum.ADMIN"
+                }
+            }
+        ]
+        ```
+    """
+    project = maybe_get_project(project_id)  # check privilege and get project
+    users = []
+    for permission in project.permissions:
+        users.append({
+            'access_type': str(permission.access_type),
+            'user': {
+                'username': permission.user.username,
+                'email': permission.user.email,
+                'created_at': str(permission.user.created_at),
+                'privileges': str(permission.user.privileges)}})
+    return jsonify(users), 200

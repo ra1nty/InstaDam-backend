@@ -10,7 +10,7 @@ from instadam.app import create_app, db
 from instadam.config import Config
 from instadam.models.project import Project
 from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
-from instadam.models.user import PrivilegesEnum, User
+from instadam.models.user import User
 from tests.conftest import TEST_MODE
 
 
@@ -24,8 +24,7 @@ def local_client():
         db.drop_all()
         db.create_all()
 
-        user = User(username='test_upload_user1', email='email@test_upload.com',
-                    privileges=PrivilegesEnum.ADMIN)
+        user = User(username='test_upload_user1', email='email@test_upload.com')
         user.set_password('TestTest1')
         db.session.add(user)
         db.session.flush()
@@ -43,7 +42,7 @@ def local_client():
         user = User(username='test_upload_user2',
                     email='email2@test_upload.com')
         user.set_password('TestTest1')
-        permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
+        permission = ProjectPermission(access_type=AccessTypeEnum.READ_ONLY)
         user.project_permissions.append(permission)
         project.permissions.append(permission)
         db.session.add(user)
