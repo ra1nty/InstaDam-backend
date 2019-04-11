@@ -299,7 +299,7 @@ def update_user_permission(project_id):
     # Check if user has already had some sort of permission to the project
     permission = ProjectPermission.query.filter(
         (ProjectPermission.user_id == user.id)
-        & (ProjectPermission.project_id == project_id))
+        & (ProjectPermission.project_id == project_id)).first()
     if permission is not None:
         permission.access_type = access_type
         db.session.commit()
