@@ -84,8 +84,8 @@ def test_create_project_success(client):
 
 
 def test_create_project_not_logged_in(client):
-    response = client.post(
-        PROJECT_ENDPOINT, json={'project_name': FAIL_PROJECT_NAME})
+    response = client.post(PROJECT_ENDPOINT,
+                           json={'project_name': FAIL_PROJECT_NAME})
     assert response.status_code == 401
     res = response.get_json()
     assert 'msg' in res
@@ -163,13 +163,11 @@ def get_project_fixture():
         db.session.flush()
         db.session.commit()
 
-        annotation1 = Annotation(
-            image_id=1, project_id=1, creator_id=1, label_id=1, data=b'1234',
-            vector=b'1234')
+        annotation1 = Annotation(image_id=1, project_id=1, creator_id=1,
+                                 label_id=1, data=b'1234', vector=b'1234')
         db.session.add(annotation1)
-        annotation2 = Annotation(
-            image_id=1, project_id=1, creator_id=1, label_id=2, data=b'1234',
-            vector=b'1234')
+        annotation2 = Annotation(image_id=1, project_id=1, creator_id=1,
+                                 label_id=2, data=b'1234', vector=b'1234')
         db.session.add(annotation2)
         db.session.flush()
         db.session.commit()
