@@ -1,3 +1,6 @@
+"""Module related to testing all endpoint functionality with the 
+blueprint '/project/...'
+"""
 import os
 
 import pytest
@@ -84,8 +87,8 @@ def test_create_project_success(client):
 
 
 def test_create_project_not_logged_in(client):
-    response = client.post(PROJECT_ENDPOINT,
-                           json={'project_name': FAIL_PROJECT_NAME})
+    response = client.post(
+        PROJECT_ENDPOINT, json={'project_name': FAIL_PROJECT_NAME})
     assert response.status_code == 401
     res = response.get_json()
     assert 'msg' in res
@@ -163,11 +166,21 @@ def get_project_fixture():
         db.session.flush()
         db.session.commit()
 
-        annotation1 = Annotation(image_id=1, project_id=1, creator_id=1,
-                                 label_id=1, data=b'1234', vector=b'1234')
+        annotation1 = Annotation(
+            image_id=1,
+            project_id=1,
+            creator_id=1,
+            label_id=1,
+            data=b'1234',
+            vector=b'1234')
         db.session.add(annotation1)
-        annotation2 = Annotation(image_id=1, project_id=1, creator_id=1,
-                                 label_id=2, data=b'1234', vector=b'1234')
+        annotation2 = Annotation(
+            image_id=1,
+            project_id=1,
+            creator_id=1,
+            label_id=2,
+            data=b'1234',
+            vector=b'1234')
         db.session.add(annotation2)
         db.session.flush()
         db.session.commit()
@@ -243,6 +256,11 @@ def get_images_helper(client, token, project_id):
 
 
 def test_delete_project_success(get_project_fixture):
+    """
+    Tests whether or not project has been deleted successfully by checking 
+    the status of all the project's attributes (images, annotations, labels)
+
+    """
     token = login(get_project_fixture, ADMIN_USERNAME, ADMIN_PWD)
     assert os.path.isdir('static-dir/1')
     assert get_labels_helper(get_project_fixture, token) == 200
@@ -262,6 +280,11 @@ def test_delete_project_success(get_project_fixture):
 
 
 def test_delete_project_permissions_fail1(get_project_fixture):
+    """
+    Tests whether or not the request to delete project fails with the wrong 
+    permissions (i.e. annotator)
+
+    """
     token = login(get_project_fixture, ANNOTATOR_USERNAME, ANNOTATOR_PWD)
     response = get_project_fixture.delete(
         '%s/%d' % (PROJECT_ENDPOINT, 1),
@@ -270,6 +293,11 @@ def test_delete_project_permissions_fail1(get_project_fixture):
 
 
 def test_delete_project_permissions_fail2(get_project_fixture):
+    """
+    Tests whether or not the request to delete project fails with a nonexistent
+    project id
+
+    """
     token = login(get_project_fixture, ADMIN_USERNAME, ADMIN_PWD)
     invalid_project_id = 100
     response = get_project_fixture.delete(
@@ -278,7 +306,6 @@ def test_delete_project_permissions_fail2(get_project_fixture):
     assert response.status_code == 401
 
 
-# def test_delete_project_permissions_fail(get_project_fixture):
 def test_list_project_users(get_project_fixture):
     token = login(get_project_fixture, ADMIN_USERNAME, ADMIN_PWD)
     project_id = 1
