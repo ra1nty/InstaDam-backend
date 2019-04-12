@@ -1,4 +1,5 @@
 import os
+import shutil
 from string import hexdigits
 
 from flask import Blueprint, abort, jsonify, request
@@ -99,7 +100,12 @@ def get_projects():
     """
     List all the project this user has access to.
     Returns:
-
+        200, and a json list of projects
+        {
+            "id": 1,
+            "is_admin": true,
+            "name": "First Project"
+        },
     """
 
     current_user = get_jwt_identity()
@@ -125,6 +131,23 @@ def get_unannotated_images(project_id):
     """
     Get unannotated images across ALL projects so that user (annotator) can
     see images to annotate
+
+    Args:
+        project_id: ID of the project
+
+    Returns:
+        200 and a json object:
+        {
+            "unannotated_images": [
+                {
+                    "id": 1,
+                    "is_annotated": false,
+                    "name": "cf3179a2-6e0e-4dd8-938f-85e4147103ce.png",
+                    "path": "static/1/cf3179a2-6e0e-4dd8-938f-85e4147103ce.png",
+                    "project_id": 1
+                },
+            ]
+        }
     """
 
     current_user = get_jwt_identity()
@@ -167,6 +190,20 @@ def get_project_images(project_id):
 
     Args:
         project_id: The id of the project
+
+    Returns:
+        200 and a json object:
+        {
+            "project_images": [
+                {
+                    "id": 1,
+                    "is_annotated": false,
+                    "name": "cf3179a2-6e0e-4dd8-938f-85e4147103ce.png",
+                    "path": "static/1/cf3179a2-6e0e-4dd8-938f-85e4147103ce.png",
+                    "project_id": 1
+                },
+            ]
+        }
     """
 
     current_user = get_jwt_identity()
@@ -204,6 +241,26 @@ def get_project_images(project_id):
 @bp.route('/project/<project_id>/labels', methods=['POST'])
 @jwt_required
 def add_label(project_id):
+    """
+    Add a label to the project
+
+    Takes a json object:
+
+    {
+       "label_text": "first label",
+       "label_color": "#12345"
+    }
+
+    Args:
+        project_id: ID of the project
+
+    Returns:
+        200 and json object
+        {
+            "msg": "Label added successfully"
+        }
+
+    """
     project = maybe_get_project(project_id)
     req = request.get_json()
 
@@ -230,6 +287,25 @@ def add_label(project_id):
 @bp.route('/project/<project_id>/labels', methods=['GET'])
 @jwt_required
 def get_labels(project_id):
+    """
+    Get a list of labels in this project
+    Does not need a request body
+
+    Args:
+        project_id: The id of the project
+
+    Returns:
+        200 and a json object:
+        {
+            "labels": [
+                {
+                    "color": "#12345",
+                    "label_id": 1,
+                    "text": "first label"
+                },
+            ]
+        }
+    """
     project = maybe_get_project(project_id)
     labels = [{
         'color': label.label_color,
@@ -324,6 +400,59 @@ def update_user_permission(project_id):
         db.session.commit()
 
     return construct_msg('Permission added successfully'), 200
+
+
+@bp.route('/project/<project_id>', methods=['DELETE'])
+@jwt_required
+def delete_project(project_id):
+    """
+    Delete a project with specified project id. Doesn't require a body
+
+    Args:
+        project_id: The ID of the project
+
+    Raises:
+        401 if
+          * The project doesn't exist
+          * Currently logged in user is not admin of this project (read write
+            access)
+
+    Returns:
+        200 and a json object:
+        {
+            'msg': 'Project deleted successfully'
+        }
+    """
+    project = maybe_get_project(project_id)  # check privilege and get project
+
+    images = project.images
+    for image in images:
+        db.session.delete(image)
+    # Delete the whole image directory
+    shutil.rmtree(os.path.join(app.config['STATIC_STORAGE_DIR'],
+                               str(project.id)))
+
+    # Delete labels
+    labels = project.labels
+    for label in labels:
+        db.session.delete(label)
+
+    # Delete annotations
+    annotations = project.annotations
+    for annotation in annotations:
+        db.session.delete(annotation)
+
+    # Delete permissions
+    permissions = project.permissions
+    for permission in permissions:
+        db.session.delete(permission)
+
+    db.session.delete(project)
+
+    db.session.flush()
+    db.session.commit()
+
+    return construct_msg('Project deleted successfully'), 200
 
 
 @bp.route('/project/<project_id>/users', methods=['GET'])
