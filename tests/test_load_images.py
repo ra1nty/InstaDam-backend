@@ -1,3 +1,7 @@
+"""Module related to testing all endpoint functionality with loading project
+images
+"""
+
 import base64
 import os
 import shutil
