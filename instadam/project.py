@@ -12,7 +12,8 @@ from instadam.models.label import Label
 from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
 from instadam.models.user import PrivilegesEnum, User
 from instadam.utils import check_json, construct_msg
-from instadam.utils.get_project import maybe_get_project
+from instadam.utils.get_project import (maybe_get_project,
+                                        maybe_get_project_read_only)
 from instadam.utils.user_identification import check_user_admin_privilege
 from .app import db
 from .models.project import Project
@@ -306,7 +307,7 @@ def get_labels(project_id):
             ]
         }
     """
-    project = maybe_get_project(project_id)
+    project = maybe_get_project_read_only(project_id)
     labels = [{
         'color': label.label_color,
         'text': label.label_name,
