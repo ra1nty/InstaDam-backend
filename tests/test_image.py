@@ -1,3 +1,6 @@
+"""Module related to testing image model
+"""
+
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import HTTPException
 

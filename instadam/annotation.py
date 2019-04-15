@@ -13,7 +13,8 @@ from instadam.models.image import Image
 from instadam.models.label import Label
 from instadam.models.user import User
 from instadam.utils import construct_msg
-from instadam.utils.get_project import maybe_get_project
+from instadam.utils.get_project import (maybe_get_project,
+                                        maybe_get_project_read_only)
 
 bp = Blueprint('annotation', __name__, url_prefix='/annotation')
 
@@ -26,7 +27,7 @@ def upload_annotation():
     for field_to_check in fields_to_check:
         if field_to_check not in req:
             abort(400, 'Missing %s in json' % field_to_check)
-    project = maybe_get_project(req['project_id'])
+    project = maybe_get_project_read_only(req['project_id'])
     image = Image.query.filter_by(id=req['image_id'],
                                   project_id=project.id).first()
     if not image:

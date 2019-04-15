@@ -1,6 +1,7 @@
 """Module related to testing all endpoint functionality with the 
 blueprint '/project/...'
 """
+
 import os
 
 import pytest

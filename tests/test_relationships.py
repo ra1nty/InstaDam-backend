@@ -1,3 +1,6 @@
+"""Module related to testing correctness of relationships between model schemas
+"""
+
 from instadam.models.annotation import Annotation
 from instadam.models.image import Image
 from instadam.models.label import Label
@@ -39,9 +42,10 @@ def test_label_and_project(client):
 
     project.labels.append(label)
     project.labels.append(label1)
-    assert(len(project.labels) == 2)
-    assert(label.project_id == project.id)
-    assert(label1.project_id == project.id)
+    assert (len(project.labels) == 2)
+    assert (label.project_id == project.id)
+    assert (label1.project_id == project.id)
+
 
 # TODO: test label_project_association unique (cannot add the same association twice)
 
@@ -89,4 +93,3 @@ def test_annotation_and_user(client):
     assert len(user.annotations) == 2
     assert annotation1 == user.annotations[1]
     assert user == annotation1.created_by
-
