@@ -373,20 +373,14 @@ def update_user_permission(project_id):
         abort(400, 'Not able to interpret access_type.')
     access_type = map_code_to_access_type[req['access_type']]
 
-    # Check if user already have the permission of `access_type` to the project
+    # Check if user has already had some sort of permission to the project
     permission = ProjectPermission.query.filter(
         (ProjectPermission.user_id == user.id)
-        & (ProjectPermission.project_id == project_id)).filter(
-        (ProjectPermission.access_type == access_type)).first()
+        & (ProjectPermission.project_id == project_id)).first()
     if permission is not None:
-        return construct_msg('Permission already existed'), 200
-
-    # Check if user is allowed to have the permission of `access_type`
-    if user.privileges == PrivilegesEnum.ANNOTATOR and \
-            access_type == AccessTypeEnum.READ_WRITE:
-        abort(403,
-              'User with ANNOTATOR privilege cannot obtain READ_WRITE access'
-              'to projects')
+        permission.access_type = access_type
+        db.session.commit()
+        return construct_msg('Permission updated successfully'), 200
 
     new_permission = ProjectPermission(access_type=access_type)
     project.permissions.append(new_permission)
@@ -400,7 +394,7 @@ def update_user_permission(project_id):
     else:
         db.session.commit()
 
-    return construct_msg('Permission added successfully'), 200
+    return construct_msg('Permission added successfully'), 201
 
 
 @bp.route('/project/<project_id>', methods=['DELETE'])

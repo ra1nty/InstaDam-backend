@@ -18,6 +18,8 @@ ADMIN_USERNAME = "test_admin"
 ADMIN_PWD = "test_admin"
 ANNOTATOR_USERNAME = "test_annotator"
 ANNOTATOR_PWD = "test_annotator"
+ANNOTATOR_USERNAME2 = "test_annotator2"
+
 
 
 @pytest.fixture
@@ -47,7 +49,13 @@ def local_client():
 
         user = User(username=ANNOTATOR_USERNAME, email='email2@test_upload.com')
         user.set_password(ANNOTATOR_PWD)
+        db.session.add(user)
+        db.session.flush()
+        db.session.commit()
 
+        user = User(username=ANNOTATOR_USERNAME2,
+                    email='email1@test_upload.com')
+        user.set_password(ANNOTATOR_PWD)
         db.session.add(user)
         db.session.flush()
         db.session.commit()
@@ -82,32 +90,32 @@ def test_update_user_permission_readonly(local_client):
             'access_type': 'r',
         },
         headers={'Authorization': 'Bearer %s' % access_token})
-    assert 200 == rv.status_code
+    assert 201 == rv.status_code
     json_data = rv.get_json()
     assert 'msg' in json_data
     assert 'Permission added successfully' == json_data['msg']
 
 
-def test_update_user_permission_duplicate_permission(local_client):
+def test_update_user_permission_update_permission(local_client):
     access_token = successful_login(local_client, ADMIN_USERNAME, ADMIN_PWD)
 
-    # Add READ_WRITE for the first time
+    # Add READ for the first time
     body = {
-        'username': ANNOTATOR_USERNAME,
+        'username': ANNOTATOR_USERNAME2,
         'access_type': 'r',
     }
     rv = local_client.put(
         '/project/1/permissions',
         json=body,
         headers={'Authorization': 'Bearer %s' % access_token})
-    assert 200 == rv.status_code
+    assert 201 == rv.status_code
     json_data = rv.get_json()
     assert 'msg' in json_data
     assert 'Permission added successfully' == json_data['msg']
 
-    # Add READ_WRITE for the second time
+    # Add READ for the second time
     body = {
-        'username': ANNOTATOR_USERNAME,
+        'username': ANNOTATOR_USERNAME2,
         'access_type': 'r',
     }
     rv = local_client.put(
@@ -117,7 +125,7 @@ def test_update_user_permission_duplicate_permission(local_client):
     assert 200 == rv.status_code
     json_data = rv.get_json()
     assert 'msg' in json_data
-    assert 'Permission already existed' == json_data['msg']
+    assert 'Permission updated successfully' == json_data['msg']
 
 
 def test_update_user_permission_bad_access_type(local_client):
