@@ -244,7 +244,7 @@ Endpoints for getting and uploading images to project
               "name": "evilgeniuses.jpg",
               "path": "static/1/b268235e-37c6-4863-805e-77175a574647.jpg",
               "project_id": 1
-          },
+          }
       ]
   } 
   ```
