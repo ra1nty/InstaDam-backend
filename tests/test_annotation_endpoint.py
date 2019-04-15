@@ -99,8 +99,7 @@ def image_label_uploaded(local_client):
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()
-    assert 'msg' in json_data
-    assert 'Label added successfully' == json_data['msg']
+    assert 'label_id' in json_data
     yield local_client
 
 

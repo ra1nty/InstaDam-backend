@@ -282,7 +282,7 @@ def add_label(project_id):
         abort(400, 'Failed to add label, label name should be unique')
     else:
         db.session.commit()
-    return construct_msg('Label added successfully'), 200
+    return jsonify({'label_id': label.id}), 200
 
 
 @bp.route('/project/<project_id>/labels', methods=['GET'])
