@@ -90,7 +90,7 @@ def test_update_user_permission_readonly(local_client):
             'access_type': 'r',
         },
         headers={'Authorization': 'Bearer %s' % access_token})
-    assert 200 == rv.status_code
+    assert 201 == rv.status_code
     json_data = rv.get_json()
     assert 'msg' in json_data
     assert 'Permission added successfully' == json_data['msg']
@@ -108,7 +108,7 @@ def test_update_user_permission_update_permission(local_client):
         '/project/1/permissions',
         json=body,
         headers={'Authorization': 'Bearer %s' % access_token})
-    assert 200 == rv.status_code
+    assert 201 == rv.status_code
     json_data = rv.get_json()
     assert 'msg' in json_data
     assert 'Permission added successfully' == json_data['msg']
