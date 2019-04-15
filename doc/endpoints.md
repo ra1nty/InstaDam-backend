@@ -337,6 +337,14 @@ Endpoints for creating projects and loading info
       "label_color": "#12345"
   } 
   ```
+  
+  Example response body:
+  ```json
+  {
+      "label_id": 1
+  }
+  ```
+  
 * Add user to Project : `PUT /project/:project_id/permissions`
 
   Example request body:
