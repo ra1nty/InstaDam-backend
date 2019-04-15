@@ -1,9 +1,7 @@
 # How to change the code
 
 ## Project directory structure
-
   * Root directory
-    
     * .gitignore: Gitignore file
     * .travis.yml: Travis config
     * Dockerfile: Docker configuration
@@ -44,3 +42,16 @@
         * List user of a project
       * search_users.py: Endpoint for searching user
       * user.py: Change user privilege (deprecated)
+      * model: Contains model for database. Note that the relationship between 
+        * annotation.py: Model for annotation
+        * image.py: Model for image
+        * label.py: Model for label
+        * project.py: Model for project
+        * project_permission.py: Model for user access permission. Used to implement many to many mapping between user and project
+        * revoked_token.py: Save revoked tokens when user log out
+        * user.py: Model for user
+
+## Set up development environment
+  * Install dependencies in requirements/dev.txt 
+
+## Deploy to custom environment
