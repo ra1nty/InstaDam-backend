@@ -1,3 +1,6 @@
+"""Module related to testing all endpoint functionality with the user model
+"""
+
 from instadam.models.user import User
 
 

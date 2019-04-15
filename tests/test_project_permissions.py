@@ -1,3 +1,6 @@
+"""Module related to testing project permission model
+"""
+
 from instadam.models.project_permission import ProjectPermission
 from instadam.models.project_permission import AccessTypeEnum
 
