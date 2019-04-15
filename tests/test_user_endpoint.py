@@ -1,3 +1,7 @@
+"""Module related to testing all endpoint functionality with changing 
+privilege of user
+"""
+
 import pytest
 
 from instadam.app import create_app, db
@@ -59,13 +63,17 @@ def successful_login(client, username, password):
 
 
 test_data = [
-    ('test_upload_admin1', 'TestTest1', {'username': 'test_upload_annotator1',
-                                         'privilege': 'admin'}, '200 OK'),
-    ('test_upload_annotator1', 'TestTest2',
-     {'username': 'test_upload_annotator2',
-      'privilege': 'admin'}, '401 UNAUTHORIZED'),
-    ('test_upload_admin1', 'TestTest1', {'username': 'test_upload_annotator1'},
-     '400 BAD REQUEST'),
+    ('test_upload_admin1', 'TestTest1', {
+        'username': 'test_upload_annotator1',
+        'privilege': 'admin'
+    }, '200 OK'),
+    ('test_upload_annotator1', 'TestTest2', {
+        'username': 'test_upload_annotator2',
+        'privilege': 'admin'
+    }, '401 UNAUTHORIZED'),
+    ('test_upload_admin1', 'TestTest1', {
+        'username': 'test_upload_annotator1'
+    }, '400 BAD REQUEST'),
     ('test_upload_admin1', 'TestTest1', None, '400 BAD REQUEST'),
 ]
 
@@ -74,7 +82,8 @@ test_data = [
 def test_change_privilege(requester, requester_pass, json, expected,
                           local_client):
     token = successful_login(local_client, requester, requester_pass)
-    response = local_client.put('/user/privilege/',
-                                json=json,
-                                headers={'Authorization': 'Bearer %s' % token})
+    response = local_client.put(
+        '/user/privilege/',
+        json=json,
+        headers={'Authorization': 'Bearer %s' % token})
     assert expected == response.status

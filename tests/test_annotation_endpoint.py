@@ -1,3 +1,7 @@
+"""Module related to testing all endpoint functionality with the 
+blueprint '/annotation/...'
+"""
+
 import base64
 import os
 import shutil
@@ -23,8 +27,10 @@ def local_client():
         db.drop_all()
         db.create_all()
 
-        user = User(username='test_upload_user1', email='email@test_upload.com',
-                    privileges=PrivilegesEnum.ADMIN)
+        user = User(
+            username='test_upload_user1',
+            email='email@test_upload.com',
+            privileges=PrivilegesEnum.ADMIN)
         user.set_password('TestTest1')
         db.session.add(user)
         db.session.flush()
@@ -39,8 +45,8 @@ def local_client():
         user.project_permissions.append(permission)
         project.permissions.append(permission)
 
-        user = User(username='test_upload_user2',
-                    email='email2@test_upload.com')
+        user = User(
+            username='test_upload_user2', email='email2@test_upload.com')
         user.set_password('TestTest1')
         permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
         user.project_permissions.append(permission)
@@ -56,7 +62,10 @@ def local_client():
 def successful_login(client, username, password):
     rv = client.post(
         '/login',
-        json={'username': username, 'password': password},
+        json={
+            'username': username,
+            'password': password
+        },
         follow_redirects=True)
 
     assert '201 CREATED' == rv.status
@@ -73,7 +82,8 @@ def image_label_uploaded(local_client):
     with open('tests/cat.jpg', 'rb') as img:
         file = FileStorage(img)
         rv = local_client.post(
-            '/image/upload/1', data={'image': file},
+            '/image/upload/1',
+            data={'image': file},
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '200 OK' == rv.status
         json_data = rv.get_json()
@@ -82,7 +92,10 @@ def image_label_uploaded(local_client):
 
     rv = local_client.post(
         '/project/1/labels',
-        json={'label_text': 'my_label', 'label_color': '#000000'},
+        json={
+            'label_text': 'my_label',
+            'label_color': '#000000'
+        },
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()
@@ -105,11 +118,22 @@ def test_add_and_get_annotation(image_label_uploaded):
 
     with open('tests/cat.jpg', 'rb') as img:
         base64_str = base64.b64encode(img.read()).decode('utf-8')
-        labels = [{'label_id': 1, 'bitmap': base64_str,
-                   'vector': {'name': 'test', 'user': 'admin'}}]
+        labels = [{
+            'label_id': 1,
+            'bitmap': base64_str,
+            'vector': {
+                'name': 'test',
+                'user': 'admin'
+            }
+        }]
         rv = image_label_uploaded.post(
-            '/annotation/', json={'project_id': 1, 'label_id': 1, 'image_id': 1,
-                                  'labels': labels},
+            '/annotation/',
+            json={
+                'project_id': 1,
+                'label_id': 1,
+                'image_id': 1,
+                'labels': labels
+            },
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '200 OK' == rv.status
         json_data = rv.get_json()
@@ -127,7 +151,11 @@ def test_add_and_get_annotation(image_label_uploaded):
 
         rv = image_label_uploaded.get(
             '/annotation/1/1/',
-            json={'project_id': 1, 'label_id': 1, 'image_id': 1},
+            json={
+                'project_id': 1,
+                'label_id': 1,
+                'image_id': 1
+            },
             headers={'Authorization': 'Bearer %s' % access_token})
 
         assert '200 OK' == rv.status
@@ -142,8 +170,13 @@ def test_add_and_get_annotation(image_label_uploaded):
 
         labels[0]['vector']['test-test'] = 100
         rv = image_label_uploaded.post(
-            '/annotation/', json={'project_id': 1, 'label_id': 1, 'image_id': 1,
-                                  'labels': labels},
+            '/annotation/',
+            json={
+                'project_id': 1,
+                'label_id': 1,
+                'image_id': 1,
+                'labels': labels
+            },
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '200 OK' == rv.status
         json_data = rv.get_json()
@@ -153,7 +186,11 @@ def test_add_and_get_annotation(image_label_uploaded):
 
         rv = image_label_uploaded.get(
             '/annotation/1/1/',
-            json={'project_id': 1, 'label_id': 1, 'image_id': 1},
+            json={
+                'project_id': 1,
+                'label_id': 1,
+                'image_id': 1
+            },
             headers={'Authorization': 'Bearer %s' % access_token})
 
         assert '200 OK' == rv.status

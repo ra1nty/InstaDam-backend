@@ -1,3 +1,8 @@
+"""Module related to testing authentication (login, signup) 
+functionality
+"""
+
+
 def register(client, email, username, password):
     return client.post(
         '/register',
