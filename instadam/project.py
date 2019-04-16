@@ -397,7 +397,7 @@ def update_user_permission(project_id):
     else:
         db.session.commit()
 
-    return construct_msg('Permission added successfully'), 200
+    return construct_msg('Permission added successfully'), 201
 
 
 @bp.route('/project/<project_id>/request', methods=['POST'])
