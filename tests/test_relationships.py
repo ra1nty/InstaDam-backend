@@ -4,6 +4,7 @@
 from instadam.models.annotation import Annotation
 from instadam.models.image import Image
 from instadam.models.label import Label
+from instadam.models.message import Message
 from instadam.models.project import Project
 from instadam.models.project_permission import ProjectPermission
 from instadam.models.user import User
@@ -93,3 +94,35 @@ def test_annotation_and_user(client):
     assert len(user.annotations) == 2
     assert annotation1 == user.annotations[1]
     assert user == annotation1.created_by
+
+
+def test_message_and_user(client):
+    message1 = Message()
+    sender1 = User()
+    receiver_a = User()
+    receiver_b = User()
+
+    sender1.sent_messages.append(message1)
+    receiver_a.received_messages.append(message1)
+    receiver_b.received_messages.append(message1)
+
+    assert message1 == sender1.sent_messages[0]
+    assert sender1 == message1.sender
+
+    assert message1 == receiver_a.received_messages[0]
+    assert message1 == receiver_b.received_messages[0]
+    assert receiver_a == message1.receivers[0]
+    assert receiver_b == message1.receivers[1]
+
+    # Second sender
+    message2 = Message()
+    sender2 = User()
+
+    sender2.sent_messages.append(message2)
+    receiver_a.received_messages.append(message2)
+
+    assert message2 == sender2.sent_messages[0]
+    assert sender2 == message2.sender
+
+    assert message2 == receiver_a.received_messages[1]
+    assert receiver_a == message2.receivers[0]
