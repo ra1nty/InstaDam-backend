@@ -1,3 +1,7 @@
+"""Module related to testing all endpoint functionality with updating project
+permissions
+"""
+
 import os
 import shutil
 
@@ -14,6 +18,8 @@ ADMIN_USERNAME = "test_admin"
 ADMIN_PWD = "test_admin"
 ANNOTATOR_USERNAME = "test_annotator"
 ANNOTATOR_PWD = "test_annotator"
+ANNOTATOR_USERNAME2 = "test_annotator2"
+
 
 
 @pytest.fixture
@@ -26,8 +32,7 @@ def local_client():
         db.drop_all()
         db.create_all()
 
-        user = User(username=ADMIN_USERNAME, email='email@test_upload.com',
-                    privileges=PrivilegesEnum.ADMIN)
+        user = User(username=ADMIN_USERNAME, email='email@test_upload.com')
         user.set_password(ADMIN_PWD)
         db.session.add(user)
         db.session.flush()
@@ -42,10 +47,15 @@ def local_client():
         user.project_permissions.append(permission)
         project.permissions.append(permission)
 
-        user = User(username=ANNOTATOR_USERNAME,
-                    email='email2@test_upload.com')
+        user = User(username=ANNOTATOR_USERNAME, email='email2@test_upload.com')
         user.set_password(ANNOTATOR_PWD)
+        db.session.add(user)
+        db.session.flush()
+        db.session.commit()
 
+        user = User(username=ANNOTATOR_USERNAME2,
+                    email='email1@test_upload.com')
+        user.set_password(ANNOTATOR_PWD)
         db.session.add(user)
         db.session.flush()
         db.session.commit()
@@ -57,7 +67,10 @@ def local_client():
 def successful_login(client, username, password):
     rv = client.post(
         '/login',
-        json={'username': username, 'password': password},
+        json={
+            'username': username,
+            'password': password
+        },
         follow_redirects=True)
 
     assert '201 CREATED' == rv.status
@@ -71,79 +84,61 @@ def test_update_user_permission_readonly(local_client):
     access_token = successful_login(local_client, ADMIN_USERNAME, ADMIN_PWD)
 
     rv = local_client.put(
-        '/project/1/permissions', json={
+        '/project/1/permissions',
+        json={
             'username': ANNOTATOR_USERNAME,
             'access_type': 'r',
         },
-        headers={'Authorization': 'Bearer %s' % access_token}
-    )
-    assert 200 == rv.status_code
+        headers={'Authorization': 'Bearer %s' % access_token})
+    assert 201 == rv.status_code
     json_data = rv.get_json()
     assert 'msg' in json_data
     assert 'Permission added successfully' == json_data['msg']
 
 
-def test_update_user_permission_readwrite(local_client):
+def test_update_user_permission_update_permission(local_client):
     access_token = successful_login(local_client, ADMIN_USERNAME, ADMIN_PWD)
 
-    rv = local_client.put(
-        '/project/1/permissions', json={
-            'username': ANNOTATOR_USERNAME,
-            'access_type': 'rw',
-        },
-        headers={'Authorization': 'Bearer %s' % access_token}
-    )
-    assert 403 == rv.status_code
-    json_data = rv.get_json()
-    assert 'msg' in json_data
-    assert 'User with ANNOTATOR privilege cannot obtain READ_WRITE access' \
-        'to projects' == json_data['msg']
-
-
-def test_update_user_permission_duplicate_permission(local_client):
-    access_token = successful_login(local_client, ADMIN_USERNAME, ADMIN_PWD)
-
-    # Add READ_WRITE for the first time
+    # Add READ for the first time
     body = {
-        'username': ANNOTATOR_USERNAME,
+        'username': ANNOTATOR_USERNAME2,
         'access_type': 'r',
     }
     rv = local_client.put(
-        '/project/1/permissions', json=body,
-        headers={'Authorization': 'Bearer %s' % access_token}
-    )
-    assert 200 == rv.status_code
+        '/project/1/permissions',
+        json=body,
+        headers={'Authorization': 'Bearer %s' % access_token})
+    assert 201 == rv.status_code
     json_data = rv.get_json()
     assert 'msg' in json_data
     assert 'Permission added successfully' == json_data['msg']
 
-    # Add READ_WRITE for the second time
+    # Add READ for the second time
     body = {
-        'username': ANNOTATOR_USERNAME,
+        'username': ANNOTATOR_USERNAME2,
         'access_type': 'r',
     }
     rv = local_client.put(
-        '/project/1/permissions', json=body,
-        headers={'Authorization': 'Bearer %s' % access_token}
-    )
+        '/project/1/permissions',
+        json=body,
+        headers={'Authorization': 'Bearer %s' % access_token})
     assert 200 == rv.status_code
     json_data = rv.get_json()
     assert 'msg' in json_data
-    assert 'Permission already existed' == json_data['msg']
+    assert 'Permission updated successfully' == json_data['msg']
 
 
 def test_update_user_permission_bad_access_type(local_client):
     access_token = successful_login(local_client, ADMIN_USERNAME, ADMIN_PWD)
 
     rv = local_client.put(
-        '/project/1/permissions', json={
+        '/project/1/permissions',
+        json={
             'username': ANNOTATOR_USERNAME,
             'access_type': 'rwww',
         },
-        headers={'Authorization': 'Bearer %s' % access_token}
-    )
+        headers={'Authorization': 'Bearer %s' % access_token})
     assert 400 == rv.status_code
     json_data = rv.get_json()
     assert 'msg' in json_data
     assert 'Not able to interpret access_type.' == json_data['msg']
-

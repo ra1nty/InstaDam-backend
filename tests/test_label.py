@@ -1,3 +1,6 @@
+"""Module related to testing label model
+"""
+
 from instadam.models.label import Label
 
 

@@ -1,3 +1,5 @@
+"""Module related to testing annotation model
+"""
 from instadam.models.annotation import Annotation
 import os
 

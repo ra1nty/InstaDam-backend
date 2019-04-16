@@ -1,3 +1,7 @@
+"""Module related to testing all endpoint functionality with loading project
+images
+"""
+
 import base64
 import os
 import shutil
@@ -125,11 +129,11 @@ def test_load_unannotated_images(local_client):
         'unannotated_images'][1]['name'] == 'dog.png'
 
     assert json_res['unannotated_images'][0][
-        'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
-            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
+               'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
+               'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
     assert json_res['unannotated_images'][0][
-        'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
-            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
+               'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
+               'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
 
 
 def test_load_unannotated_images_fail(local_client):
@@ -214,7 +218,17 @@ def test_load_image(local_client):
     assert json_res['path'] == 'test_dir/test_dir_2/cat.jpg'
 
 
-def test_load_image_fail(local_client):
+def test_load_image_fail1(local_client):
+    access_token = successful_login(local_client, 'test_upload_annotator2',
+                                    'TestTest3')
+
+    res = local_client.get(
+        '/image/1', headers={'Authorization': 'Bearer %s' % access_token})
+
+    assert '401 UNAUTHORIZED' == res.status
+
+
+def test_load_image_fail2(local_client):
     access_token = successful_login(local_client, 'test_upload_annotator1',
                                     'TestTest2')
 

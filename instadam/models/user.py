@@ -50,7 +50,7 @@ class User(db.Model):
     privileges = db.Column(
         db.Enum(PrivilegesEnum),
         nullable=False,
-        default=PrivilegesEnum.ANNOTATOR)
+        default=PrivilegesEnum.ADMIN)
 
     project_permissions = relationship('ProjectPermission',
                                        back_populates='user')
