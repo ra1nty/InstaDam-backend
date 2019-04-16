@@ -54,4 +54,11 @@
 ## Set up development environment
   * Install dependencies in requirements/dev.txt 
 
-## Deploy to custom environment
+## Deploy with Docker & docker-compose
+  * Set necessary enviornment variables for deployment: 
+      - DB_USERNAME: Database username.
+      - DB_PASSWORD: Database password.
+      - DB_NAME: Database name for InstaDam app.
+      - SECRETE_KEY: User supplied secrete key for the app.
+  * Run ```docker-compose up``` in project root folder
+     
