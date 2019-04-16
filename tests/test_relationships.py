@@ -95,6 +95,7 @@ def test_annotation_and_user(client):
     assert annotation1 == user.annotations[1]
     assert user == annotation1.created_by
 
+
 def test_message_and_user(client):
     message1 = Message()
     sender1 = User()
