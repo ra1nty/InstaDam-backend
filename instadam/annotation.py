@@ -78,7 +78,7 @@ def get_annotation(image_id):
     image = Image.query.filter_by(id=image_id).first()
     if image is None:
         abort(400, 'Invalid image id')
-    project = maybe_get_project(image.project_id)
+    maybe_get_project(image.project_id)
     annotations = []
     for annotation in image.annotations:
         annotations.append(json.loads(annotation.data))
