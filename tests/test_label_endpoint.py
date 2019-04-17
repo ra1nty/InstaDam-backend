@@ -73,40 +73,61 @@ def successful_login(client, username, password):
     return json_data['access_token']
 
 
-def test_add_label(local_client):
+test_data = [
+    ({
+         'label_text': 'my_label',
+         'label_color': '#000000'
+     }, '200 OK', 'label_id'),
+    ({
+         'label_color': '#000000'
+     }, '400 BAD REQUEST', 'msg'),
+    ({
+         'label_text': 'my_label',
+     }, '400 BAD REQUEST', 'msg'),
+]
+
+
+@pytest.mark.parametrize("json, status, in_json", test_data)
+def test_add_label(json, status, in_json, local_client):
+    access_token = successful_login(local_client, 'test_upload_user1',
+                                    'TestTest1')
+    rv = local_client.post(
+        '/project/1/labels',
+        json=json,
+        headers={'Authorization': 'Bearer %s' % access_token})
+    assert status == rv.status
+    json_data = rv.get_json()
+    assert in_json in json_data
+
+
+test_data = [
+    ('my_label_1', '#001000', 'my_label_2', '#000111'),
+    ('qwer', '#000000', 'asdf', '#333333')
+]
+
+
+@pytest.mark.parametrize("label_text1, label_color1, label_text2, label_color2",
+                         test_data)
+def test_get_label(label_text1, label_color1, label_text2, label_color2,
+                   local_client):
     access_token = successful_login(local_client, 'test_upload_user1',
                                     'TestTest1')
     rv = local_client.post(
         '/project/1/labels',
         json={
-            'label_text': 'my_label',
-            'label_color': '#000000'
+            'label_text': label_text1,
+            'label_color': label_color1
         },
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()
     assert 'label_id' in json_data
 
-
-def test_get_label(local_client):
-    access_token = successful_login(local_client, 'test_upload_user1',
-                                    'TestTest1')
     rv = local_client.post(
         '/project/1/labels',
         json={
-            'label_text': 'my_label_1',
-            'label_color': '#001000'
-        },
-        headers={'Authorization': 'Bearer %s' % access_token})
-    assert '200 OK' == rv.status
-    json_data = rv.get_json()
-    assert 'label_id' in json_data
-
-    rv = local_client.post(
-        '/project/1/labels',
-        json={
-            'label_text': 'my_label_2',
-            'label_color': '#000000'
+            'label_text': label_text2,
+            'label_color': label_color2
         },
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
@@ -120,9 +141,12 @@ def test_get_label(local_client):
     assert '200 OK' == rv.status
     json_data = rv.get_json()
     assert 'labels' in json_data
-    labels = json_data['labels']
+    labels = sorted(json_data['labels'], key=lambda label: label['label_id'])
     assert 2 == len(labels)
 
-    for label in labels:
-        label_id = label['label_id']
-        assert 'my_label_%d' % label_id == label['text']
+    assert label_text1 == labels[0]['text']
+    assert label_text2 == labels[1]['text']
+    assert label_color1 == labels[0]['color']
+    assert label_color2 == labels[1]['color']
+
+
