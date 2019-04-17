@@ -85,8 +85,7 @@ def test_add_label(local_client):
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()
-    assert 'msg' in json_data
-    assert 'Label added successfully' == json_data['msg']
+    assert 'label_id' in json_data
 
 
 def test_get_label(local_client):
@@ -101,8 +100,7 @@ def test_get_label(local_client):
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()
-    assert 'msg' in json_data
-    assert 'Label added successfully' == json_data['msg']
+    assert 'label_id' in json_data
 
     rv = local_client.post(
         '/project/1/labels',
@@ -113,8 +111,7 @@ def test_get_label(local_client):
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()
-    assert 'msg' in json_data
-    assert 'Label added successfully' == json_data['msg']
+    assert 'label_id' in json_data
 
     rv = local_client.get(
         '/project/1/labels',

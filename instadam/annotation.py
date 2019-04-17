@@ -13,7 +13,8 @@ from instadam.models.image import Image
 from instadam.models.label import Label
 from instadam.models.user import User
 from instadam.utils import construct_msg
-from instadam.utils.get_project import maybe_get_project
+from instadam.utils.get_project import (maybe_get_project,
+                                        maybe_get_project_read_only)
 
 bp = Blueprint('annotation', __name__, url_prefix='/annotation')
 
@@ -26,7 +27,7 @@ def upload_annotation():
     for field_to_check in fields_to_check:
         if field_to_check not in req:
             abort(400, 'Missing %s in json' % field_to_check)
-    project = maybe_get_project(req['project_id'])
+    project = maybe_get_project_read_only(req['project_id'])
     image = Image.query.filter_by(id=req['image_id'],
                                   project_id=project.id).first()
     if not image:
@@ -71,20 +72,14 @@ def upload_annotation():
     return construct_msg('Annotation saved successfully'), 200
 
 
-@bp.route('/<int:label_id>/<int:image_id>/', methods=['GET'])
+@bp.route('/<int:image_id>/', methods=['GET'])
 @jwt_required
-def get_annotation(label_id, image_id):
-    label = Label.query.filter_by(id=label_id).first()
-    if not label:
-        abort(400, 'Invalid label id')
-    project = maybe_get_project(label.project_id)
-    image = Image.query.filter_by(id=image_id,
-                                  project_id=project.id).first()
+def get_annotation(image_id):
+    image = Image.query.filter_by(id=image_id).first()
     if image is None:
         abort(400, 'Invalid image id')
-    annotation = Annotation.query.filter_by(project_id=project.id,
-                                            image_id=image.id,
-                                            label_id=label.id).first()
-    if not annotation:
-        abort(400, 'Annotation not found')
-    return jsonify(json.loads(annotation.data)), 200
+    project = maybe_get_project(image.project_id)
+    annotations = []
+    for annotation in image.annotations:
+        annotations.append(json.loads(annotation.data))
+    return jsonify(annotations), 200

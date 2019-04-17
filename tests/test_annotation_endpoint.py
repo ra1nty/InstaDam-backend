@@ -99,8 +99,7 @@ def image_label_uploaded(local_client):
         headers={'Authorization': 'Bearer %s' % access_token})
     assert '200 OK' == rv.status
     json_data = rv.get_json()
-    assert 'msg' in json_data
-    assert 'Label added successfully' == json_data['msg']
+    assert 'label_id' in json_data
     yield local_client
 
 
@@ -150,19 +149,15 @@ def test_add_and_get_annotation(image_label_uploaded):
         assert json['project_images'][0]['is_annotated']
 
         rv = image_label_uploaded.get(
-            '/annotation/1/1/',
-            json={
-                'project_id': 1,
-                'label_id': 1,
-                'image_id': 1
-            },
+            '/annotation/1/',
             headers={'Authorization': 'Bearer %s' % access_token})
 
         assert '200 OK' == rv.status
         json_data = rv.get_json()
-        assert 'bitmap' in json_data
-        assert base64_str == json_data['bitmap']
-        vector = json_data['vector']
+        assert len(json_data) == 1
+        assert 'bitmap' in json_data[0]
+        assert base64_str == json_data[0]['bitmap']
+        vector = json_data[0]['vector']
         assert 'name' in vector
         assert 'test' == vector['name']
         assert 'user' in vector
@@ -185,7 +180,7 @@ def test_add_and_get_annotation(image_label_uploaded):
         assert 'Annotation saved successfully' == json_data['msg']
 
         rv = image_label_uploaded.get(
-            '/annotation/1/1/',
+            '/annotation/1/',
             json={
                 'project_id': 1,
                 'label_id': 1,
@@ -195,9 +190,10 @@ def test_add_and_get_annotation(image_label_uploaded):
 
         assert '200 OK' == rv.status
         json_data = rv.get_json()
-        assert 'bitmap' in json_data
-        assert base64_str == json_data['bitmap']
-        vector = json_data['vector']
+        assert len(json_data) == 1
+        assert 'bitmap' in json_data[0]
+        assert base64_str == json_data[0]['bitmap']
+        vector = json_data[0]['vector']
         assert 'name' in vector
         assert 'test' == vector['name']
         assert 'user' in vector

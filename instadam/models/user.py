@@ -7,6 +7,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from ..app import db
 
+from ..models.message import Message
+
 
 class PrivilegesEnum(enum.Enum):
     """Class PrivilegesEnum is an enum structure to represent the 
@@ -53,6 +55,13 @@ class User(db.Model):
     project_permissions = relationship('ProjectPermission',
                                        back_populates='user')
     annotations = relationship('Annotation', backref='created_by')
+
+    # message
+    received_messages = relationship(
+        "Message",
+        secondary="message_receiver_link",
+        back_populates="receivers")
+    sent_messages = relationship("Message", back_populates="sender")
 
     def set_password(self, password):
         """

@@ -12,10 +12,14 @@ from instadam.models.label import Label
 from instadam.models.project_permission import AccessTypeEnum, ProjectPermission
 from instadam.models.user import PrivilegesEnum, User
 from instadam.utils import check_json, construct_msg
-from instadam.utils.get_project import maybe_get_project
+from instadam.utils.get_project import (maybe_get_project,
+                                        maybe_get_project_read_only)
 from instadam.utils.user_identification import check_user_admin_privilege
 from .app import db
 from .models.project import Project
+
+from instadam.models.message import MessageTypeEnum, Message
+from instadam.utils import check_json
 
 bp = Blueprint('project', __name__, url_prefix='')
 
@@ -281,7 +285,7 @@ def add_label(project_id):
         abort(400, 'Failed to add label, label name should be unique')
     else:
         db.session.commit()
-    return construct_msg('Label added successfully'), 200
+    return jsonify({'label_id': label.id}), 200
 
 
 @bp.route('/project/<project_id>/labels', methods=['GET'])
@@ -306,7 +310,7 @@ def get_labels(project_id):
             ]
         }
     """
-    project = maybe_get_project(project_id)
+    project = maybe_get_project_read_only(project_id)
     labels = [{
         'color': label.label_color,
         'text': label.label_name,
@@ -372,20 +376,14 @@ def update_user_permission(project_id):
         abort(400, 'Not able to interpret access_type.')
     access_type = map_code_to_access_type[req['access_type']]
 
-    # Check if user already have the permission of `access_type` to the project
+    # Check if user has already had some sort of permission to the project
     permission = ProjectPermission.query.filter(
         (ProjectPermission.user_id == user.id)
-        & (ProjectPermission.project_id == project_id)).filter(
-        (ProjectPermission.access_type == access_type)).first()
+        & (ProjectPermission.project_id == project_id)).first()
     if permission is not None:
-        return construct_msg('Permission already existed'), 200
-
-    # Check if user is allowed to have the permission of `access_type`
-    if user.privileges == PrivilegesEnum.ANNOTATOR and \
-            access_type == AccessTypeEnum.READ_WRITE:
-        abort(403,
-              'User with ANNOTATOR privilege cannot obtain READ_WRITE access'
-              'to projects')
+        permission.access_type = access_type
+        db.session.commit()
+        return construct_msg('Permission updated successfully'), 200
 
     new_permission = ProjectPermission(access_type=access_type)
     project.permissions.append(new_permission)
@@ -399,7 +397,78 @@ def update_user_permission(project_id):
     else:
         db.session.commit()
 
-    return construct_msg('Permission added successfully'), 200
+    return construct_msg('Permission added successfully'), 201
+
+
+@bp.route('/project/<project_id>/request', methods=['POST'])
+@jwt_required
+def request_permission(project_id):
+    """ Request for specific permission to a project
+
+        Request for specified privilege (READ_WRITE or READ_ONLY) to project
+        upon receiving a `POST` request to the `/project/<project_id>/request`
+        entry point. User must be signed in. User must provide a `message_type`
+        to specify the privilege he or she is requesting for.
+
+        `message_type` takes a string of two values: `r` or `rw`,
+        where `r` is `READ_ONLY` and `rw` is `READ_WRITE`
+
+        The request message will be sent to all admins of the project. Note that
+        an annotator can also send a request of 'rw' permission. The decision of
+        whether upgrading the ANNOTATOR to ADMIN and then granting 'rw' permission
+        is left to the ADMIN.
+
+        Must supply a jwt-token to verify user status and extract `user_id`.
+
+        Raises:
+            400 Error if message_type is not specified
+            400 Error if message is not 'r' or 'rw'
+            401 Error if not logged in
+            404 Error if project does not exist
+
+        Returns:
+            201 if success. Will also return `project_id`.
+        """
+
+    req = request.get_json()
+    check_json(req, ['message_type'])  # check missing keys
+
+    project = Project.query.filter_by(id=project_id).first()
+    if project is None:
+        abort(404, 'Project with id=%s does not exist' % project_id)
+
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(username=current_user).first()
+
+    map_code_to_message_type = {
+        'r': MessageTypeEnum.READ_ONLY_PERMISSION_REQUEST,
+        'rw': MessageTypeEnum.READ_WRITE_PERMISSION_REQUEST,
+    }
+
+    if req['message_type'] not in map_code_to_message_type:
+        abort(400, 'Not able to interpret message_type.')
+    message_type = map_code_to_message_type[req['message_type']]
+
+    # Get the list of admins to the project
+    admins = []
+    for permission in project.permissions:
+        if permission.access_type == AccessTypeEnum.READ_WRITE:
+            admins.append(permission.user)
+
+    message = Message(type=message_type)
+    try:
+        db.session.add(message)
+        db.session.flush()
+    except IntegrityError:
+        db.session.rollback()
+        abort(400, 'Create message failed.')
+    else:
+        user.sent_messages.append(message)
+        for admin in admins:
+            admin.received_messages.append(message)
+        db.session.commit()
+
+    return construct_msg('Message sent successfully'), 200
 
 
 @bp.route('/project/<project_id>', methods=['DELETE'])
@@ -497,3 +566,4 @@ def list_users_of_project(project_id):
                 'created_at': str(permission.user.created_at),
                 'privileges': str(permission.user.privileges)}})
     return jsonify(users), 200
+
