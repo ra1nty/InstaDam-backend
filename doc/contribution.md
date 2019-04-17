@@ -52,7 +52,12 @@
         * user.py: Model for user
 
 ## Set up development environment
-  * Install dependencies in requirements/dev.txt 
+  * Install the dependencies in requirements/dev.txt
+  `pip install -r requirements/dev.txt`
+  * The development mode utilize in-memory Sqlite database for fast-prototyping and development,
+    make sure you have Sqlite installed in your development environment.
+    Start the server:
+  `python3 manage.py start --mode=development`
 
 ## Deploy with Docker & docker-compose
   * Set necessary enviornment variables for deployment: 
