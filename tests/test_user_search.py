@@ -1,3 +1,6 @@
+"""Module related to testing all endpoint functionality with searching users
+"""
+
 import pytest
 
 from instadam.app import create_app, db

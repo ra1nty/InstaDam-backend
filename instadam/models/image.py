@@ -38,7 +38,8 @@ class Image(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'),
                            nullable=False)
 
-    annotations = relationship('Annotation', backref='original_image')
+    annotations = relationship('Annotation', backref='original_image',
+                               order_by='Annotation.label_id')
 
     def save_image_to_project(self, img_file):
         """Saves the image file associated to disk.

@@ -1,3 +1,9 @@
+"""Module related to testing authentication (login, signup) 
+functionality
+"""
+import pytest
+
+
 def register(client, email, username, password):
     return client.post(
         '/register',
@@ -100,33 +106,22 @@ def test_logout(client):
     assert code == '401 UNAUTHORIZED'
 
 
-def test_credential_validation(client):
-    rv = register(client, 'someone3@illinois.edu', 'test3', 'Password0')
-    code = rv.status
-    json_data = rv.get_json()
-    assert code == '201 CREATED'
-    assert 'access_token' in json_data
+test_data = [
+    ('someone3@illinois.edu', 'test3', 'Password0', '201 CREATED',
+     'access_token'),
+    ('someone4@illinois.edu', 'test4', 'password', '400 BAD REQUEST', 'msg'),
+    ('someone4@illinois.edu', 'test4', 'pass', '400 BAD REQUEST', 'msg'),
+    ('someone4@illinois.edu', 'test4', 'password0', '400 BAD REQUEST', 'msg'),
+    ('someone4#illinois.edu', 'test4', 'Password0', '400 BAD REQUEST', 'msg'),
+]
 
-    rv = register(client, 'someone4@illinois.edu', 'test4', 'password')
-    code = rv.status
-    json_data = rv.get_json()
-    assert code == '400 BAD REQUEST'
-    assert 'msg' in json_data
 
-    rv = register(client, 'someone4@illinois.edu', 'test4', 'pass')
+@pytest.mark.parametrize("email, username, password, status, in_json",
+                         test_data)
+def test_credential_validation(email, username, password, status, in_json,
+                               client):
+    rv = register(client, email, username, password)
     code = rv.status
     json_data = rv.get_json()
-    assert code == '400 BAD REQUEST'
-    assert 'msg' in json_data
-
-    rv = register(client, 'someone4@illinois.edu', 'test4', 'password0')
-    code = rv.status
-    json_data = rv.get_json()
-    assert code == '400 BAD REQUEST'
-    assert 'msg' in json_data
-
-    rv = register(client, 'someone4#illinois.edu', 'test4', 'Password0')
-    code = rv.status
-    json_data = rv.get_json()
-    assert code == '400 BAD REQUEST'
-    assert 'msg' in json_data
+    assert code == status
+    assert in_json in json_data

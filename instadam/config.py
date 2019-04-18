@@ -6,6 +6,7 @@ import os
 DATABASE_USERNAME = 'postgres'
 DATABASE_HOSTNAME = 'postgres'
 DATABASE_PASSWORD = ''
+DATABASE_NAME = 'instadam'
 FLASK_SECRETE_KEY = ''
 if '_DB_USERNAME' in os.environ and os.environ['_DB_USERNAME'] is not None:
     DATABASE_USERNAME = os.environ['_DB_USERNAME']
@@ -15,6 +16,8 @@ if '_SECRETE_KEY' in os.environ and os.environ['_SECRETE_KEY'] is not None:
     FLASK_SECRETE_KEY = os.environ['_SECRETE_KEY']
 if '_DB_HOSTNAME' in os.environ and os.environ['_DB_HOSTNAME'] is not None:
     DATABASE_HOSTNAME = os.environ['_DB_HOSTNAME']
+if '_DB_NAME' in os.environ and os.environ['_DB_NAME'] is not None:
+    DATABASE_NAME = os.environ['_DB_NAME']
 
 INSTADAM_STORAGE = 'static-dir'
 if ('INSTADAM_STORAGE' in os.environ
@@ -36,6 +39,7 @@ class Config(object):
     MAIL_DEFAULT_SENDER = 'admin@demo.test'
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ['access']
+    JWT_ACCESS_TOKEN_EXPIRES = False
 
     STATIC_STORAGE_DIR = INSTADAM_STORAGE
     STATIC_STORAGE_URL = INSTADAM_STORAGE_ROOT_URL
@@ -56,7 +60,7 @@ class Production(Config):
     """Production config
     """
     SECRET_KEY = FLASK_SECRETE_KEY
-    _SQLALCHEMY_DATABASE_DATABASE = ''
+    _SQLALCHEMY_DATABASE_DATABASE = DATABASE_NAME
     _SQLALCHEMY_DATABASE_HOSTNAME = DATABASE_HOSTNAME
     _SQLALCHEMY_DATABASE_PASSWORD = DATABASE_PASSWORD
     _SQLALCHEMY_DATABASE_USERNAME = DATABASE_USERNAME

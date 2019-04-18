@@ -1,3 +1,6 @@
+"""Module related to testing all endpoint functionality with uploading images
+"""
+
 import filecmp
 import os
 import shutil
@@ -39,8 +42,8 @@ def local_client():
         user.project_permissions.append(permission)
         project.permissions.append(permission)
 
-        user = User(username='test_upload_user2',
-                    email='email2@test_upload.com')
+        user = User(
+            username='test_upload_user2', email='email2@test_upload.com')
         user.set_password('TestTest1')
         permission = ProjectPermission(access_type=AccessTypeEnum.READ_ONLY)
         user.project_permissions.append(permission)
@@ -56,7 +59,10 @@ def local_client():
 def successful_login(client, username, password):
     rv = client.post(
         '/login',
-        json={'username': username, 'password': password},
+        json={
+            'username': username,
+            'password': password
+        },
         follow_redirects=True)
 
     assert '201 CREATED' == rv.status
@@ -73,7 +79,8 @@ def test_upload_image(local_client):
     with open('tests/cat.jpg', 'rb') as img:
         file = FileStorage(img)
         rv = local_client.post(
-            '/image/upload/1', data={'image': file},
+            '/image/upload/1',
+            data={'image': file},
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '200 OK' == rv.status
         json_data = rv.get_json()
@@ -95,7 +102,8 @@ def test_upload_image_fail_1(local_client):
     with open('tests/cat.jpg', 'rb') as img:
         file = FileStorage(img)
         rv = local_client.post(
-            '/image/upload/0', data={'image': file},
+            '/image/upload/0',
+            data={'image': file},
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '401 UNAUTHORIZED' == rv.status
         json_data = rv.get_json()
@@ -112,7 +120,8 @@ def test_upload_image_fail_2(local_client):
     with open('tests/cat.jpg', 'rb') as img:
         file = FileStorage(img)
         rv = local_client.post(
-            '/image/upload/1', data={'image': file},
+            '/image/upload/1',
+            data={'image': file},
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '401 UNAUTHORIZED' == rv.status
         json_data = rv.get_json()
@@ -126,7 +135,8 @@ def test_upload_image_fail_3(local_client):
     with open('tests/cat.jpg', 'rb') as img:
         file = FileStorage(img)
         rv = local_client.post(
-            '/image/upload/1', data={'file': file},
+            '/image/upload/1',
+            data={'file': file},
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '400 BAD REQUEST' == rv.status
         json_data = rv.get_json()
@@ -140,7 +150,8 @@ def test_upload_image_fail_4(local_client):
     with open('tests/__init__.py', 'rb') as fd:
         file = FileStorage(fd)
         rv = local_client.post(
-            '/image/upload/1', data={'image': file},
+            '/image/upload/1',
+            data={'image': file},
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '415 UNSUPPORTED MEDIA TYPE' == rv.status
         json_data = rv.get_json()
@@ -153,7 +164,8 @@ def test_upload_zip(local_client):
     with open('tests/test.zip', 'rb') as fd:
         file = FileStorage(fd)
         rv = local_client.post(
-            '/image/upload/zip/1', data={'zip': file},
+            '/image/upload/zip/1',
+            data={'zip': file},
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '200 OK' == rv.status
         json_data = rv.get_json()
@@ -167,8 +179,9 @@ def test_upload_zip(local_client):
     assert os.path.isdir(storage_path)
     files = os.listdir(storage_path)
     assert 2 == len(files)
-    assert filecmp.cmp(os.path.join(storage_path, files[0]),
-                       os.path.join(storage_path, files[1]))
+    assert filecmp.cmp(
+        os.path.join(storage_path, files[0]),
+        os.path.join(storage_path, files[1]))
     assert filecmp.cmp(os.path.join(storage_path, files[0]), 'tests/cat.jpg')
 
 
@@ -178,7 +191,8 @@ def test_upload_zip_failed(local_client):
     with open('tests/cat.jpg', 'rb') as fd:
         file = FileStorage(fd)
         rv = local_client.post(
-            '/image/upload/zip/1', data={'zip': file},
+            '/image/upload/zip/1',
+            data={'zip': file},
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '415 UNSUPPORTED MEDIA TYPE' == rv.status
 
@@ -189,6 +203,7 @@ def test_upload_zip_failed2(local_client):
     with open('tests/cat.jpg', 'rb') as fd:
         file = FileStorage(fd)
         rv = local_client.post(
-            '/image/upload/zip/1', data={'image': file},
+            '/image/upload/zip/1',
+            data={'image': file},
             headers={'Authorization': 'Bearer %s' % access_token})
         assert '400 BAD REQUEST' == rv.status
