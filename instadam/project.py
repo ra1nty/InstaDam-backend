@@ -62,12 +62,11 @@ def create_project():
 
     try:
         db.session.add(project)
-        db.session.flush()
     except IntegrityError:
         db.session.rollback()
         abort(
             400, 'Duplicate project name. '
-                 'Please provide a different project name.')
+            'Please provide a different project name.')
     else:
         # if able to add project to db, try add project_permission
         # creator is granted with READ_WRITE privilege
@@ -79,7 +78,6 @@ def create_project():
         project.permissions.append(project_permission)
         try:
             db.session.add(project_permission)
-            db.session.flush()
         except DatabaseError:
             db.session.rollback()
             abort(400, 'Cannot update project permission for user.')
@@ -118,12 +116,12 @@ def get_projects():
     for project_permission in user.project_permissions:
         project_dict = {
             'id':
-                project_permission.project.id,
+            project_permission.project.id,
             'name':
-                project_permission.project.project_name,
+            project_permission.project.project_name,
             'is_admin':
-                (user.privileges == PrivilegesEnum.ADMIN and
-                 project_permission.access_type == AccessTypeEnum.READ_WRITE)
+            (user.privileges == PrivilegesEnum.ADMIN and
+             project_permission.access_type == AccessTypeEnum.READ_WRITE)
         }
         projects.append(project_dict)
     return jsonify(projects), 200
@@ -137,10 +135,10 @@ def get_unannotated_images(project_id):
     see images to annotate
 
     Args:
-        project_id: ID of the project
+        project_id -- ID of the project
 
     Returns:
-        200 and a json object:
+        200 and a json object --
         {
             "unannotated_images": [
                 {
@@ -193,10 +191,10 @@ def get_project_images(project_id):
     Get all images (annotated and unannotated) of project with project_id
 
     Args:
-        project_id: The id of the project
+        project_id -- The id of the project
 
     Returns:
-        200 and a json object:
+        200 and a json object --
         {
             "project_images": [
                 {
@@ -248,7 +246,7 @@ def add_label(project_id):
     """
     Add a label to the project
 
-    Takes a json object:
+    Takes a json object --
 
     {
        "label_text": "first label",
@@ -256,7 +254,7 @@ def add_label(project_id):
     }
 
     Args:
-        project_id: ID of the project
+        project_id -- ID of the project
 
     Returns:
         200 and json object
@@ -279,7 +277,6 @@ def add_label(project_id):
     project.labels.append(label)
     try:
         db.session.add(label)
-        db.session.flush()
     except IntegrityError:
         db.session.rollback()
         abort(400, 'Failed to add label, label name should be unique')
@@ -296,10 +293,10 @@ def get_labels(project_id):
     Does not need a request body
 
     Args:
-        project_id: The id of the project
+        project_id -- The id of the project
 
     Returns:
-        200 and a json object:
+        200 and a json object --
         {
             "labels": [
                 {
@@ -378,8 +375,8 @@ def update_user_permission(project_id):
 
     # Check if user has already had some sort of permission to the project
     permission = ProjectPermission.query.filter(
-        (ProjectPermission.user_id == user.id)
-        & (ProjectPermission.project_id == project_id)).first()
+        (ProjectPermission.user_id == user.id) &
+        (ProjectPermission.project_id == project_id)).first()
     if permission is not None:
         permission.access_type = access_type
         db.session.commit()
@@ -390,7 +387,6 @@ def update_user_permission(project_id):
     user.project_permissions.append(new_permission)
     try:
         db.session.add(new_permission)
-        db.session.flush()
     except IntegrityError:
         db.session.rollback()
         abort(400, 'Update permission failed.')
@@ -458,7 +454,6 @@ def request_permission(project_id):
     message = Message(type=message_type)
     try:
         db.session.add(message)
-        db.session.flush()
     except IntegrityError:
         db.session.rollback()
         abort(400, 'Create message failed.')
@@ -478,7 +473,7 @@ def delete_project(project_id):
     Delete a project with specified project id. Doesn't require a body
 
     Args:
-        project_id: The ID of the project
+        project_id -- The ID of the project
 
     Raises:
         401 if
@@ -487,20 +482,21 @@ def delete_project(project_id):
             access)
 
     Returns:
-        200 and a json object:
+        200 and a json object --
         {
             'msg': 'Project deleted successfully'
         }
     """
     project = maybe_get_project(project_id)  # check privilege and get project
-
+    '''
     images = project.images
     for image in images:
         db.session.delete(image)
+    '''
     # Delete the whole image directory
-    shutil.rmtree(os.path.join(app.config['STATIC_STORAGE_DIR'],
-                               str(project.id)))
-
+    shutil.rmtree(
+        os.path.join(app.config['STATIC_STORAGE_DIR'], str(project.id)))
+    '''
     # Delete labels
     labels = project.labels
     for label in labels:
@@ -515,10 +511,10 @@ def delete_project(project_id):
     permissions = project.permissions
     for permission in permissions:
         db.session.delete(permission)
+    '''
 
     db.session.delete(project)
 
-    db.session.flush()
     db.session.commit()
 
     return construct_msg('Project deleted successfully'), 200
@@ -531,7 +527,7 @@ def list_users_of_project(project_id):
     List all the users having access to the specified project. Doesn't require
     a body
     Args:
-        project_id: The id of the project
+        project_id -- The id of the project
 
     Raises:
         401 if
@@ -564,6 +560,7 @@ def list_users_of_project(project_id):
                 'username': permission.user.username,
                 'email': permission.user.email,
                 'created_at': str(permission.user.created_at),
-                'privileges': str(permission.user.privileges)}})
+                'privileges': str(permission.user.privileges)
+            }
+        })
     return jsonify(users), 200
-

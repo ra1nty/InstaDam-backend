@@ -22,39 +22,34 @@ def local_client():
         db.drop_all()
         db.create_all()
 
-        user = User(username=ADMIN_USERNAME, email='email@test_upload.com',
-                    privileges=PrivilegesEnum.ADMIN)
+        user = User(
+            username=ADMIN_USERNAME,
+            email='email@test_upload.com',
+            privileges=PrivilegesEnum.ADMIN)
         user.set_password(ADMIN_PWD)
         db.session.add(user)
-        db.session.flush()
         db.session.commit()
 
         project = Project(project_name='test/test1', created_by=user.id)
         db.session.add(project)
-        db.session.flush()
         db.session.commit()
 
         project = Project(project_name='test/test2', created_by=user.id)
         db.session.add(project)
-        db.session.flush()
         db.session.commit()
 
         # first annotator
-        user = User(username=ANNOTATOR1_USERNAME,
-                    email=ANNOTATOR1_EMAIL)
+        user = User(username=ANNOTATOR1_USERNAME, email=ANNOTATOR1_EMAIL)
         user.set_password(ANNOTATOR_PWD)
 
         db.session.add(user)
-        db.session.flush()
         db.session.commit()
 
         # second annotator
-        user = User(username=ANNOTATOR2_USERNAME,
-                    email=ANNOTATOR2_EMAIL)
+        user = User(username=ANNOTATOR2_USERNAME, email=ANNOTATOR2_EMAIL)
         user.set_password(ANNOTATOR_PWD)
 
         db.session.add(user)
-        db.session.flush()
         db.session.commit()
 
     client = app.test_client()
@@ -78,17 +73,12 @@ def successful_login(client, username, password):
 
 
 def test_request_success_r(local_client):
-    access_token = successful_login(
-        local_client,
-        ANNOTATOR1_USERNAME,
-        ANNOTATOR_PWD
-    )
+    access_token = successful_login(local_client, ANNOTATOR1_USERNAME,
+                                    ANNOTATOR_PWD)
     rv = local_client.post(
-        '/project/1/request', json={
-            'message_type': 'r'
-        },
-        headers={'Authorization': 'Bearer %s' % access_token}
-    )
+        '/project/1/request',
+        json={'message_type': 'r'},
+        headers={'Authorization': 'Bearer %s' % access_token})
 
     assert 200 == rv.status_code
     json_data = rv.get_json()
@@ -97,17 +87,12 @@ def test_request_success_r(local_client):
 
 
 def test_request_success_rw(local_client):
-    access_token = successful_login(
-        local_client,
-        ANNOTATOR1_USERNAME,
-        ANNOTATOR_PWD
-    )
+    access_token = successful_login(local_client, ANNOTATOR1_USERNAME,
+                                    ANNOTATOR_PWD)
     rv = local_client.post(
-        '/project/1/request', json={
-            'message_type': 'rw'
-        },
-        headers={'Authorization': 'Bearer %s' % access_token}
-    )
+        '/project/1/request',
+        json={'message_type': 'rw'},
+        headers={'Authorization': 'Bearer %s' % access_token})
 
     assert 200 == rv.status_code
     json_data = rv.get_json()
@@ -116,17 +101,12 @@ def test_request_success_rw(local_client):
 
 
 def test_request_fail_unknown_key(local_client):
-    access_token = successful_login(
-        local_client,
-        ANNOTATOR1_USERNAME,
-        ANNOTATOR_PWD
-    )
+    access_token = successful_login(local_client, ANNOTATOR1_USERNAME,
+                                    ANNOTATOR_PWD)
     rv = local_client.post(
-        '/project/1/request', json={
-            'message_type': 'unknown_key'
-        },
-        headers={'Authorization': 'Bearer %s' % access_token}
-    )
+        '/project/1/request',
+        json={'message_type': 'unknown_key'},
+        headers={'Authorization': 'Bearer %s' % access_token})
 
     assert 400 == rv.status_code
     json_data = rv.get_json()

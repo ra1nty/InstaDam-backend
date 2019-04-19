@@ -15,10 +15,8 @@ bp = Blueprint('auth', __name__, url_prefix='')
 def credential_checking(password, email):
     """Check the validity of the given user credential.
 
-    * Needs a refactoring
-
     Raises:
-        IntegrityError: An error occurred when invalidate user credential is
+        IntegrityError -- An error occurred when invalidate user credential is
         given
     """
     if len(password) < 8:
@@ -54,8 +52,9 @@ def login():
     user = User.query.filter_by(username=req['username']).first()
     if user is not None:
         if user.verify_password(req['password']):
-            return jsonify({'access_token': create_access_token(
-                identity=user.username)}), 201
+            return jsonify(
+                {'access_token':
+                 create_access_token(identity=user.username)}), 201
     abort(401, 'User %s not found' % username)
 
 
@@ -83,7 +82,6 @@ def register():
     user.set_password(password)
     try:
         db.session.add(user)
-        db.session.flush()
     except IntegrityError:
         db.session.rollback()
         abort(401, 'User %s already exist' % username)
@@ -113,6 +111,5 @@ def logout():
     jti = get_raw_jwt()['jti']
     token = RevokedToken(jti=jti)
     db.session.add(token)
-    db.session.flush()
     db.session.commit()
     return construct_msg('Logged out'), 200

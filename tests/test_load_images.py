@@ -39,7 +39,6 @@ def local_client():
         admin.set_password('TestTest1')
         admin.project_permissions.append(rw_permission)
         db.session.add(admin)
-        db.session.flush()
         db.session.commit()
 
         annotator = User(
@@ -49,19 +48,16 @@ def local_client():
         annotator.set_password('TestTest2')
         annotator.project_permissions.append(r_permission)
         db.session.add(annotator)
-        db.session.flush()
         db.session.commit()
 
         annotator_2 = User(
             username='test_upload_annotator2', email='email3@test_load.com')
         annotator_2.set_password('TestTest3')
         db.session.add(annotator_2)
-        db.session.flush()
         db.session.commit()
 
         project = Project(project_name='TestProject', created_by=admin.id)
         db.session.add(project)
-        db.session.flush()
         db.session.commit()
 
         project.permissions.append(rw_permission)
@@ -72,7 +68,6 @@ def local_client():
             image_url='test_dir/test_dir_2/cat.jpg',
             project_id=project.id)
         db.session.add(test_image)
-        db.session.flush()
         db.session.commit()
 
         test_image_2 = Image(
@@ -80,7 +75,6 @@ def local_client():
             image_url='test_dir/test_dir_2/dog.png',
             project_id=project.id)
         db.session.add(test_image_2)
-        db.session.flush()
         db.session.commit()
 
         test_image_3 = Image(
@@ -89,7 +83,6 @@ def local_client():
             image_storage_path='tests/cat.jpg',
             project_id=project.id)
         db.session.add(test_image_3)
-        db.session.flush()
         db.session.commit()
 
     client = app.test_client()
@@ -129,11 +122,11 @@ def test_load_unannotated_images(local_client):
         'unannotated_images'][1]['name'] == 'dog.png'
 
     assert json_res['unannotated_images'][0][
-               'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
-               'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
+        'path'] == 'test_dir/test_dir_2/cat.jpg' or json_res[
+            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/cat.jpg'
     assert json_res['unannotated_images'][0][
-               'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
-               'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
+        'path'] == 'test_dir/test_dir_2/dog.png' or json_res[
+            'unannotated_images'][1]['path'] == 'test_dir/test_dir_2/dog.png'
 
 
 def test_load_unannotated_images_fail(local_client):
