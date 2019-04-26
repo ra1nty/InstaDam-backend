@@ -277,11 +277,10 @@ def add_label(project_id):
     project.labels.append(label)
     try:
         db.session.add(label)
+        db.session.commit()
     except IntegrityError:
         db.session.rollback()
         abort(400, 'Failed to add label, label name should be unique')
-    else:
-        db.session.commit()
     return jsonify({'label_id': label.id}), 200
 
 
@@ -387,11 +386,10 @@ def update_user_permission(project_id):
     user.project_permissions.append(new_permission)
     try:
         db.session.add(new_permission)
+        db.session.commit()
     except IntegrityError:
         db.session.rollback()
         abort(400, 'Update permission failed.')
-    else:
-        db.session.commit()
 
     return construct_msg('Permission added successfully'), 201
 
@@ -454,14 +452,13 @@ def request_permission(project_id):
     message = Message(type=message_type)
     try:
         db.session.add(message)
-    except IntegrityError:
-        db.session.rollback()
-        abort(400, 'Create message failed.')
-    else:
         user.sent_messages.append(message)
         for admin in admins:
             admin.received_messages.append(message)
         db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        abort(400, 'Create message failed.')
 
     return construct_msg('Message sent successfully'), 200
 

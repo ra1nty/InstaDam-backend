@@ -82,11 +82,10 @@ def register():
     user.set_password(password)
     try:
         db.session.add(user)
+        db.session.commit()
     except IntegrityError:
         db.session.rollback()
         abort(401, 'User %s already exist' % username)
-    else:
-        db.session.commit()
     return jsonify(
         {'access_token': create_access_token(identity=user.username)}), 201
 

@@ -41,11 +41,10 @@ def upload_image(project_id):
         project.images.append(image)
         try:
             db.session.add(image)
+            db.session.commit()
         except IntegrityError:
             db.session.rollback()
             abort(400, 'Failed to add image')
-        else:
-            db.session.commit()
         return construct_msg('Image added successfully'), 200
     else:
         abort(400, 'Missing \'image\' in request')
@@ -99,11 +98,10 @@ def upload_zip(project_id):
             project.images.append(image)
             try:
                 db.session.add(image)
+                db.session.commit()
             except IntegrityError:
                 db.session.rollback()
                 abort(400, 'Failed to add image')
-            else:
-                db.session.commit()
             name_map[image_name] = image.image_storage_path
 
         zip_file.close()
