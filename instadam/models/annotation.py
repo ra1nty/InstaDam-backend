@@ -35,7 +35,8 @@ class Annotation(db.Model):
     # backref: label
     label_id = db.Column(db.Integer, db.ForeignKey('label.id'))
 
-    added_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
+    added_at = db.Column(
+        db.DateTime, nullable=False, default=dt.datetime.utcnow)
     data = db.Column(db.LargeBinary, nullable=False)
     vector = db.Column(db.LargeBinary, nullable=False)
 

@@ -15,7 +15,7 @@ def create_app(mode='development'):
     create and configure the app in specific mode
 
     Args:
-        mode: A string indicate the mode of the application
+        mode -- A string indicate the mode of the application
             one of 'development', 'production', 'testing'
 
     Returns:

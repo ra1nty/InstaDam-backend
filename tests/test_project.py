@@ -54,7 +54,6 @@ def init_test(app):
         user.set_password(ANNOTATOR_PWD)
         db.session.add(user)
 
-        db.session.flush()
         db.session.commit()
 
 
@@ -147,24 +146,20 @@ def get_project_fixture():
             privileges=PrivilegesEnum.ADMIN)
         user.set_password(ADMIN_PWD)
         db.session.add(user)
-        db.session.flush()
         db.session.commit()
 
         project = Project(project_name='test1', created_by=user.id)
         db.session.add(project)
-        db.session.flush()
         db.session.commit()
 
         image1 = Image(project_id=1, image_name='cracked_building.png')
         db.session.add(image1)
-        db.session.flush()
         db.session.commit()
 
         label1 = Label(label_name='asdf1', project_id=project.id)
         db.session.add(label1)
         label2 = Label(label_name='asdf2', project_id=project.id)
         db.session.add(label2)
-        db.session.flush()
         db.session.commit()
 
         annotation1 = Annotation(
@@ -183,7 +178,6 @@ def get_project_fixture():
             data=b'1234',
             vector=b'1234')
         db.session.add(annotation2)
-        db.session.flush()
         db.session.commit()
 
         # Create project directory
@@ -201,14 +195,12 @@ def get_project_fixture():
         user.set_password(ANNOTATOR_PWD)
 
         db.session.add(user)
-        db.session.flush()
         db.session.commit()
 
         permission = ProjectPermission(access_type=AccessTypeEnum.READ_ONLY)
         user.project_permissions.append(permission)
         project.permissions.append(permission)
 
-        db.session.flush()
         db.session.commit()
 
     client = app.test_client()
@@ -244,8 +236,7 @@ def get_labels_helper(client, token):
 
 def get_annotations_helper(client, token):
     response = client.get(
-        '/annotation/1/',
-        headers={'Authorization': 'Bearer %s' % token})
+        '/annotation/1/', headers={'Authorization': 'Bearer %s' % token})
     return response.status_code
 
 

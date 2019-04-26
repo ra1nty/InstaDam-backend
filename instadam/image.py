@@ -41,12 +41,10 @@ def upload_image(project_id):
         project.images.append(image)
         try:
             db.session.add(image)
-            db.session.flush()
+            db.session.commit()
         except IntegrityError:
             db.session.rollback()
             abort(400, 'Failed to add image')
-        else:
-            db.session.commit()
         return construct_msg('Image added successfully'), 200
     else:
         abort(400, 'Missing \'image\' in request')
@@ -67,6 +65,16 @@ def unzip_process(zip_path, name_map):
 @bp.route('/upload/zip/<project_id>', methods=['POST'])
 @jwt_required
 def upload_zip(project_id):
+    """
+    Upload zip file of images to project
+
+    Args:
+        project_id -- id of project to upload zip file to
+
+    Returns:
+        HTTP status code and message of zip file upload
+    """
+
     def filter_condition(name):
         split = name.lower().split('.')
         return split and split[-1] in VALID_IMG_EXTENSIONS
@@ -90,12 +98,10 @@ def upload_zip(project_id):
             project.images.append(image)
             try:
                 db.session.add(image)
-                db.session.flush()
+                db.session.commit()
             except IntegrityError:
                 db.session.rollback()
                 abort(400, 'Failed to add image')
-            else:
-                db.session.commit()
             name_map[image_name] = image.image_storage_path
 
         zip_file.close()
@@ -115,8 +121,8 @@ def get_project_image(image_id):
     Get images with image_id that exists in project with project_id
 
     Args:
-        project_id: The id of the project
-        image_id: The id of the image to return
+        project_id -- id of the project
+        image_id -- id of the image to return
     """
     image = Image.query.filter_by(id=image_id).first()
     if image is None:
@@ -129,7 +135,8 @@ def get_project_image(image_id):
         'id': image.id,
         'path': image.image_url,
         'project_id': image.project_id,
-        'modified_at': image.modified_at}), 200
+        'modified_at': image.modified_at
+    }), 200
 
 
 @bp.route('/<image_id>/thumbnail')
@@ -138,7 +145,7 @@ def get_image_thumbnail(image_id):
     """
     Get the thumbnail of the image
     Args:
-        image_id: The id of the image
+        image_id -- id of the image
     """
     image = Image.query.filter_by(id=image_id).first()
     if image is None:
@@ -160,4 +167,5 @@ def get_image_thumbnail(image_id):
     return jsonify({
         'image_id': image.id,
         'format': 'png',
-        'base64_image': base64_str}), 200
+        'base64_image': base64_str
+    }), 200

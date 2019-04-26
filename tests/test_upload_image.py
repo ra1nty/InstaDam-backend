@@ -30,12 +30,10 @@ def local_client():
         user = User(username='test_upload_user1', email='email@test_upload.com')
         user.set_password('TestTest1')
         db.session.add(user)
-        db.session.flush()
         db.session.commit()
 
         project = Project(project_name='test/test', created_by=user.id)
         db.session.add(project)
-        db.session.flush()
         db.session.commit()
 
         permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
@@ -49,7 +47,6 @@ def local_client():
         user.project_permissions.append(permission)
         project.permissions.append(permission)
         db.session.add(user)
-        db.session.flush()
         db.session.commit()
 
     client = app.test_client()

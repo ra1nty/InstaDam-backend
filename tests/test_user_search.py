@@ -45,7 +45,6 @@ def local_client():
         db.session.add(user_2)
         db.session.add(user_3)
         db.session.add(user_4)
-        db.session.flush()
         db.session.commit()
 
     client = app.test_client()

@@ -17,7 +17,7 @@ def query_users():
     Upload image to a project
 
     Args:
-        user_query: query to search for specific user(s)
+        user_query -- query to search for specific user(s)
 
     Returns:
         list of users that satisfy the query
@@ -65,12 +65,12 @@ def change_privilege():
         "username": "someone",
         "privilege": "annotator",
     }
-    Valid privileges are: "annotator", "admin"
+    Valid privileges are "annotator", "admin"
     Returns:
-        401 if: current user is not logged in
-        403 if: current user is not admin
-        400 if: requested user is not found, privilege name is not valid
-        200 if: updated successfully
+        401 if current user is not logged in
+        403 if current user is not admin
+        400 if requested user is not found, privilege name is not valid
+        200 if updated successfully
 
     """
     current_user = get_jwt_identity()
@@ -85,8 +85,10 @@ def change_privilege():
     if user is None:
         abort(400, 'User %s not found' % username)
 
-    privilege_map = {'admin': PrivilegesEnum.ADMIN,
-                     'annotator': PrivilegesEnum.ANNOTATOR}
+    privilege_map = {
+        'admin': PrivilegesEnum.ADMIN,
+        'annotator': PrivilegesEnum.ANNOTATOR
+    }
 
     privilege = json['privilege']
     if privilege not in privilege_map:

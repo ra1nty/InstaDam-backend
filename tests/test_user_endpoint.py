@@ -23,7 +23,6 @@ def local_client():
             privileges=PrivilegesEnum.ADMIN)
         admin.set_password('TestTest1')
         db.session.add(admin)
-        db.session.flush()
         db.session.commit()
 
         annotator = User(
@@ -32,14 +31,12 @@ def local_client():
             privileges=PrivilegesEnum.ANNOTATOR)
         annotator.set_password('TestTest2')
         db.session.add(annotator)
-        db.session.flush()
         db.session.commit()
 
         annotator_2 = User(
             username='test_upload_annotator2', email='email3@test_load.com')
         annotator_2.set_password('TestTest3')
         db.session.add(annotator_2)
-        db.session.flush()
         db.session.commit()
 
     client = app.test_client()

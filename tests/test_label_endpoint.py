@@ -31,12 +31,10 @@ def local_client():
             privileges=PrivilegesEnum.ADMIN)
         user.set_password('TestTest1')
         db.session.add(user)
-        db.session.flush()
         db.session.commit()
 
         project = Project(project_name='test/test', created_by=user.id)
         db.session.add(project)
-        db.session.flush()
         db.session.commit()
 
         permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
@@ -50,7 +48,6 @@ def local_client():
         user.project_permissions.append(permission)
         project.permissions.append(permission)
         db.session.add(user)
-        db.session.flush()
         db.session.commit()
 
     client = app.test_client()
@@ -75,15 +72,15 @@ def successful_login(client, username, password):
 
 test_data = [
     ({
-         'label_text': 'my_label',
-         'label_color': '#000000'
-     }, '200 OK', 'label_id'),
+        'label_text': 'my_label',
+        'label_color': '#000000'
+    }, '200 OK', 'label_id'),
     ({
-         'label_color': '#000000'
-     }, '400 BAD REQUEST', 'msg'),
+        'label_color': '#000000'
+    }, '400 BAD REQUEST', 'msg'),
     ({
-         'label_text': 'my_label',
-     }, '400 BAD REQUEST', 'msg'),
+        'label_text': 'my_label',
+    }, '400 BAD REQUEST', 'msg'),
 ]
 
 
@@ -100,10 +97,8 @@ def test_add_label(json, status, in_json, local_client):
     assert in_json in json_data
 
 
-test_data = [
-    ('my_label_1', '#001000', 'my_label_2', '#000111'),
-    ('qwer', '#000000', 'asdf', '#333333')
-]
+test_data = [('my_label_1', '#001000', 'my_label_2', '#000111'),
+             ('qwer', '#000000', 'asdf', '#333333')]
 
 
 @pytest.mark.parametrize("label_text1, label_color1, label_text2, label_color2",
@@ -148,5 +143,3 @@ def test_get_label(label_text1, label_color1, label_text2, label_color2,
     assert label_text2 == labels[1]['text']
     assert label_color1 == labels[0]['color']
     assert label_color2 == labels[1]['color']
-
-

@@ -21,7 +21,6 @@ ANNOTATOR_PWD = "test_annotator"
 ANNOTATOR_USERNAME2 = "test_annotator2"
 
 
-
 @pytest.fixture
 def local_client():
     if os.path.isdir(Config.STATIC_STORAGE_DIR):
@@ -35,12 +34,10 @@ def local_client():
         user = User(username=ADMIN_USERNAME, email='email@test_upload.com')
         user.set_password(ADMIN_PWD)
         db.session.add(user)
-        db.session.flush()
         db.session.commit()
 
         project = Project(project_name='test/test', created_by=user.id)
         db.session.add(project)
-        db.session.flush()
         db.session.commit()
 
         permission = ProjectPermission(access_type=AccessTypeEnum.READ_WRITE)
@@ -50,14 +47,12 @@ def local_client():
         user = User(username=ANNOTATOR_USERNAME, email='email2@test_upload.com')
         user.set_password(ANNOTATOR_PWD)
         db.session.add(user)
-        db.session.flush()
         db.session.commit()
 
-        user = User(username=ANNOTATOR_USERNAME2,
-                    email='email1@test_upload.com')
+        user = User(
+            username=ANNOTATOR_USERNAME2, email='email1@test_upload.com')
         user.set_password(ANNOTATOR_PWD)
         db.session.add(user)
-        db.session.flush()
         db.session.commit()
 
     client = app.test_client()
