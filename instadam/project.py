@@ -62,6 +62,7 @@ def create_project():
 
     try:
         db.session.add(project)
+        db.session.flush()  # To make sure no duplicates exist in db
     except IntegrityError:
         db.session.rollback()
         abort(
