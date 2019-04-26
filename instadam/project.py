@@ -486,33 +486,10 @@ def delete_project(project_id):
         }
     """
     project = maybe_get_project(project_id)  # check privilege and get project
-    '''
-    images = project.images
-    for image in images:
-        db.session.delete(image)
-    '''
     # Delete the whole image directory
     shutil.rmtree(
         os.path.join(app.config['STATIC_STORAGE_DIR'], str(project.id)))
-    '''
-    # Delete labels
-    labels = project.labels
-    for label in labels:
-        db.session.delete(label)
-
-    # Delete annotations
-    annotations = project.annotations
-    for annotation in annotations:
-        db.session.delete(annotation)
-
-    # Delete permissions
-    permissions = project.permissions
-    for permission in permissions:
-        db.session.delete(permission)
-    '''
-
     db.session.delete(project)
-
     db.session.commit()
 
     return construct_msg('Project deleted successfully'), 200
