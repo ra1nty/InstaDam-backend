@@ -22,12 +22,16 @@ class Project(db.Model):
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(
         db.DateTime, nullable=False, default=dt.datetime.utcnow)
+    modified_at = db.Column(
+        db.DateTime, nullable=False, default=dt.datetime.utcnow)
 
-    images = relationship('Image', backref='project')
-    permissions = relationship('ProjectPermission', back_populates='project')
-    annotations = relationship('Annotation', backref='project')
+    images = relationship('Image', backref='project', cascade='delete')
+    permissions = relationship(
+        'ProjectPermission', back_populates='project', cascade='delete')
+    annotations = relationship(
+        'Annotation', backref='project', cascade='delete')
 
-    labels = relationship("Label", backref="project")
+    labels = relationship("Label", backref="project", cascade='delete')
 
     def __repr__(self):
         return '<Project: %r>' % self.project_name
