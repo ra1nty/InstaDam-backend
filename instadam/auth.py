@@ -67,9 +67,9 @@ def login():
     if user is not None:
         if user.verify_password(req['password']):
             return jsonify(
-                {'access_token':
-                     create_access_token(identity=user.username)}), 201
-    abort(401, 'User %s not found' % username)
+                {'access_token': create_access_token(
+                    identity=user.username)}), 201
+    abort(401, 'User %s not found or incorrect password' % username)
 
 
 @bp.route('/register', methods=['POST'])
@@ -100,7 +100,7 @@ def register():
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-        abort(401, 'User %s already exist' % username)
+        abort(401, 'User/Email already exist')
     return jsonify(
         {'access_token': create_access_token(identity=user.username)}), 201
 
@@ -127,4 +127,3 @@ def logout():
     db.session.add(token)
     db.session.commit()
     return construct_msg('Logged out'), 200
-
