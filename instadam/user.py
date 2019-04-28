@@ -128,17 +128,18 @@ def update_info():
     current_user = get_jwt_identity()
     json = request.get_json()
     user = User.query.filter_by(username=current_user).first()
+    check_json(json, ['current_password'])
     if not user.verify_password(json['current_password']):
         abort(401, 'Current password incorrect')
-    new_password = json['password']
+    new_password = json.get('password', None)
     if new_password and credential_checking(new_password):
         user.set_password(new_password)
 
-    new_email = json['email']
+    new_email = json.get('email', None)
     if new_password and email_checking(new_email):
         user.email = new_email
 
-    new_username = json['username']
+    new_username = json.get('username', None)
     if new_username:
         user.username = new_username
 
@@ -146,3 +147,5 @@ def update_info():
         db.session.commit()
     except IntegrityError:
         abort(400, 'Username or email already exist')
+
+    return construct_msg('Successfully updated'), 200
