@@ -12,12 +12,15 @@ from .utils import construct_msg
 bp = Blueprint('auth', __name__, url_prefix='')
 
 
-def credential_checking(password, email):
-    """Check the validity of the given user credential.
+def credential_checking(password):
+    """
+    Check the validity of the given user credential.
+    Args:
+        password -- The password string
 
     Raises:
-        IntegrityError -- An error occurred when invalidate user credential is
-        given
+        400 if any of the format requirement is unmet for the password
+
     """
     if len(password) < 8:
         abort(400, 'Password should be longer than 8 characters.')
@@ -30,6 +33,17 @@ def credential_checking(password, email):
     if not has_upper:
         abort(400, 'Password must have at least one uppercase letter.')
 
+
+def email_checking(email):
+    """
+    Check the format of email user provided.
+    Args:
+        email -- The email string
+
+    Raises:
+        400 if the email does not have a valid format
+
+    """
     # Check email
     if parseaddr(email) == ('', '') or '@' not in email:
         abort(400, 'Please enter a valid email address.')
@@ -54,7 +68,7 @@ def login():
         if user.verify_password(req['password']):
             return jsonify(
                 {'access_token':
-                 create_access_token(identity=user.username)}), 201
+                     create_access_token(identity=user.username)}), 201
     abort(401, 'User %s not found' % username)
 
 
@@ -76,7 +90,8 @@ def register():
     password = req['password']
     email = req['email']
 
-    credential_checking(password, email)
+    credential_checking(password)
+    email_checking(email)
 
     user = User(username=username, email=email)
     user.set_password(password)
@@ -112,3 +127,4 @@ def logout():
     db.session.add(token)
     db.session.commit()
     return construct_msg('Logged out'), 200
+
