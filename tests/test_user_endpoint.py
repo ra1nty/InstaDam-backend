@@ -84,3 +84,51 @@ def test_change_privilege(requester, requester_pass, json, expected,
         json=json,
         headers={'Authorization': 'Bearer %s' % token})
     assert expected == response.status
+
+
+def test_change_info_success(local_client):
+    token = successful_login(local_client, 'test_upload_annotator2',
+                             'TestTest3')
+    response = local_client.put(
+        '/user/',
+        json={'username': 'lololol11', 'current_password': 'TestTest3'},
+        headers={'Authorization': 'Bearer %s' % token})
+
+    assert '200 OK' == response.status
+
+    successful_login(local_client, 'lololol11', 'TestTest3')
+
+
+def test_change_info_auth_fail(local_client):
+    token = successful_login(local_client, 'test_upload_annotator2',
+                             'TestTest3')
+    response = local_client.put(
+        '/user/',
+        json={'username': 'lololol11', 'current_password': '1234'},
+        headers={'Authorization': 'Bearer %s' % token})
+
+    assert '401 UNAUTHORIZED' == response.status
+
+
+def test_change_info_auth_fail2(local_client):
+    token = successful_login(local_client, 'test_upload_annotator2',
+                             'TestTest3')
+    response = local_client.put(
+        '/user/',
+        json={'username': 'test_upload_admin1',
+              'current_password': 'TestTest3'},
+        headers={'Authorization': 'Bearer %s' % token})
+
+    assert '400 BAD REQUEST' == response.status
+
+
+def test_change_info_auth_fail3(local_client):
+    token = successful_login(local_client, 'test_upload_annotator2',
+                             'TestTest3')
+    response = local_client.put(
+        '/user/',
+        json={'username': 'test_upload_admin1', 'email': 'test.illinois.edu',
+              'current_password': 'TestTest3'},
+        headers={'Authorization': 'Bearer %s' % token})
+
+    assert '400 BAD REQUEST' == response.status
