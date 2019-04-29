@@ -59,7 +59,6 @@ class Image(db.Model):
         self.image_storage_path = os.path.join(project_dir, new_file_name)
         self.image_url = os.path.join(get_project_static_url(project),
                                       new_file_name)
-        img_file.save(self.image_storage_path)
 
     def save_empty_image(self, original_file_name):
         extension = parse_and_validate_file_extension(original_file_name,
