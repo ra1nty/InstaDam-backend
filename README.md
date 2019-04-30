@@ -13,13 +13,22 @@ pip install -r requirements.txt
 python manage.py start
 ```
 
-# Documentation
+## Documentation
 
 [Project Structure](doc/contribution.md)
+
 [Project Endpoints](doc/endpoints.md)
 
-# Contributors
-Nishanth Salinamakki
-Zonglin Li
-Yu Tang
-Wanxian Yang
+Run below command to generate HTML documentation via Pydoc:
+```
+sh doc.sh
+```
+
+## Contributors
+Nishanth Salinamakki: nishanthrs
+
+Zonglin Li: zli117
+
+Yu Tang: ra1nty
+
+Wanxian Yang: Louise15926
