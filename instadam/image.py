@@ -37,7 +37,10 @@ def upload_image(project_id):
         file = request.files['image']
         project = project
         image = Image(project_id=project.id)
-        image.save_image_to_project(file)
+        try:
+            image.save_image_to_project(file)
+        except IOError:
+            abort(400, 'Unable to save image')
         project.images.append(image)
         try:
             db.session.add(image)
@@ -55,7 +58,10 @@ def unzip_process(zip_path, name_map):
     for name, hashed_name in name_map.items():
         image = zip_file.read(name)
         with open(hashed_name, 'wb') as f:
-            f.write(image)
+            try:
+                f.write(image)
+            except IOError as e:
+                print('Error when saving image from zip:', e)
     try:
         os.remove(zip_path)
     except OSError:
