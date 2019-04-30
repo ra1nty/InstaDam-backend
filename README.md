@@ -13,8 +13,13 @@ pip install -r requirements.txt
 python manage.py start
 ```
 
- ~~start a production server (PostgreSQL) :~~
-```
-python manage.py initdb --mode=production
-python manage.py start --mode=production
-```
+# Documentation
+
+[Project Structure](doc/contribution.md)
+[Project Endpoints](doc/endpoints.md)
+
+# Contributors
+Nishanth Salinamakki
+Zonglin Li
+Yu Tang
+Wanxian Yang
