@@ -30,8 +30,9 @@ def create_project():
     """ Create a new project by the user currently signed in
 
     Create a new project entry in the database and a new folder in the
-    filesystem to hold image dataset upon receiving a `POST`request to the `/project` entry
-    point. User must provide a `project name` to create a new project.
+    filesystem to hold image dataset upon receiving a `POST`request to 
+    the `/project` entry point. User must provide a `project name` to 
+    create a new project.
 
     Must supply a jwt-token to verify user status and extract `user_id`.
     `project name` must be unique.
