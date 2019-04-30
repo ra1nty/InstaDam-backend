@@ -40,7 +40,7 @@ def upload_image(project_id):
         try:
             image.save_image_to_project(file)
         except IOError:
-            abort(400, 'Failed to save image')
+            abort(400, 'Unable to save image')
         project.images.append(image)
         try:
             db.session.add(image)
