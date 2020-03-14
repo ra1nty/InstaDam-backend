@@ -41,7 +41,7 @@ Start a development server (Use In-memory Sqlite) :
   * Alternatively, you can reuse the previous data by using  
   `python3 manage.py start --mode=production`
 
-## Documentation
+## Developer's Guide
 
 [Project Structure](doc/contribution.md)
 
